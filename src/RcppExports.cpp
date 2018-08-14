@@ -5,13 +5,27 @@
 
 using namespace Rcpp;
 
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP _PIHMgisR_rcpp_hello_world() {
+// getCentroid
+NumericMatrix getCentroid(NumericMatrix poly, NumericMatrix points);
+RcppExport SEXP _PIHMgisR_getCentroid(SEXP polySEXP, SEXP pointsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello_world());
+    Rcpp::traits::input_parameter< NumericMatrix >::type poly(polySEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    rcpp_result_gen = Rcpp::wrap(getCentroid(poly, points));
+    return rcpp_result_gen;
+END_RCPP
+}
+// polygonArea
+double polygonArea(NumericVector X, NumericVector Y);
+RcppExport SEXP _PIHMgisR_polygonArea(SEXP XSEXP, SEXP YSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Y(YSEXP);
+    rcpp_result_gen = Rcpp::wrap(polygonArea(X, Y));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -27,10 +41,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// triTopology
+NumericMatrix triTopology(NumericMatrix tri);
+RcppExport SEXP _PIHMgisR_triTopology(SEXP triSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type tri(triSEXP);
+    rcpp_result_gen = Rcpp::wrap(triTopology(tri));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_PIHMgisR_rcpp_hello_world", (DL_FUNC) &_PIHMgisR_rcpp_hello_world, 0},
+    {"_PIHMgisR_getCentroid", (DL_FUNC) &_PIHMgisR_getCentroid, 2},
+    {"_PIHMgisR_polygonArea", (DL_FUNC) &_PIHMgisR_polygonArea, 2},
     {"_PIHMgisR_rowMatch", (DL_FUNC) &_PIHMgisR_rowMatch, 2},
+    {"_PIHMgisR_triTopology", (DL_FUNC) &_PIHMgisR_triTopology, 1},
     {NULL, NULL, 0}
 };
 

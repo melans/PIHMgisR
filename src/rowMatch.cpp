@@ -1,8 +1,6 @@
 
 #include <Rcpp.h>
-#include <iostream>
 using namespace Rcpp;
-
 //' Identify whether every row of \code{m} is same as \code{v};
 //' @param x required
 //' @param m required
@@ -13,7 +11,7 @@ LogicalVector rowMatch(NumericVector x, NumericMatrix m) {
   int nr = m.nrow();
   int nc = m.ncol();
   LogicalVector  out(nr, false);
-  int i,j;
+  int i;
   if(n != 2 || nc != 2){
     return 0;
   }
