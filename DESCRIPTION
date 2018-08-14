@@ -1,0 +1,24 @@
+Package: PIHMgisR
+Type: Package
+Title: GIS Tool For Preparing Input of PIHM
+Version: 0.0.1.9000
+Date: 2018-07-27
+Authors@R: c(
+person("Lele", "Shu", email = "lele.shu@gmail.com",role = c("aut", "cre")),
+person("Christopher", "Duffy", email = "cxd11@psu.edu",role = c("cre")))
+Description: One paragraph description of what the package
+      does as one or more full sentences.
+URL: http:://www.pihm.psu.edu
+BugReports: http://www.pihm.psu.edu or <mailto::lele.shu@gmail.com>
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.12.17),
+  sp,
+  raster,
+  rgeos,
+  rgdal
+LinkingTo: Rcpp,
+  sp,
+  raster,
+  rgeos,
+  rgdal
+RoxygenNote: 6.1.0

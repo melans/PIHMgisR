@@ -1,0 +1,5 @@
+useDynLib(PIHMgisR, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
+importFrom('graphics', 'plot')
+import('sp')
