@@ -31,3 +31,7 @@ NULL
 #' @docType data
 #' @keywords data
 NULL
+
+#' This is .pihmgis environment.
+#' @name .pihmgis
+.pihmgis<-new.env()
