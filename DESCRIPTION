@@ -1,24 +1,33 @@
 Package: PIHMgisR
 Type: Package
-Title: GIS Tool For Preparing Input of PIHM
+Title: GIS Tool for Preparing Input of PIHM
 Version: 0.0.1.9000
 Date: 2018-07-27
-Authors@R: c(
-person("Lele", "Shu", email = "lele.shu@gmail.com",role = c("aut", "cre")),
-person("Christopher", "Duffy", email = "cxd11@psu.edu",role = c("cre")))
-Description: One paragraph description of what the package
-      does as one or more full sentences.
+Authors@R: c(person("Lele", "Shu", email = "lele.shu@gmail.com",role = c("aut", "cre")))
+Description: The Penn State Integrated Hydrologic Model (PIHM) is a multiprocess, multi-scale hydrologic model 
+  where the major hydrological processes are fully coupled using the semi-discrete finite volume method. 
+  This tool is to convert the geospatial data into PIHM format. 
 URL: http:://www.pihm.psu.edu
-BugReports: http://www.pihm.psu.edu or <mailto::lele.shu@gmail.com>
 License: GPL (>= 2)
+LazyData: TRUE
+Depends: R (>= 3.0.0)
+Encoding: UTF-8
 Imports: Rcpp (>= 0.12.17),
-  sp,
-  raster,
-  rgeos,
-  rgdal
-LinkingTo: Rcpp,
-  sp,
-  raster,
-  rgeos,
-  rgdal
+  xts, 
+  zoo,
+  raster (>= 2.1.0), 
+  sp, 
+  rgeos, 
+  RTriangle,
+  rgdal (>= 1.1.0),
+  abind,
+  utils,
+  lubridate,
+  geometry,
+  methods
+LinkingTo: Rcpp, sp
 RoxygenNote: 6.1.0
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
