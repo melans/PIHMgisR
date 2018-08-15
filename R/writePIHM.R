@@ -27,8 +27,8 @@ write.tsd <- function(x, file, append = F, quite=F, backup=TRUE){
   tt = stats::time(x)
   tday = as.numeric( difftime(tt, tt[1], units = 'days') )
   t0 = format(time(x)[1], '%Y%m%d')
-  dd = data.frame('Time' = tday, mat)
-  write(c(nr,nc, t0),file = file, ncolumns = 3, append = append, sep = '\t')
+  dd = data.frame('Time_Day' = tday, mat)
+  write(c(nr, nc+1, t0),file = file, ncolumns = 3, append = append, sep = '\t')
   write(colnames(dd), file = file, ncolumns = nc+1, append = T, sep = '\t')
   write(t(dd), file = file, ncolumns = nc, append = T, sep = '\t')
 }
