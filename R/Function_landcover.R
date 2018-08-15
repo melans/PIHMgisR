@@ -66,6 +66,9 @@ fun.lairl <- function(lc, years=2000){
   
   ts.lai = xts::as.xts(rbind(rep.row(mlai, ny), mlai[1,]), order.by =tday)
   ts.rl = xts::as.xts(rbind(rep.row(mrl, ny), mrl[1,]), order.by =tday)
+  # ts.lai = zoo::zoo(rbind(rep.row(mlai, ny), mlai[1,]), order.by =tday)
+  # ts.rl = zoo::zoo(rbind(rep.row(mrl, ny), mrl[1,]), order.by =tday)
+  
   colnames(ts.lai) = paste(lc)
   colnames(ts.rl) = paste(lc)
   ret = list(LAI = ts.lai, RL=ts.rl, nLAI=nlc)

@@ -9,12 +9,12 @@
 #' @return List of initial condition
 #' @export
 pihm.init <- function(ncell, nriv, AqD = 10, stage = 0.1, p1=0.4, p2 = p1){
-  mi = cbind(rep(0, ncell), 0, 0,
+  mi = cbind(1:ncell, rep(0, ncell), 0, 0,
              AqD * p1, AqD * p2)
-  ri = cbind(rep(stage, nriv))
+  ri = cbind(1:nriv, rep(stage, nriv))
   
-  colnames(mi) = c('Canopy', 'Snow', 'Surface', 'Unsat', 'GW')
-  colnames(ri) = c('Stage')
+  colnames(mi) = c('Index', 'Canopy', 'Snow', 'Surface', 'Unsat', 'GW')
+  colnames(ri) = c('Index', 'Stage')
   ret = list('minit' = mi, 'rinit' = ri)
 }
 #' Generate the default PIHM model configuration

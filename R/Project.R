@@ -1,10 +1,10 @@
 #' Prepare Input file of PIHM
 #' \code{PIHM.filein} 
-#' @param projname Character, project name
-#' @param indir PIHM input directory
+#' @param projname Character, project name, default= PRJNAME which is a global variable.
+#' @param indir PIHM input directory, default = inpath which is global variable
 #' @return Character of full path of input files for PIHM
 #' @export
-PIHM.filein <- function(projname, indir = getwd() ){
+PIHM.filein <- function(projname=PRJNAME, indir = inpath ){
   fn.mesh = file.path(indir, paste0(projname, '.sp.mesh' ) );
   fn.att = file.path(indir, paste0(projname, '.sp.att' ) );
   fn.pt = file.path(indir, paste0(projname, '.sp.points' ) )
