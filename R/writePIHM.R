@@ -1,4 +1,3 @@
-
 #' Write a backup file if the file exist
 #' \code{filebackup} 
 #' @param file file name
@@ -9,25 +8,28 @@ filebackup <- function(file, backup = TRUE){
     file.copy(file,bakFile)
   }
 }
-#' Write data.frame out into file
-#' \code{write.df} 
+#' Write xts data out into file
+#' \code{write.tsd} 
 #' @param x xts data
 #' @param file file name
 #' @param append whether append
 #' @param quite TRUE/FALSE, if quiet mode
 #' @param backup TRUE/FALSE, if backup the existing file
-write.tsd <- function(x, file, append = T, quite=F, backup=TRUE){
+write.tsd <- function(x, file, append = F, quite=F, backup=TRUE){
   filebackup(file, backup = backup)
-  x=lr$LAI
-  x = as.matrix(rbind(x))
+   # x=lr$LAI
+  mat = as.matrix(rbind(x))
   nr = nrow(x)
   nc = ncol(x)
   if(!quite){
     message('Writing ', file)
   }
-  dd = data.frame('Time' = rownames(x), x)
-  write(c(nr,nc),file = file, append = append, sep = '\t')
-  write(colnames(x), file = file, ncolumns = nc,append = T, sep = '\t')
+  tt = stats::time(x)
+  tday = as.numeric( difftime(tt, tt[1], units = 'days') )
+  t0 = format(time(x)[1], '%Y%m%d')
+  dd = data.frame('Time' = tday, mat)
+  write(c(nr,nc, t0),file = file, ncolumns = 3, append = append, sep = '\t')
+  write(colnames(dd), file = file, ncolumns = nc+1, append = T, sep = '\t')
   write(t(dd), file = file, ncolumns = nc, append = T, sep = '\t')
 }
 #' Write data.frame out into file
@@ -37,7 +39,7 @@ write.tsd <- function(x, file, append = T, quite=F, backup=TRUE){
 #' @param append whether append
 #' @param quite TRUE/FALSE, if quiet mode
 #' @param backup TRUE/FALSE, if backup the existing file
-write.df <- function(x, file, append = T, quite=F, backup=TRUE){
+write.df <- function(x, file, append = F, quite=F, backup=TRUE){
   filebackup(file, backup = backup)
   x=as.matrix(rbind(x))
   nr = nrow(x)

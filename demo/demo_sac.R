@@ -9,6 +9,8 @@ x=lapply(clib, library, character.only=T)
 library(PIHMgisR)
 #test_check("PIHMgisR")
 prjname = 'sac1'
+PRJNAME=prjname
+inapth = 'demo/sac1/'
 
 pihmout <- file.path('demo', prjname)
 fin <- PIHM.filein(prjname, indir = pihmout)
@@ -35,7 +37,8 @@ ss = 'sac2'
 # riv = riv[-1*id,]
 # wbd = readOGR(paste0('/Users/leleshu/Dropbox/PIHM/Projects/SAC/GIS_SUB/Subs/', ss, '/', ss, '_wbd.shp') )
 # dem = raster('/Users/leleshu/Dropbox/PIHM/Projects/SAC/GIS/dem/dem_m.tif')
-# dem = raster::crop(dem, wbd)
+# wbbuf = rgeos::gBuffer(wbd, width = 2000)
+# dem = raster::crop(dem, wbbuf)
 # sac2 = list('wbd'=wbd, 'riv'=riv,'dem'=dem)
 # devtools::use_data(sac2, overwrite = T)
 
@@ -43,7 +46,8 @@ data(sac2)
 wbd=sac2[['wbd']]
 riv=sac2[['riv']]; plot(riv)
 dem=sac2[['dem']]
-dem = raster::crop(dem, wbd)
+wbbuf = rgeos::gBuffer(wbd, width = 2000)
+dem = raster::crop(dem, wbbuf)
 
 png(file = file.path(pngout, 'data_0.png'), height=11, width=11, res=100, unit='in')
 plot(dem); plot(wbd, add=T, border=2, lwd=2); plot(riv, add=T, lwd=2, col=4)
@@ -120,7 +124,7 @@ para.soil = pihmsoil()
 
 lc = c(43, 23, 81, 11) 
 # 43-mixed forest in NLCD classification
-# 23-developed, medium
+# 23-developed, medium           
 # 81-crop land
 # 11-water
 lr=fun.lairl(lc, years=2000:2001)
@@ -130,8 +134,8 @@ col=1:length(lc)
 plot(lr$LAI, col=col, main='LAI'); legend('top', paste0(lc), col=col, lwd=1)
 plot(lr$RL, col=col, main='Roughness Length'); legend('top', paste0(lc), col=col, lwd=1)
 dev.off()
-write.df(lr$LAI, file = fin['md.lai'])
-write.df(lr$RL, file = fin['md.rl'])
+write.tsd(lr$LAI, file = fin['md.lai'])
+write.tsd(lr$RL, file = fin['md.rl'])
 
 
 
