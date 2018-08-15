@@ -1,6 +1,7 @@
 # PIHMgisR --- PIHMgis tool in R
 
 - Lele Shu (lele.shu@gmail.com)
+- www.pihm.psu.edu
 
 ## PIHM
 The Penn State Integrated Hydrologic Model (PIHM) is a multiprocess, multi-scale hydrologic model where the major hydrological processes are fully coupled using the semi-discrete finite volume method. 
