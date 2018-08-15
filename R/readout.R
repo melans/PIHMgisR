@@ -7,9 +7,10 @@
 #' @return A TimeSeries data. This list require support of xts packages.
 #' @export  
 readout <- function(keyword,
-                    path=outpath,
-                    theFile = file.path(path, paste0(PRJNAME,'.', keyword,'.dat') ) ,
-                    start=as.Date(STARTDATE) ){
+                    path=get('outpath', envir=.pihmgis) ,
+                    theFile = file.path(path, paste0(get('PRJNAME', envir=.pihmgis),'.', keyword,'.dat') ) ,
+                    start=as.Date(get('STARTDATE', envir=.pihmgis)) 
+                    ){
   fid=file(theFile, 'rb');
   nc=readBin(fid, what=integer(), n=1)
   tmp=readBin(fid, what=numeric(), n=1e9, size=8)
