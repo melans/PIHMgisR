@@ -29,7 +29,8 @@ read.df <-function(file, text = readLines(file)){
 #' @export
 readmesh <-function(file = PIHM.filein()['md.mesh'] ){
   d = read.df(file = file);
-  ret <- PIHM.mesh(mesh = d[[1]], point = d[[2]])
+  ret <- PIHM.mesh(mesh = data.frame(d[[1]]),
+                   point = data.frame(d[[2]]) )
 }
 
 #' Read the .att file
@@ -49,9 +50,9 @@ readatt <-function( file = PIHM.filein()['md.att']){
 #' @export
 readriv <-function(file = PIHM.filein()['md.riv'] ){
   d = read.df(file = file);
-  ret <- PIHM.river(river = d[[1]], 
-                    rivertype = d[[2]],
-                    point = d[[3]])
+  ret <- PIHM.river(river = data.frame(d[[1]]), 
+                    rivertype = data.frame(d[[2]]),
+                    point = data.frame(d[[3]]) )
 }
 
 #' Read the .rivchn file
