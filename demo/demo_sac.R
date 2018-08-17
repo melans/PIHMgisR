@@ -23,7 +23,7 @@ dir.create(pihmout, showWarnings = F, recursive = T)
 dir.create(pngout, showWarnings = F, recursive = T)
 dir.create(gisout, showWarnings = F, recursive = T)
 
-a.max = 1e6 * .5;
+a.max = 1e6 * .1;
 q.min = 33;
 tol.riv = 200
 tol.wb = 200
@@ -138,7 +138,6 @@ write.tsd(lr$LAI, file = fin['md.lai'])
 write.tsd(lr$RL, file = fin['md.rl'])
 
 
-
 # write PIHM input files.
 writemesh(pm, file = fin['md.mesh'])
 writeriv(pr, file=fin['md.riv'])
@@ -152,4 +151,4 @@ write.df(para.geol, file=fin['md.geol'])
 
 write.pc(cfg.para, fin['md.para'])
 write.pc(cfg.calib, fin['md.calib'])
-
+print(nrow(pm@mesh))
