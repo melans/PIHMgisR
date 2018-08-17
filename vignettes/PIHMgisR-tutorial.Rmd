@@ -1,0 +1,23 @@
+---
+title: "PIHM tool kit in R"
+author: "Lele Shu <lele.shu@gmail.com>"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+The Penn State Integrated Hydrologic Model (PIHM) is a multiprocess, multi-scale hydrologic model where the major hydrological processes are fully coupled using the semi-discrete finite volume method. 
+  
+This tool kit is to convert the geospatial data into PIHM format. 
+
+The version of PIHMgisR are only works for latest PIHM v3.0, that was developed in C++. 
+
