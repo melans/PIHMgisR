@@ -151,7 +151,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-4){
 #' @param dbf Attribute data for exported SpatialLines
 #' @return SpatialLinesDataFrame
 #' @export
-sp.riv2shp <- function(pr, dbf=NULL){
+sp.riv2shp <- function(pr = readriv(), dbf=NULL){
   pt = pr@point[,2:3]
   rt = pr@rivertype
   riv = pr@river
