@@ -4,8 +4,8 @@
 #' @param indir PIHM input directory, default = inpath which is global variable
 #' @return Character of full path of input files for PIHM
 #' @export
-PIHM.filein <- function(projname=get('PRJNAME', envir=.pihmgis),
-                        indir = get('inpath', envir=.pihmgis) ){
+PIHM.filein <- function(projname=get('PRJNAME', envir=.pihm),
+                        indir = get('inpath', envir=.pihm) ){
   fn.mesh = file.path(indir, paste0(projname, '.sp.mesh' ) );
   fn.att = file.path(indir, paste0(projname, '.sp.att' ) );
   fn.pt = file.path(indir, paste0(projname, '.sp.points' ) )
