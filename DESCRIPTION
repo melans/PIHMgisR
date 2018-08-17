@@ -3,7 +3,8 @@ Type: Package
 Title: GIS Tool for Preparing Input of PIHM
 Version: 0.0.1
 Date: 2018-07-27
-Authors@R: c(person("Lele", "Shu", email = "lele.shu@gmail.com",role = c("aut", "cre")))
+Author: Lele Shu <lele.shu@gmail.com>
+Maintainer: Lele Shu <lele.shu@gmail.com>
 Description: The Penn State Integrated Hydrologic Model (PIHM) is a multiprocess, multi-scale hydrologic model 
   where the major hydrological processes are fully coupled using the semi-discrete finite volume method. 
   This tool is to convert the geospatial data into PIHM format. 
