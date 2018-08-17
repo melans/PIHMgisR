@@ -5,3 +5,5 @@ importFrom('graphics', 'plot')
 import('sp')
 importFrom('methods', 'new')
 importFrom("stats", "dist", "rnorm", "time")
+importFrom("grDevices", "adjustcolor", "dev.off", "graphics.off",
+             "png")
