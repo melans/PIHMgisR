@@ -32,6 +32,6 @@ NULL
 #' @keywords data
 NULL
 
-#' This is .pihmgis environment.
-#' @name .pihmgis
-.pihmgis<-new.env()
+#' This is .pihm environment.
+#' @name .pihm
+.pihm<-new.env()
