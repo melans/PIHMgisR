@@ -15,6 +15,9 @@ LazyData: TRUE
 Depends: R (>= 3.0.0)
 Encoding: UTF-8
 Imports: Rcpp (>= 0.12.17),
+  ggplot2,
+  gridExtra,
+  grid,
   fields,
   interp,
   xts, 
