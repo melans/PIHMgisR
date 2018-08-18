@@ -1,10 +1,13 @@
 #' Calculate the water balance
 #' \code{p.waterbalance}
 #' @param xl List of data. Five variables are included: prcp (qEleprcp), et0 (qEleet0), et1 (qEleet1), et2 (qEleet2) and discharge (Qrivflx)
+#' @param FUN Function to process the time-series data. Default = apply.daily.
 #' @export 
 p.waterbalance <-function(
   xl=BasicPlot(varname=c(paste0('qEle', c('prcp', 'et0', 'et1', 'et2') )
-                         , 'QRivflx'), plot = F, return = T)
+                         , 'QRivflx'), plot = FALSE, return = TRUE),
+  
+  FUN = xts::apply.yearly
 ){
   
   func <-function(x, w){
@@ -16,12 +19,11 @@ p.waterbalance <-function(
   w = ia/aa
   pr = readriv()
   oid=getOutlets(pr)
-  apply.period = apply.yearly
-  P = apply.period( func(xl[['qEleprcp']], w ), FUN=sum)
-  Q = apply.period(xl[['QRivflx']][,oid], FUN=sum) / aa
-  ET0 = apply.period( func(xl[['qEleet0']], w ), FUN=sum)
-  ET1 = apply.period( func(xl[['qEleet1']], w ), FUN=sum)
-  ET2 = apply.period( func(xl[['qEleet2']], w ), FUN=sum)
+  P = FUN( func(xl[['qEleprcp']], w ), FUN=sum)
+  Q = FUN(xl[['QRivflx']][,oid], FUN=sum) / aa
+  ET0 = FUN( func(xl[['qEleet0']], w ), FUN=sum)
+  ET1 = FUN( func(xl[['qEleet1']], w ), FUN=sum)
+  ET2 = FUN( func(xl[['qEleet2']], w ), FUN=sum)
   dh = P-Q-ET0-ET1-ET2
   x=cbind(P,Q,ET0, ET1,ET2)
   colnames(x)=c('P','Q','ET0', 'ET1','ET2')
