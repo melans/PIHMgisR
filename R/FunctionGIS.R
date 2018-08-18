@@ -57,7 +57,7 @@ PIHM.mask  <- function (pm = readmesh(),
     spd = rgeos::gUnionCascaded(sp)
     rr <-raster::rasterize(spd, r)
     # raster::plot(spd)
-    # raster::plot(rr, add=T)
+    # raster::plot(rr, add=TRUE)
     # saveRDS(file=RDSfile, r)
     # }
     # assign("PIHM.MASK",rr, envir = .pihm)
