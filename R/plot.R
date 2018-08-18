@@ -20,7 +20,7 @@ png.control <- function(fn='figure.png',
   if(!dir.exists(fd)){
     dir.create(fd, showWarnings = F, recursive = T)
   }
-  png(filename = file, height = ht, width=wd, units = units, res=res)
+  grDevices::png(filename = file, height = ht, width=wd, units = units, res=res)
 }
 #' Raster plot the mesh data
 #' \code{map2d}
@@ -40,12 +40,12 @@ map2d<-function(x=getElevation(),
   raster::plot(r)
   if(is.null(sp.riv)){
     #  bgcol= adjustcolor('gray80', alpha.f = 0.8)
-    col = adjustcolor(sp.riv@data[,'Type'], alpha.f = 0.7)
+    col = grDevices::adjustcolor(sp.riv@data[,'Type'], alpha.f = 0.7)
     lwd=sp.riv@data[,'Type']
     # raster::plot(add=T, sp.riv, col=bgcol, lwd=lwd*3, lty=2)
     raster::plot(add=T, sp.riv, col=col, lwd=lwd)
   }
-  grid()
+  graphics::grid()
   r
 }
 
@@ -60,6 +60,9 @@ map2d<-function(x=getElevation(),
 hydrograph <- function(x, legend.position='bottom', unit = rep('', ncol(x)),
                        col = c(3,4), heights = c(3,7)
                        ){
+  Time = NULL
+  rain = NULL
+  varialbe = NULL
   cn=colnames(x)
   dfp = data.frame('Time' = time(x), 'rain' = as.numeric(x[,1]) )
   # head(dfp)
@@ -67,30 +70,33 @@ hydrograph <- function(x, legend.position='bottom', unit = rep('', ncol(x)),
   dfqq =  data.frame('Time' = time(x), x[,-1] )
   dfq = reshape2::melt(dfqq, id='Time')
   
-  g.top <- ggplot(dfp, aes(x = Time, y = rain, ymin=0, ymax=rain) ) +
-    geom_col( fill=col[1]) +
-    scale_y_continuous(trans = "reverse") +
-    theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank()) +
-    labs(y = paste( cn[1], unit[1]))
+  g.top <- ggplot2::ggplot(dfp, ggplot2::aes_string(x = 'Time', y = 'rain', ymin=0, ymax=rain) ) +
+    ggplot2::geom_col( fill=col[1]) +
+    ggplot2::scale_y_continuous(trans = "reverse") +
+    ggplot2::theme(axis.title.x=ggplot2::element_blank(),
+          axis.text.x=ggplot2::element_blank(),
+          axis.ticks.x=ggplot2::element_blank()) +
+    ggplot2::labs(y = paste( cn[1], unit[1]))
   
-  g.bottom <- ggplot(dfq, aes(x = Time, y = value , color = variable)) +
-    geom_line() +
-    theme() +
-    scale_fill_distiller(palette = "Spectral")+
-    labs(x = "Date", y = paste( cn[-1], unit[-1]) ) 
+  g.bottom <- ggplot2::ggplot(dfq, ggplot2::aes_string(x = 'Time', y = 'value' , color = 'variable')) +
+    ggplot2::geom_line() +
+    ggplot2::theme() +
+    ggplot2::scale_fill_distiller(palette = "Spectral")+
+    ggplot2::labs(x = "Date", y = paste( cn[-1], unit[-1]) ) 
   if(ncol(x)>2){
-    g.bottom  <- g.bottom + theme(legend.position=legend.position, legend.direction = 'horizontal', 
+    g.bottom  <- g.bottom + 
+      ggplot2::theme(legend.position=legend.position, legend.direction = 'horizontal', 
           legend.title = element_blank())
   }else{
-    g.bottom  <- g.bottom + theme(legend.position='none')
+    g.bottom  <- g.bottom + 
+      ggplot2::theme(legend.position='none')
   }
   
-  gA <- ggplotGrob(g.top)
-  gB <- ggplotGrob(g.bottom)
+  gA <- ggplot2::ggplotGrob(g.top)
+  gB <- ggplot2::ggplotGrob(g.bottom)
   maxWidth = grid::unit.pmax(gA$widths[2:5], gB$widths[2:5])
   gA$widths[2:5] <- as.list(maxWidth)
   gB$widths[2:5] <- as.list(maxWidth)
   p <- gridExtra::grid.arrange(gA, gB, ncol=1,heights = heights )
 }
+
