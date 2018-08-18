@@ -92,10 +92,10 @@ count <- function(x, n=NULL){
 sp2PSLG<-function(sp){
   sl = methods::as(sp, 'SpatialLines')
   nsl = length(sl)
-  P = extractCoords(sl, unique = T)
+  P = extractCoords(sl, unique = TRUE)
   S=NULL
   for(i in 1:nsl){
-    cc = extractCoords(sl[i,], unique = F)
+    cc = extractCoords(sl[i,], unique = FALSE)
     e = xy2ID(cc,P)  
     S = rbind(S, cbind(e[-length(e)], e[-1]))
   }
