@@ -1,9 +1,11 @@
 useDynLib(PIHMgisR, .registration=TRUE)
 exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
-importFrom('graphics', 'plot')
+importFrom('graphics', 'plot', "grid")
 import('sp')
 importFrom('methods', 'new')
 importFrom("stats", "dist", "rnorm", "time")
 importFrom("grDevices", "adjustcolor", "dev.off", "graphics.off",
-             "png")
+             "png", 'rgb')
+importFrom("ggplot2", "ggplot", "aes", "element_blank",
+             "theme")
