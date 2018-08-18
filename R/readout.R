@@ -45,6 +45,16 @@ BasicPlot <- function(
   print(varname)
   nv=length(varname)
   prjname = get('PRJNAME', envir = .pihm)
+  if(imap ){
+    sp.riv = sp.riv2shp()
+  }
+  if(plot){
+    path = file.path(get('anapath', envir = .pihm), 'BasicPlot')
+    if(!dir.exists(path)){
+      dir.create(path, recursive = T, showWarnings = F)
+    }
+  }
+  
   ret=list()
   for(i in 1:nv){
     vn=varname[i]
@@ -59,7 +69,6 @@ BasicPlot <- function(
       t0=min(time)
       t1=max(time)
       tr=paste( strftime(t0) ,'-', strftime(t1))
-      path = get('anapath', envir = .pihm)
       png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
       pp=xts::plot.xts(x, main=vn)
       print(pp)
@@ -70,6 +79,7 @@ BasicPlot <- function(
           y = colMeans(x)
           png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
           map2d(y)
+          raster::plot(sp.riv, col=rgb(1,0,0,0.7), lwd=2, add=T)
           dev.off()
         }
       }
