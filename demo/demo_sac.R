@@ -10,9 +10,9 @@ library(PIHMgisR)
 #test_check("PIHMgisR")
 prjname = 'sac1'
 PRJNAME=prjname
-inapth = 'demo/sac1/'
+inapth = file.path(prjname)
 
-pihmout <- file.path('demo', prjname)
+pihmout <- file.path(prjname)
 fin <- PIHM.filein(prjname, indir = pihmout)
 x=list.files(pihmout, pattern = glob2rx(paste0(prjname, '.*.*')), full.names = T)
 file.remove(x)
@@ -23,12 +23,15 @@ dir.create(pihmout, showWarnings = F, recursive = T)
 dir.create(pngout, showWarnings = F, recursive = T)
 dir.create(gisout, showWarnings = F, recursive = T)
 
-a.max = 1e6 * .1;
+a.max = 1e6 * .2;
 q.min = 33;
 tol.riv = 200
 tol.wb = 200
 tol.len = 500
 AqDepth = 10
+years = 2000:2010
+ny=length(years)
+nday = 365*ny +round(ny/4)
 ss = 'sac2'
 # riv = readOGR(paste0('/Users/leleshu/Dropbox/PIHM/Projects/SAC/GIS_SUB/Subs/', ss, '/', ss, '_strD.shp') )
 # riv = sp.DissolveLines(riv)
@@ -115,7 +118,7 @@ plot(spp.riv, col=spp.riv@data[,5] + 1 , add=T, lwd=3)
 dev.off()
 
 # model configuration, parameter
-cfg.para = pihmpara(nday = 300)
+cfg.para = pihmpara(nday = nday)
 # calibration
 cfg.calib = pihmcalib()
 para.lc = pihmlandcover()
@@ -127,7 +130,7 @@ lc = c(43, 23, 81, 11)
 # 23-developed, medium           
 # 81-crop land
 # 11-water
-lr=fun.lairl(lc, years=2000:2001)
+lr=fun.lairl(lc, years=years)
 png(file = file.path(pngout, 'data_lairl.png'), height=11, width=11, res=100, unit='in')
 par(mfrow=c(2,1))
 col=1:length(lc)
