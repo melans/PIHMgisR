@@ -28,7 +28,7 @@ m.DomainDecomposition <- function(wb, riv=NULL, q=30, ...){
   # plot(tri, asp=1)
   # points(ps1$P, col=2)
   # points(ps2$P, col=3)
-  # plot(riv, add=T, col=4)
+  # plot(riv, add=TRUE, col=4)
   tri
 }
 
