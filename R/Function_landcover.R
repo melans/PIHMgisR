@@ -5,6 +5,15 @@
 #' @param years numeric years.
 #' @return Default fun.lairl parameters, a list $LAI, $RL
 #' @export
+#' @examples
+#' lc = c(43, 23, 81, 11) 
+#' lr=fun.lairl(lc, years=2000:2001)
+#' par(mfrow=c(2,1))
+#' col=1:length(lc)
+#' plot(lr$LAI, col=col, main='LAI'); 
+#' legend('top', paste0(lc), col=col, lwd=1)
+#' plot(lr$RL, col=col, main='Roughness Length');
+#' legend('top', paste0(lc), col=col, lwd=1)
 fun.lairl <- function(lc, years=2000){
   rltbl =matrix(c(
     0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
