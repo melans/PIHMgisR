@@ -6,6 +6,32 @@
 #' @param r.aq  Aquifer Thickness. Raster object
 #' @return Triangle mesh of model domain.
 #' @export
+#' @examples 
+#' library(raster)
+#' data(sac2)
+#' wbd=sac2[['wbd']]
+#' dem=sac2[['dem']]
+#' a.max = 1e6 * 1;
+#' q.min = 33;
+#' tol.riv = 200
+#' tol.wb = 200
+#' tol.len = 500
+#' AqDepth = 10
+#' 
+#' wbbuf = rgeos::gBuffer(wbd, width = 2000)
+#' dem = raster::crop(dem, wbbuf)
+#' 
+#' wb.dis = rgeos::gUnionCascaded(wbd)
+#' wb.simp = rgeos::gSimplify(wb.dis, tol=tol.wb, topologyPreserve = TRUE)
+#' 
+#' 
+#' tri = m.DomainDecomposition(wb=wb.simp,q=q.min, a=a.max)
+#' plot(tri, asp=1)
+#' 
+#' # generate PIHM .mesh 
+#' pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
+#' sm = sp.mesh2Shape(pm)
+#' raster::plot(sm)
 pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth ){
   topo=triTopology(tri$T)
   pt = tri$P;
@@ -48,25 +74,33 @@ pihmAtt <- function(tri, r.soil =NULL, r.geol=NULL, r.lc=NULL, r.forc=NULL,
   atthead=c( "INDEX",  "SOIL", "GEOL", "LC", 'FORC', 'MF', 'BC')
   nh = length(atthead)
   att = cbind(1:ncell, 1, 1, 1, 1, 1, 1)
-  
+  extract.id <- function(r, pt){
+    id = raster::extract(r.forc, pt)
+    if(is.matrix(id) | is.data.frame(id)){
+      ret=id[,2]
+    }else{
+      ret =id
+    }
+    ret
+  }
   colnames(att) = atthead;
   if (!is.null(r.soil)){
-    att[,2] = raster::extract(r.soil, pt)
+    att[,2] = extract.id(r.soil, pt)
   }
   if (!is.null(r.geol)){
-    att[,3] = raster::extract(r.geol, pt)
+    att[,3] = extract.id(r.geol, pt)
   }
   if (!is.null(r.lc)){
-    att[,4] = raster::extract(r.lc, pt)
+    att[,4] = extract.id(r.lc, pt)
   }
   if (!is.null(r.forc)){
-    att[,5] = raster::extract(r.forc, pt)
+    att[,5] = extract.id(r.forc, pt)
   }
   if (!is.null(r.mf)){
-    att[,6] = raster::extract(r.mf, pt)
+    att[,6] = extract.id(r.mf, pt)
   }
   if (!is.null(r.bc)){
-    att[,7] = raster::extract(r.bc, pt)
+    att[,7] = extract.id(r.bc, pt)
   }
   att
 }
