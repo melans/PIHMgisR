@@ -22,6 +22,10 @@ toCentroid <- function(tri, point){
 #' @param p2 coordinates of point 2
 #' @return Distance between \code{p1} and \code{p2}
 #' @export
+#' @examples 
+#' p1 = c(1,1)
+#' p2 = c(2,2)
+#' Eudist(p1,p2)
 Eudist <- function(p1,p2){
   d = sqrt( sum( (p1-p2) ^2) )
   d
@@ -33,6 +37,10 @@ Eudist <- function(p1,p2){
 #' @param unique whether return unique coordinates or duplicated coordinates
 #' @return coordinates of points, m x 2.
 #' @export
+#' @examples 
+#' data('sac2')
+#' wb=sac2[['wbd']]
+#' extractCoords(wb)
 extractCoords<-function(sp, unique=TRUE){
   spl <- methods::as(sp, "SpatialLines")  
   x = coordinates(spl)
