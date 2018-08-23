@@ -27,7 +27,7 @@ PIHM.river <- methods::setClass("PIHM River",
 NULL
 
 #' This is data to be included in my package
-#' @name sac2
+#' @name sac
 #' @docType data
 #' @keywords data
 NULL
