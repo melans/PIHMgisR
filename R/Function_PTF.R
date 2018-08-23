@@ -1,10 +1,14 @@
-
 #' Pedotransfer function to generate soil/geol parameter from soil texture
 #' \code{PTF} 
 #' @param  x  data.frame or matrix, column = c(Silt_perc, Clay_perc, OrganicMatter _perc, BulkDensity g/cm3)
 #' @param topsoil TRUE/FALSE, default = TRUE
 #' @return Hydraulic parameters, matrix
 #' @export
+#' @examples 
+#' x=cbind(10,40, 1:20, 1.5)
+#' y=PTF(x)
+#' apply(y[,-1], 2, summary)
+#' plot(x[,3], y[,2])
 PTF <- function (x, topsoil=TRUE){
   #Wösten, J. H. M., Pachepsky, Y. a., & Rawls, W. J. (2001). Pedotransfer functions: Bridging the gap between available basic soil data and missing soil hydraulic characteristics. Journal of Hydrology, 251(3–4), 123–150. https://doi.org/10.1016/S0022-1694(01)00464-4
   if(is.matrix(x) || is.data.frame(x)){
@@ -88,6 +92,11 @@ PTF <- function (x, topsoil=TRUE){
 #' @param  x  data.frame or matrix, column = c(Silt_perc, Clay_perc, OrganicMatter _perc, BulkDensity g/cm3)
 #' @return Hydraulic parameters, matrix
 #' @export
+#' @examples 
+#' x=cbind(10,40, 1:20, 1.5)
+#' y=PTF.soil(x)
+#' apply(y[,-1], 2, summary)
+#' plot(x[,3], y[,2])
 PTF.soil <- function(x, topsoil=TRUE){
   y = as.matrix(x, ncol = 4)
   nsoil  = nrow(y)
@@ -113,6 +122,11 @@ PTF.soil <- function(x, topsoil=TRUE){
 #' @param topsoil TRUE/FALSE, default = FALSE
 #' @return Hydraulic parameters, matrix
 #' @export
+#' @examples 
+#' x=cbind(10,40, 1:20, 1.5)
+#' y=PTF.geol(x)
+#' apply(y[,-1], 2, summary)
+#' plot(x[,3], y[,2])
 PTF.geol <- function(x, topsoil=FALSE){
   y = as.matrix(x, ncol = 4)
   nsoil  = nrow(y)
