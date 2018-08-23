@@ -103,3 +103,17 @@ write.pc <-function(x, file){
   write(out, file, append = F, ncolumns = 2, sep = '\t')
 }
 
+#' Write PIHM .forc file
+#' \code{writeforc} 
+#' @param fns  filenames; Vector of character,
+#' @param startdate Start Date. Character. e.g. 20000101
+#' @param file file name
+#' @export
+writeforc <- function(fns, path='', startdate='20000101', file){
+  filebackup(file)
+  nf=length(fns)
+  message('Writing ', file)
+  write( paste(nf, startdate), file=file, append=F)
+  write( path, file=file, append=T,  ncolumns = 1)
+  write( fns, file=file, append=T,  ncolumns = 1)
+}
