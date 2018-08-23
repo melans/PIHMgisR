@@ -3,7 +3,7 @@
 #' @param shp Spatial file
 #' @param crs projection 
 #' @param file file path, without '.shp'.
-writeshape <- function(shp,crs = crs(shp), file=NULL){
+writeshape <- function(shp,crs = raster::crs(shp), file=NULL){
   if(grepl(class(shp)[1],'SpatialPolygons' ) ){
     shp = methods::as(shp, "SpatialPolygonsDataFrame")
   }else if ( grepl(class(shp)[1],'SpatialLines' )   ){
