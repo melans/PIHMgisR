@@ -106,6 +106,7 @@ write.pc <-function(x, file){
 #' Write PIHM .forc file
 #' \code{writeforc} 
 #' @param fns  filenames; Vector of character,
+#' @param path Common path of the files. 
 #' @param startdate Start Date. Character. e.g. 20000101
 #' @param file file name
 #' @export
