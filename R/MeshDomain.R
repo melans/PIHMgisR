@@ -8,9 +8,9 @@
 #' @export
 #' @examples 
 #' library(raster)
-#' data(sac2)
-#' wbd=sac2[['wbd']]
-#' dem=sac2[['dem']]
+#' data(sac)
+#' wbd=sac[['wbd']]
+#' dem=sac[['dem']]
 #' a.max = 1e6 * 1;
 #' q.min = 33;
 #' tol.riv = 200
