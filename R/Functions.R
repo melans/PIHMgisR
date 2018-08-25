@@ -38,8 +38,8 @@ Eudist <- function(p1,p2){
 #' @return coordinates of points, m x 2.
 #' @export
 #' @examples 
-#' data('sac2')
-#' wb=sac2[['wbd']]
+#' data('sac')
+#' wb=sac[['wbd']]
 #' extractCoords(wb)
 extractCoords<-function(sp, unique=TRUE){
   spl <- methods::as(sp, "SpatialLines")  
