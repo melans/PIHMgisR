@@ -8,11 +8,11 @@ x=lapply(clib, library, character.only=T)
 
 library(PIHMgisR)
 #test_check("PIHMgisR")
-prjname = 'sac1'
+prjname = 'sac'
 PRJNAME=prjname
 inapth = file.path(prjname)
 
-pihmout <- file.path(prjname)
+pihmout <- file.path('../demo', prjname)
 fin <- PIHM.filein(prjname, indir = pihmout)
 x=list.files(pihmout, pattern = glob2rx(paste0(prjname, '.*.*')), full.names = T)
 file.remove(x)
@@ -32,23 +32,23 @@ AqDepth = 10
 years = 2000:2010
 ny=length(years)
 nday = 365*ny +round(ny/4)
-ss = 'sac2'
-# riv = readOGR(paste0('/Users/leleshu/Dropbox/PIHM/Projects/SAC/GIS_SUB/Subs/', ss, '/', ss, '_strD.shp') )
-# riv = sp.DissolveLines(riv)
-# len = rgeos::gLength(byid=T, riv)
-# id = which(len < 100)
-# riv = riv[-1*id,]
-# wbd = readOGR(paste0('/Users/leleshu/Dropbox/PIHM/Projects/SAC/GIS_SUB/Subs/', ss, '/', ss, '_wbd.shp') )
-# dem = raster('/Users/leleshu/Dropbox/PIHM/Projects/SAC/GIS/dem/dem_m.tif')
-# wbbuf = rgeos::gBuffer(wbd, width = 2000)
-# dem = raster::crop(dem, wbbuf)
-# sac2 = list('wbd'=wbd, 'riv'=riv,'dem'=dem)
-# devtools::use_data(sac2, overwrite = T)
 
-data(sac2)
-wbd=sac2[['wbd']]
-riv=sac2[['riv']]; plot(riv)
-dem=sac2[['dem']]
+# source('../PIHMgisR.code/Data_Sac5.R')
+# devtools::use_data(sac, overwrite = T)
+
+data(sac)
+wbd=sac[['wbd']]
+riv=sac[['riv']]; plot(riv)
+dem=sac[['dem']]
+rsoil=sac[['rsoil']]
+rgeol=sac[['rsoil']]
+rlc=sac[['rlc']]
+asoil=sac[['asoil']]
+ageol=sac[['asoil']]
+alc =sac[['alc']]
+sp.forc =sac[['forc']]
+plot(sp.forc)
+
 wbbuf = rgeos::gBuffer(wbd, width = 2000)
 dem = raster::crop(dem, wbbuf)
 
@@ -84,7 +84,10 @@ sm = sp.mesh2Shape(pm)
 writeshape(sm, crs(wbd), file=file.path(gisout, 'domain'))
 
 # generate PIHM .att
-pa=pihmAtt(tri)
+pa=pihmAtt(tri, r.soil = rsoil, r.geol = rgeol, r.lc = rlc, r.forc = sp.forc )
+forc.fns = paste0(sp.forc@data[, 'NLDAS_ID'], '.csv')
+forc.fns
+writeforc(forc.fns, path='/Users/leleshu/Dropbox/PIHM/Projects/SAC/forcing/csv2000-2017', file=fin['md.forc'])
 
 # generate PIHM .riv
 pr=pihmRiver(riv.simp, dem)
@@ -121,11 +124,12 @@ dev.off()
 cfg.para = pihmpara(nday = nday)
 # calibration
 cfg.calib = pihmcalib()
-para.lc = pihmlandcover()
-para.geol = pihmgeol()
-para.soil = pihmsoil()
+#soil/geol/landcover
+lc = unlist(alc)
+para.lc = PTF.lc(lc)
+para.soil = PTF.soil(asoil)
+para.geol = PTF.geol(asoil)
 
-lc = c(43, 23, 81, 11) 
 # 43-mixed forest in NLCD classification
 # 23-developed, medium           
 # 81-crop land
@@ -140,6 +144,9 @@ dev.off()
 write.tsd(lr$LAI, file = fin['md.lai'])
 write.tsd(lr$RL, file = fin['md.rl'])
 
+#MeltFactor
+mf = MeltFactor(years = years)
+write.tsd(mf, file=fin['md.mf'])
 
 # write PIHM input files.
 writemesh(pm, file = fin['md.mesh'])
