@@ -1,6 +1,6 @@
 
 #' Generate the default landcover parameters for NLCD classification
-#' \code{pihfun.lairlmsoil} 
+#' \code{fun.lairl} 
 #' @param lc land classe codes in NLCD classes. 
 #' @param years numeric years.
 #' @return Default fun.lairl parameters, a list $LAI, $RL
@@ -92,6 +92,7 @@ fun.lairl <- function(lc, years=2000){
 #' @references Lele Shu(2017), Gopal Bhatt(2012)
 #' @export
 lc_EQ <-function(dtab, lc){
+  lc = as.numeric(lc)
   tab = matrix(c( #0, 0.00, 0, 0.00, #00
     0	,	0	,	0	,	0		,	#	1	0
     0	,	0	,	0	,	0		,	#	2	0
@@ -199,3 +200,4 @@ lc_EQ <-function(dtab, lc){
   v2 =  dtab[, tab[3,lc]+1  ]
   ret <- c1 * v1 + c2 * v2;
 }
+
