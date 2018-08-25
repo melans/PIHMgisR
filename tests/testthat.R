@@ -8,20 +8,6 @@ x=lapply(clib, library, character.only=T)
 
 library(PIHMgisR)
 #test_check("PIHMgisR")
-prjname = 'sac1'
-PRJNAME=prjname
-inapth = 'demo/sac1/'
-
-pihmout <- file.path('demo', prjname)
-fin <- PIHM.filein(prjname, indir = pihmout)
-x=list.files(pihmout, pattern = glob2rx(paste0(prjname, '.*.*')), full.names = T)
-file.remove(x)
-
-pngout = file.path(pihmout, 'fig')
-gisout = file.path(pihmout, 'gis')
-dir.create(pihmout, showWarnings = F, recursive = T)
-dir.create(pngout, showWarnings = F, recursive = T)
-dir.create(gisout, showWarnings = F, recursive = T)
 
 a.max = 1e6 * 2;
 q.min = 33;
@@ -29,12 +15,20 @@ tol.riv = 200
 tol.wb = 200
 tol.len = 500
 AqDepth = 10
-ss = 'sac2'
 
-data(sac2)
-wbd=sac2[['wbd']]
-riv=sac2[['riv']]; plot(riv)
-dem=sac2[['dem']]
+years = 2000:2001
+data(sac)
+wbd=sac[['wbd']]
+riv=sac[['riv']]; plot(riv)
+dem=sac[['dem']]
+rsoil=sac[['rsoil']]
+rgeol=sac[['rsoil']]
+rlc=sac[['rlc']]
+asoil=sac[['asoil']]
+ageol=sac[['asoil']]
+alc =sac[['alc']]
+sp.forc =sac[['forc']]
+
 wbbuf = rgeos::gBuffer(wbd, width = 2000)
 dem = raster::crop(dem, wbbuf)
 
@@ -46,11 +40,6 @@ plot(riv.s1); plot(riv.s2, add=T, col=3)
 wb.dis = rgeos::gUnionCascaded(wbd)
 wb.s1 = rgeos::gSimplify(wb.dis, tol=tol.wb, topologyPreserve = T)
 wb.s2 = sp.simplifyLen(wb.s1, tol.len)
-
-png(file = file.path(pngout, 'data_1.png'), height=11, width=11, res=100, unit='in')
-plot(dem); plot(wb.s2, add=T, border=2, lwd=2); 
-plot(riv.s2, add=T, lwd=2, col=4)
-dev.off()
 
 
 # shp.riv =raster::crop(riv.simp, wb.simp)
@@ -64,7 +53,6 @@ plot(tri, asp=1)
 # generate PIHM .mesh 
 pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
 sm = sp.mesh2Shape(pm)
-writeshape(sm, crs(wbd), file=file.path(gisout, 'domain'))
 
 # generate PIHM .att
 pa=pihmAtt(tri)
@@ -96,13 +84,16 @@ sp.dm = sp.mesh2Shape(pm)
 cfg.para = pihmpara(nday = 300)
 # calibration
 cfg.calib = pihmcalib()
-para.lc = pihmlandcover()
-para.geol = pihmgeol()
-para.soil = pihmsoil()
 
+#soil/geol/landcover
 lc = c(43, 23, 81, 11) 
 # 43-mixed forest in NLCD classification
 # 23-developed, medium           
 # 81-crop land
 # 11-water
-lr=fun.lairl(lc, years=2000:2001)
+para.lc = PTF.lc(lc)
+para.soil = PTF.soil()
+para.geol = PTF.geol()
+lr=fun.lairl(lc, years=years)
+
+mf = MeltFactor(years)
