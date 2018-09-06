@@ -14,6 +14,10 @@ read.df <-function(file, text = readLines(file)){
     ndim = as.numeric(utils::read.table(text = text[r0] ))
     nr = ndim[1]
     nc = ndim[2]
+    if(nr <= 0){
+      nr = nrow-2
+    }else{
+    }
     xl[[i]] = as.matrix(utils::read.table(text = text[0:nr + 1 + r0], header = T))
     r0 = r0 + nr + 2;
     if(r0 + 1 > nrow){
@@ -40,7 +44,7 @@ readmesh <-function(file = PIHM.filein()['md.mesh'] ){
 #' @export
 readatt <-function( file = PIHM.filein()['md.att']){
   x = read.df(file)
-  x
+  ret = x[[1]]
 }
 
 #' Read the .riv file
@@ -105,7 +109,7 @@ readic <- function(
 #' @export
 readsoil <-function(file =  PIHM.filein()['md.soil']){
   x=read.df(file)
-  x
+  ret = x[[1]]
 }
 
 #============
@@ -116,7 +120,7 @@ readsoil <-function(file =  PIHM.filein()['md.soil']){
 #' @export
 readgeol <-function(file =  PIHM.filein()['md.geol']){
   x=read.df(file)
-  x
+  ret = x[[1]]
 }
 
 #============ 
@@ -127,5 +131,41 @@ readgeol <-function(file =  PIHM.filein()['md.geol']){
 #' @export
 readlc <-function( file = PIHM.filein()['md.lc']){
   x=read.df(file)
-  x
+  ret = x[[1]]
+}
+#============ 
+#' Read the .forc file
+#' \code{readlc} 
+#' @param file full path of file
+#' @return files of forcing .csv.
+#' @export
+readforc.fn <-function( file = PIHM.filein()['md.forc']){
+  text = readLines(file)
+  path=text[2]
+  fns = text[-1 * 1:2]
+  ret = file.path(path, fns)
+}
+#============ 
+#' Read the .csv files in .forc file
+#' \code{readlc} 
+#' @param file full path of file
+#' @param id  Index of the forcing sites.
+#' @return forcing data, list.
+#' @export
+readforc.csv <-function(file = PIHM.filein()['md.forc'], id=NULL){
+  fns=readforc.fn(file=file)
+  if( is.null(id)){
+    fn = fns
+    id=1:length(fns)
+  }else{
+    fn = fns[id]
+  }
+  nf = length(fn)
+  ret = list()
+  for(i in 1:nf){
+    message(i, '/', nf,'\t', fn[i])
+    x=read.df(fns[id[i]]) 
+    ret[[i]] = x[[1]]
+  }
+  ret
 }
