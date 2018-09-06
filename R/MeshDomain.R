@@ -75,7 +75,7 @@ pihmAtt <- function(tri, r.soil =NULL, r.geol=NULL, r.lc=NULL, r.forc=NULL,
   nh = length(atthead)
   att = cbind(1:ncell, 1, 1, 1, 1, 1, 1)
   extract.id <- function(r, pt){
-    id = raster::extract(r.forc, pt)
+    id = raster::extract(r, pt)
     if(is.matrix(id) | is.data.frame(id)){
       ret=id[,2]
     }else{
