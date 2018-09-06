@@ -26,10 +26,16 @@ PIHM.river <- methods::setClass("PIHM River",
 #' @keywords data
 NULL
 
-#' This is data to be included in my package
+#' This is data of one of sub-catchmetn in Sacramento Watershed  to be included in my package
 #' @name sac
 #' @docType data
 #' @keywords data
+NULL
+
+#' This is data of Lake Sunappe to be included in my package
+#' @name sunapee
+#' @docType data
+#' @keywords sunapee
 NULL
 
 #' This is .pihm environment.
