@@ -109,7 +109,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-4){
     if(nflag >= 1){
       message(nflag, ' rivers in type 1 (reverse)')
       idn = idown[rid]
-      od = which(idn %in% oid)
+      od = which(rid %in% oid)
       idn[od] = rid[od]
       
         p1 = pfr[rid]
