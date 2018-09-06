@@ -140,19 +140,20 @@ PTF.geol <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
   ly = topsoil * matrix(1, nrow= nsoil)
   ptf = PTF(x, topsoil=topsoil)
   
-  ret = matrix(0, ncol=10, nrow=nsoil)
+  ret = matrix(0, ncol=8, nrow=nsoil)
   colnames(ret) = c('INDEX', 'KsatH(m_d)','KsatV(m_d)',
-                    'ThetaS(m3_m3)', 'ThetaR(m3_m3)',  'Alpha(1_m)',
-                    'Beta', 'vAreaF(m2_m2)', 'macKsatH(m_d)', 'Dmac(m)')
+                    'ThetaS(m3_m3)', 'ThetaR(m3_m3)', 
+                    # 'Alpha(1_m)','Beta', 
+                    'vAreaF(m2_m2)', 'macKsatH(m_d)', 'Dmac(m)')
   ret[,1] = ptf[,1]    #INDEX
   ret[,2] = ptf[,2] * 10    #Horizontal K Kh = Kv * 10
   ret[,3] = ptf[,2]      #Vertical K    /100 -- cm/day -> m/day
   ret[,4] = ptf[,3]       #porosity
   ret[,5] = 0.01        #ThetaR - residual
-  ret[,6:7] = ptf[,4:5] #alpha, beta in van genuchten.
-  ret[,8] = 0.01;         #vertical macropore fraction, 1_perc
-  ret[,9] = ptf[,2] * 1e5 # Kmp = kmx * 100,000;
-  ret[,10] = 1            # Depth of Macropore;
+  # ret[,6:7] = ptf[,4:5] #alpha, beta in van genuchten.
+  ret[,6] = 0.01;         #vertical macropore fraction, 1_perc
+  ret[,7] = ptf[,2] * 1e5 # Kmp = kmx * 100,000;
+  ret[,8] = 1            # Depth of Macropore;
   ret
 }
 #' The default land cover parameters from University of Marryland Classification
@@ -233,5 +234,6 @@ MeltFactor <- function(years){
   #tmon = time(DataMon)- days_in_month(time(DataMon))+1
   tmon = as.Date( format(stats::time(DataMon), "%Y-%m-01"))
   ret = xts::as.xts(rep(mf, ny), order.by=tmon)
+  colnames(ret) = 'MF'
   ret
 }
