@@ -30,7 +30,7 @@ write.tsd <- function(x, file, append = F, quite=F, backup=TRUE){
   dd = data.frame('Time_Day' = tday, mat)
   write(c(nr, nc+1, t0),file = file, ncolumns = 3, append = append, sep = '\t')
   write(colnames(dd), file = file, ncolumns = nc+1, append = T, sep = '\t')
-  write(t(dd), file = file, ncolumns = nc, append = T, sep = '\t')
+  write(t(dd), file = file, ncolumns = nc + 1, append = T, sep = '\t')
 }
 #' Write data.frame out into file
 #' \code{write.df} 
