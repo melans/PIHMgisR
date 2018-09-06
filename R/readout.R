@@ -20,7 +20,8 @@ readout <- function(keyword,
     message('File may not completed. ', nrr, "X", nc+1)
   }
   mat=t(matrix(tmp[1:( nr*(nc+1) )], nrow=nc+1))
-  xt = as.POSIXct(as.character(st), format='%Y%m%d') + mat[,1] * 60
+  tsec = (mat[,1] - mat[1,1]) * 60 # time must shift back ONE dt.
+  xt = as.POSIXct(as.character(st), format='%Y%m%d') + tsec
   tsd = xts::as.xts(mat[,-1], order.by = xt)
   tsd
 }
