@@ -20,11 +20,14 @@ readout <- function(keyword,
     message('File may not completed. ', nrr, "X", nc+1)
   }
   mat=t(matrix(tmp[1:( nr*(nc+1) )], nrow=nc+1))
-  tsec = ( mat[,1] - mean(diff(mat[,1])) ) * 60 # time must shift back ONE dt.
-  xt = as.POSIXct(as.character(st), format='%Y%m%d') + tsec
+  tmove = diff(mat[,1])
+  tmove = c(tmove, tmove[length(tmove)])
+  tsec =   ( mat[,1] -  tmove) * 60 # time must shift back ONE dt.
+  xt = as.POSIXct(as.character(st), format='%Y%m%d') - 86400 + tsec
   tsd = xts::as.xts(mat[,-1], order.by = xt)
   tsd
 }
+
 #' Read multiply PIHM output files and do time-series plot
 #' @param varname vector of output keywords 
 #' @param plot Whether do the time-series plot
