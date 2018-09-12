@@ -1,0 +1,42 @@
+
+#' Pedotransfer function to generate soil/geol parameter from soil texture
+#' \code{autoPIHMgis} 
+#' @param x  Input data
+#' @param filter Data filter
+#' @param 
+#' @return Matrix information, c('ID','Vmin','Vmax', 'Filter')
+#' @export
+#' @examples 
+datafilter.riv <-function(x, filter=NULL, plot=TRUE){
+  # y=x[['YRivstage']]
+  y = x
+  # plot(y)
+  pr=readriv()
+  cb = readcalib()
+  tid = pr@river[,'Type']
+  uid = sort(unique(tid))
+  st=pr@rivertype[tid, 'Depth'] * cb['RIV_DPTH']
+  if( is.null(filter) ){
+    filter = st
+  }
+  ymax = apply(y, 2, max, na.rm=T)
+  ymin = apply(y, 2, min, na.rm=T)
+  id = which(ymax > filter) 
+  ret = data.frame(id, ymin[id], ymax[id], filter[id])
+  colnames(ret) = c('ID','Vmin','Vmax', 'Filter')
+  rownames(ret) = id
+  
+  if(length(id) > 0){
+    id = id
+  }else{
+    id = 1:ncol(x)
+  }
+  yv = sort(( unique(filter) ))
+  ny = length(yv)
+  col = uid
+  plot.zoo(y[,id], col=col[tid[id]], ylim=c(0,2) , screen=1)
+  abline( h=yv, col=col, lwd=3, lty=2)
+  
+  ret
+}
+
