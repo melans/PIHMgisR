@@ -70,6 +70,26 @@ readchannel <-function(file = PIHM.filein()['md.chn'] ){
 }
 
 #============
+#' Read the .para file
+#' \code{readpara} 
+#' @param file full path of file
+#' @return .para
+#' @export
+readpara <- function(file = PIHM.filein()['md.para'] ){
+  readpc(file)
+}
+
+#============
+#' Read the .calib file
+#' \code{readcalib} 
+#' @param file full path of file
+#' @return .calib
+#' @export
+readcalib <- function(file = PIHM.filein()['md.calib'] ){
+  readpc(file)
+}
+
+#============
 #' Read the .para or .calib file
 #' \code{readpc} 
 #' @param file full path of file
@@ -141,9 +161,12 @@ readlc <-function( file = PIHM.filein()['md.lc']){
 #' @export
 readforc.fn <-function( file = PIHM.filein()['md.forc']){
   text = readLines(file)
+  hd=read.table(text = text[1])
   path=text[2]
   fns = text[-1 * 1:2]
-  ret = file.path(path, fns)
+  ret = as.matrix(file.path(path, fns), ncol=1)
+  colnames(ret) = hd[2]
+  ret
 }
 #============ 
 #' Read the .csv files in .forc file
@@ -154,6 +177,8 @@ readforc.fn <-function( file = PIHM.filein()['md.forc']){
 #' @export
 readforc.csv <-function(file = PIHM.filein()['md.forc'], id=NULL){
   fns=readforc.fn(file=file)
+  tstr = colnames(fns)
+  t0 = as.POSIXct(tstr, format = '%Y%m%d')
   if( is.null(id)){
     fn = fns
     id=1:length(fns)
@@ -165,7 +190,10 @@ readforc.csv <-function(file = PIHM.filein()['md.forc'], id=NULL){
   for(i in 1:nf){
     message(i, '/', nf,'\t', fn[i])
     x=read.df(fns[id[i]]) 
-    ret[[i]] = x[[1]]
+    y=x[[1]]
+    xt = t0+y[,1]*86400
+    tsd=zoo::zoo(y[,-1], xt)
+    ret[[i]] = tsd
   }
   ret
 }
