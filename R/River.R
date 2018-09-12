@@ -88,10 +88,11 @@ RiverSlope <- function(pr){
 #' \code{correctRiverSlope} 
 #' @param pr PIHM river class
 #' @param minSlope Minimum slope 
+#' @param maxrun Maximum number to run the loops
 #' @return SpatialLinesDataFrame
 #' @export
-correctRiverSlope <- function(pr, minSlope = 1e-4){
-  # EPS = 1e-9
+correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
+  EPS = 1e-9
   # pr = ppr
   # minSlope = 1e-4
   nflag = 1
@@ -100,8 +101,9 @@ correctRiverSlope <- function(pr, minSlope = 1e-4){
   idown = pr@river[,'Down']
   len = RiverLength(pr)
   oid = getOutlets(pr)
-  
-  while(nflag > 0){
+  nloop=0
+  while(nflag > 0 & maxrun > nloop){
+    nloop=nloop+1
     pz = pr@point[, 'Zmax']
     s=RiverSlope(pr)
     rid = which(s[,1] < minSlope )
@@ -110,24 +112,40 @@ correctRiverSlope <- function(pr, minSlope = 1e-4){
       message(nflag, ' rivers in type 1 (reverse)')
       idn = idown[rid]
       od = which(rid %in% oid)
-      idn[od] = rid[od]
-      
-        p1 = pfr[rid]
-        p2 = pto[rid]
-        p3 = pto[idn]
-        l12 = len[rid]
-        l23 = len[idn]
-        ll = l12 + l23
+      if(length(od) > 0){
+        otid = rid[od]
+        
+        p1 = pfr[otid]
+        p2 = pto[otid]
+        ll = len[otid]
 
-      pz[p2] = (pz[p1] * l23 + pz[p3] * l12) / ll
-      #pz[pto[rid]] = pz[pfr[rid]] - len[rid] * minSlope - EPS
-      pr@point[,'Zmax'] = pz
+        pz[p2] = pz[p1] - minSlope*ll
+        #pz[pto[rid]] = pz[pfr[rid]] - len[rid] * minSlope - EPS
+        pr@point[,'Zmax'] = pz
+      }else{
+        # for(ip in 1:length(rid)){
+        # ip=1
+        #   p1 = pfr[rid[ip]]
+        #   p2 = pto[rid[ip]]
+        #   p3 = pto[idn[ip]]
+        #   l12 = len[rid[ip]]
+        #   l23 = len[idn[ip]]
+        #   ll = l12 + l23
+          # pz[p2] = (pz[p1] * l23 + pz[p3] * l12) / ll
+          pz[pto[rid]] = pz[pfr[rid]] - len[rid] * minSlope - EPS
+        # }
+        pr@point[,'Zmax'] = pz
+        # print(cbind(rid,idn,p1,p2,p3, pz[p1], pz[p2], pz[p3]))
+        # readline("go on?")
+      }
     }
   }
   
   flag = 1
   idown = pr@river[,'Down']
-  while(nflag > 0){
+  nloop=0
+  while(nflag > 0 & maxrun > nloop){
+    nloop=nloop+1
     pz = pr@point[, 'Zmax']
     s=RiverSlope(pr)
     rid = which(s[,2] < minSlope )
@@ -195,7 +213,7 @@ pihmRiverSeg <- function(sl){
 #' @param pr PIHM river class
 #' @return Index of outlets, numeric
 #' @export
-getOutlets <- function(pr){
+getOutlets <- function(pr=readriv()){
   idown = pr@river[,'Down']
   ids = which(idown < 0)
   ids
