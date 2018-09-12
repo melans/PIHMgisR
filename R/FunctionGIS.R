@@ -31,18 +31,15 @@ sp2raster <- function (sp, mask = get('PIHM.MASK', envir = .pihm),
 #' Generate the raster mask of Mesh domain
 #' \code{PIHM.mask} 
 #' @param pm \code{PIHM.mesh}
-#' @param ngrids number of grid along x direction.
-#' @param resolution resolution, defaul = NULL, resolution = extent / ngrids
+#' @param ngrids Number of grid along x direction.
+#' @param rr Default mask in .pihm environment
+#' @param resolution Resolution, defaul = NULL, resolution = extent / ngrids
 #' @return Raster map
 #' @export
-PIHM.mask  <- function (pm = readmesh(), 
+PIHM.mask  <- function (pm = readmesh(), rr = get('PIHM.MASK', envir = .pihm),
                         ngrids=200, resolution=NULL){
   # mesh=readmesh(shp=TRUE); ngrids=100; resolution=0
-  # if(file.exists(RDSfile) & !(reload)){
-  #   r <- readRDS(file=RDSfile)
-  # }else{
-  mask = get('PIHM.MASK', envir = .pihm)
-  if(is.null(mask)){
+  if(is.null(rr)){
     sp = sp.mesh2Shape(pm)
     
     ext <-  raster::extent (sp)
@@ -63,7 +60,7 @@ PIHM.mask  <- function (pm = readmesh(),
     # assign("PIHM.MASK",rr, envir = .pihm)
     assign('PIHM.MASK', rr, envir=.pihm)
   }else{
-    rr = mask
+    rr = rr
   }
   rr
 }
@@ -75,7 +72,7 @@ PIHM.mask  <- function (pm = readmesh(),
 #' @return Raster map
 #' @export
 MeshData2Raster <- function(x=getElevation(),
-                            mask=PIHM.mask()){
+                            rmask=PIHM.mask()){
   #Interpolate and write ASC map out.
   # loadinglib('akima')
   if( is.matrix(x) | is.data.frame(x)){
@@ -91,8 +88,8 @@ MeshData2Raster <- function(x=getElevation(),
   tps <- fields::Tps(xy, x)
   
   # use model to predict values at all locations
-  r <- raster::interpolate(mask, tps)
-  ret <- raster::mask(r,mask)
+  r <- raster::interpolate(rmask, tps)
+  ret <- raster::mask(r,rmask)
 }
 
 
