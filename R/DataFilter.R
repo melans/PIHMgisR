@@ -3,10 +3,9 @@
 #' \code{autoPIHMgis} 
 #' @param x  Input data
 #' @param filter Data filter
-#' @param 
+#' @param plot Whether plot the 
 #' @return Matrix information, c('ID','Vmin','Vmax', 'Filter')
 #' @export
-#' @examples 
 datafilter.riv <-function(x, filter=NULL, plot=TRUE){
   # y=x[['YRivstage']]
   y = x
@@ -25,18 +24,18 @@ datafilter.riv <-function(x, filter=NULL, plot=TRUE){
   ret = data.frame(id, ymin[id], ymax[id], filter[id])
   colnames(ret) = c('ID','Vmin','Vmax', 'Filter')
   rownames(ret) = id
-  
-  if(length(id) > 0){
-    id = id
-  }else{
-    id = 1:ncol(x)
+  if(plot ){
+    if(length(id) > 0){
+      id = id
+    }else{
+      id = 1:ncol(x)
+    }
+    yv = sort(( unique(filter) ))
+    ny = length(yv)
+    col = uid
+    plot.zoo(y[,id], col=col[tid[id]], ylim=c(0,2) , screen=1)
+    abline( h=yv, col=col, lwd=3, lty=2)
   }
-  yv = sort(( unique(filter) ))
-  ny = length(yv)
-  col = uid
-  plot.zoo(y[,id], col=col[tid[id]], ylim=c(0,2) , screen=1)
-  abline( h=yv, col=col, lwd=3, lty=2)
-  
   ret
 }
 
