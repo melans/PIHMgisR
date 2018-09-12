@@ -66,10 +66,12 @@ pihmpara <- function( nday = 10){
 pihmcalib <- function(){
   cn = toupper( c('KSATH', 'KSATV', 'KINF', 'KMACSATH', 'KMACSATV', 'DINF', 'DROOT', 'DMAC',
                   'POROSITY', 'ALPHA', 'BETA', 'MACVF', 'MACHF', 'VEGFRAC', 'ALBEDO', 'ROUGH',
+                  'Aquifer', 
                   'PRCP', 'SFCTMP', 'EC', 'ETT', 'EDIR', 'RIV_ROUGH', 'RIV_KH', 'RIV_DPTH',
                   'RIV_WDTH', 'RIV_SINU', 'Soil_Dgd', 'ImpAF', 'ISMAX') )
   v=rep(1, length(cn))
   names(v) = cn
   v['SFCTMP'] = 0  
+  v['Aquifer'] = 0  
   v
 }
