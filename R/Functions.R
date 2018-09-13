@@ -62,7 +62,15 @@ extractCoords<-function(sp, unique=TRUE){
 #' @param coord coordinate set
 #' @return Index in coodinate set
 #' @export
+#' @examples 
+#' coord = matrix(rnorm(10), 5,2)
+#' xy = coord[c(5,1,3),]
+#' xy2ID(xy, coord)
 xy2ID <- function(xy, coord){
+  if(is.matrix(xy) | is.data.frame(xy)){
+  }else{
+    xy = matrix(xy, ncol=2)
+  }
   ng=nrow(xy)
   id=rep(0,ng)
   for(i in 1:ng){
@@ -81,6 +89,9 @@ xy2ID <- function(xy, coord){
 #' @param n specific frequency
 #' @return count of specific frequency
 #' @export
+#' @examples 
+#' x=round(rnorm(100, 2))
+#' count(x)
 count <- function(x, n=NULL){
   if(is.null(n)){
     rt = table(x)
@@ -97,6 +108,10 @@ count <- function(x, n=NULL){
 #' @param sp SpatialLines or SpatialPolygons
 #' @return pslg class
 #' @export 
+#' @examples
+#' library(rgeos) 
+#' sl = readWKT("MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))")
+#' x = sp2PSLG(sl)
 sp2PSLG<-function(sp){
   sl = methods::as(sp, 'SpatialLines')
   nsl = length(sl)
