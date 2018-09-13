@@ -33,8 +33,8 @@ datafilter.riv <-function(x, filter=NULL, plot=TRUE){
     yv = sort(( unique(filter) ))
     ny = length(yv)
     col = uid
-    plot.zoo(y[,id], col=col[tid[id]], ylim=c(0,2) , screen=1)
-    abline( h=yv, col=col, lwd=3, lty=2)
+    zoo::plot.zoo(y[,id], col=col[tid[id]], ylim=c(0,2) , screen=1)
+    graphics::abline( h=yv, col=col, lwd=3, lty=2)
   }
   ret
 }
