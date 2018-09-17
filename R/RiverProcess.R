@@ -27,12 +27,17 @@ sp.RiverOrder <- function(sp, coord = extractCoords(sp)){
   get1st <- function(x){
     fr = x[,2]
     to = x[,3]
-    ncount = as.numeric(table(x[,2:3]))
+    tb= table(x[,2:3])
+    pid = as.numeric(names(tb))
+    ncount = as.numeric(tb)
     p.out = to[which(! to %in% fr)]
-    p.jnt = which(ncount> 2)
+    p.jnt = pid[which(ncount> 2)]
     p.key = c(p.out, p.jnt)
     # print(p.key)
-    tid=fr[ !fr %in% to] #target from id
+    tid=fr[ !fr %in% to] #target from-id
+    # plot(riv.simp)
+    # points(coord[ ])
+    # points(coord[p.key,], col=2)
     nd = length(tid)
     ret = NULL
     # message('Number of Streams = ', nd)
@@ -42,8 +47,8 @@ sp.RiverOrder <- function(sp, coord = extractCoords(sp)){
         # message('Stream ',i,'\tSeg ', j, '\tFrom Node ', cr)
         rid = which(fr == cr)
         ret=c(ret, rid)
-        sid= to[rid] #ID of to Point;
-        if( sid  %in% p.key){ #if sid IS IN key points.
+        sid= to[rid] #ID of to-point;
+        if( sid  %in% p.key){ #if sid IS IN key-points(outlets or joint point).
           break;
         }else{
           cr = sid;
