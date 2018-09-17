@@ -32,7 +32,6 @@ pihmRiver <- function(sp, dem){
              point = data.frame(pt)
   )
 }
-
 #' Calculate the river length
 #' \code{RiverLength} 
 #' @param pr PIHM river class
