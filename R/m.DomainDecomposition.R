@@ -38,7 +38,7 @@ m.DomainDecomposition <- function(wb, riv=NULL, q=30, ...){
 #' @param dbf attribute table of the mesh triangles.
 #' @return SpatialPolygons object
 #' @export
-sp.mesh2Shape <- function(pm, dbf=NULL){
+sp.mesh2Shape <- function(pm=readmesh(), dbf=NULL){
   tt = pm@mesh[,2:4]
   pp=pm@point[,2:3]
   dd = pm@point[,4]
