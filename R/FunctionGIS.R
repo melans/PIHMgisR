@@ -34,9 +34,11 @@ sp2raster <- function (sp, mask = get('PIHM.MASK', envir = .pihm),
 #' @param ngrids Number of grid along x direction.
 #' @param rr Default mask in .pihm environment
 #' @param resolution Resolution, defaul = NULL, resolution = extent / ngrids
+#' @param proj Projection parameter
 #' @return Raster map
 #' @export
-PIHM.mask  <- function (pm = readmesh(), rr = get('PIHM.MASK', envir = .pihm),
+PIHM.mask  <- function (pm = readmesh(), proj=NULL,
+                        rr = get('PIHM.MASK', envir=.pihm),
                         ngrids=200, resolution=NULL){
   # mesh=readmesh(shp=TRUE); ngrids=100; resolution=0
   if(is.null(rr)){
@@ -58,6 +60,9 @@ PIHM.mask  <- function (pm = readmesh(), rr = get('PIHM.MASK', envir = .pihm),
     # saveRDS(file=RDSfile, r)
     # }
     # assign("PIHM.MASK",rr, envir = .pihm)
+    if(!is.null(proj)){
+      raster::crs(rr) = proj
+    }
     assign('PIHM.MASK', rr, envir=.pihm)
   }else{
     rr = rr
@@ -68,15 +73,16 @@ PIHM.mask  <- function (pm = readmesh(), rr = get('PIHM.MASK', envir = .pihm),
 #' SpatialData to Raster
 #' \code{MeshData2Raster} 
 #' @param x vector or matrix, length/nrow is number of cells.
-#' @param mask mask of PIHM mesh
+#' @param rmask mask of PIHM mesh
+#' @param proj Projejction parameter
 #' @return Raster map
 #' @export
 MeshData2Raster <- function(x=getElevation(),
-                            rmask=PIHM.mask()){
+                            rmask=PIHM.mask(proj=proj), proj=NULL){
   #Interpolate and write ASC map out.
   # loadinglib('akima')
   if( is.matrix(x) | is.data.frame(x)){
-    x = x[nrow(x),]
+    x = as.numeric(x[nrow(x),])
   }
   if(any(is.na(x)) ){
     x[is.na(x)] = 0
