@@ -38,4 +38,3 @@ datafilter.riv <-function(x, filter=NULL, plot=TRUE){
   }
   ret
 }
-
