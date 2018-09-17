@@ -72,6 +72,6 @@ pihmcalib <- function(){
   v=rep(1, length(cn))
   names(v) = cn
   v['SFCTMP'] = 0  
-  v['Aquifer'] = 0  
+  v['AQUIFER'] = 0  
   v
 }
