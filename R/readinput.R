@@ -64,9 +64,9 @@ readriv <-function(file = PIHM.filein()['md.riv'] ){
 #' @param file full path of .rivchn file
 #' @return matrix
 #' @export
-readchannel <-function(file = PIHM.filein()['md.chn'] ){
+readchannel <-function(file = PIHM.filein()['md.rivseg'] ){
   d = read.df(file = file);
-  ret <- d
+  ret <- d[[1]]
 }
 
 #============
