@@ -24,16 +24,18 @@ datafilter.riv <-function(x, filter=NULL, plot=TRUE){
   ret = data.frame(id, ymin[id], ymax[id], filter[id])
   colnames(ret) = c('ID','Vmin','Vmax', 'Filter')
   rownames(ret) = id
+  ylim=range(c(filter, y))
   if(plot ){
     if(length(id) > 0){
       id = id
+      message( length(id), ' rivers are filtered.')
     }else{
       id = 1:ncol(x)
     }
     yv = sort(( unique(filter) ))
     ny = length(yv)
     col = uid
-    zoo::plot.zoo(y[,id], col=col[tid[id]], ylim=c(0,2) , screen=1)
+    zoo::plot.zoo(y[,id], col=col[tid[id]], ylim=ylim, screen=1)
     graphics::abline( h=yv, col=col, lwd=3, lty=2)
   }
   ret
