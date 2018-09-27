@@ -47,7 +47,7 @@ pihmpara <- function( nday = 10){
          'START', 'END', 
          'STEPSIZE_FACTOR', 'MODEL_STEPSIZE',
          dts)
-  v = c(0, 0, 3,
+  v = c(0, 0, 2,
         0, 1,
         8,
         1e-4, 1e-3,
