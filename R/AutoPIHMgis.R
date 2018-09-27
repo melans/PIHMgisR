@@ -13,6 +13,10 @@
 #' @param AqDepth Depth of aquifer bottom, which is surface elemvation minus bedrock elevation. meter.
 #' @param years Years to generate the LAI, Meltfactor, Roughness Length, which must be same as the period of forcing data.
 #' @param clean Whether clean the existing model files in output directory.
+#' @param cfg.para  model configuration, parameter
+#' @param cfg.calib model calibration
+#' @param rm.outlier Whether to remove the outlier in soil/geol;
+#' @param mf Meltfactor
 #' @return \code{PIHM.mesh}
 #' @export
 #' @examples 
@@ -34,11 +38,16 @@ autoPIHMgis <- function(
   tol.len = 500,
   AqDepth = 10,
   years = 2000:2010, 
-  clean = TRUE
+  clean = TRUE,
+  cfg.para = pihmpara(nday = 365*length(years) +round(length(years)/4) ),
+  cfg.calib = pihmcalib(),
+  mf = MeltFactor(years = years),
+  rm.outlier = TRUE
 ){
-  pihmout = file.path(outdir, prjname)
+  pihmout = file.path(outdir)
+  dir.create(pihmout, showWarnings = FALSE, recursive = TRUE)
   ny=length(years)
-  nday = 365*ny +round(ny/4)
+  
   clib=c('rgdal', 'rgeos', 'raster', 'sp')
   x=lapply(clib, library, character.only=T)
   library(PIHMgisR)
@@ -97,8 +106,8 @@ autoPIHMgis <- function(
   riv.simp = riv.s2
   
   tri = m.DomainDecomposition(wb=wb.simp,q=q.min, a=a.max)
-  graphics.off()
-  plot(tri, asp=1)
+  # graphics.off()
+  # plot(tri, asp=1)
   message('Number of Triangles = ', nrow(tri$T))
   # cin = readline(prompt = "See the plot. Go on?\n")
   # if( cin %in% c('n','N')){
@@ -108,6 +117,10 @@ autoPIHMgis <- function(
   pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
   sm = sp.mesh2Shape(pm)
   writeshape(sm, raster::crs(wbd), file=file.path(gisout, 'domain'))
+  plot(sm)
+  png(filename = file.path(pngout, 'data_Mesh.png'), height=11, width=11, res=100, units='in')
+  plot(sm)
+  dev.off()
   
   # generate PIHM .att
   pa=pihmAtt(tri, r.soil = rsoil, r.geol = rgeol, r.lc = rlc, r.forc = sp.forc )
@@ -117,8 +130,16 @@ autoPIHMgis <- function(
   
   # generate PIHM .riv
   pr=pihmRiver(riv.simp, dem)
+  message('Number of Rivers = ', nrow(pr@river))
   # Correct river slope to avoid negative slope
+  pz0 = pr@point[, 'Zmax']
   pr = correctRiverSlope(pr)
+  dz = pz0 - pr@point[, 'Zmax']
+  plot(dz)
+  png(filename = file.path(pngout, 'data_RiverDZ.png'), height=11, width=11, res=100, units='in')
+  plot(dz)
+  dev.off()
+
   # PIHMriver to Shapefile
   sriv = sp.riv2shp(pr)
   writeshape(sriv, raster::crs(wbd), file=file.path(gisout, 'river'))
@@ -147,15 +168,12 @@ autoPIHMgis <- function(
   plot(spp.riv, col=spp.riv@data[,5] + 1 , add=TRUE, lwd=3)
   dev.off()
   
-  # model configuration, parameter
-  cfg.para = pihmpara(nday = nday)
-  # calibration
-  cfg.calib = pihmcalib()
   #soil/geol/landcover
   lc = unlist(alc)
   para.lc = PTF.lc(lc)
-  para.soil = PTF.soil(asoil)
-  para.geol = PTF.geol(asoil)
+  para.soil = PTF.soil(asoil, rm.outlier = rm.outlier)
+  para.geol = PTF.geol(asoil, rm.outlier = rm.outlier)
+  
   
   # 43-mixed forest in NLCD classification
   # 23-developed, medium           
@@ -175,8 +193,6 @@ autoPIHMgis <- function(
   write.tsd(lr$LAI, file = fin['md.lai'])
   write.tsd(lr$RL, file = fin['md.rl'])
   
-  #MeltFactor
-  mf = MeltFactor(years = years)
   write.tsd(mf, file=fin['md.mf'])
   
   # write PIHM input files.
