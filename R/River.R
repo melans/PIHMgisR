@@ -101,6 +101,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
   len = RiverLength(pr)
   oid = getOutlets(pr)
   nloop=0
+  pz0 = pr@point[, 'Zmax']
   while(nflag > 0 & maxrun > nloop){
     nloop=nloop+1
     pz = pr@point[, 'Zmax']
@@ -118,7 +119,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
         p2 = pto[otid]
         ll = len[otid]
 
-        pz[p2] = pz[p1] - minSlope*ll
+        pz[p2] = pz[p1] - minSlope*ll - EPS
         #pz[pto[rid]] = pz[pfr[rid]] - len[rid] * minSlope - EPS
         pr@point[,'Zmax'] = pz
       }else{
@@ -159,6 +160,10 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
       pr@point[,'Zmax'] = pz
     }
   }
+  dz = pz0 - pz
+  dz0 = dz[ dz!= 0]
+  message(length(dz0), ' points was changed.')
+  print(summary(dz0))
   pr
 }
 
