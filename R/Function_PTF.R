@@ -93,6 +93,7 @@ PTF <- function (x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ), topsoil=TRUE){
 #' \code{PTF.soil} 
 #' @param topsoil TRUE/FALSE, default = TRUE
 #' @param  x  data.frame or matrix, column = c(Silt_perc, Clay_perc, OrganicMatter _perc, BulkDensity g/cm3)
+#' @param rm.outlier Whether replace the outliers in each column with the mean value of the column.
 #' @return Hydraulic parameters, matrix
 #' @export
 #' @examples 
@@ -101,7 +102,9 @@ PTF <- function (x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ), topsoil=TRUE){
 #' apply(y[,-1], 2, summary)
 #' plot(x[,3], y[,2])
 PTF.soil <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
-                     topsoil=TRUE){
+                     topsoil=TRUE,
+                     rm.outlier=FALSE
+                     ){
   y = as.matrix(x, ncol = 4)
   nsoil  = nrow(y)
   ly = topsoil * matrix(1, nrow= nsoil)
@@ -118,6 +121,15 @@ PTF.soil <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
   ret[,6:7]= ptf[,4:5] #alpha, beta in van genuchten.
   ret[,8] = 0.01; #macropore fraction, 1_perc
   ret[,9] = ptf[,2] * 100 # Kmp = kmx * 100;
+  if(rm.outlier){
+    for(i in 2:ncol(ret)){
+      oid = which_outliers(ret[,i])
+      if(i==2){
+        oid = c(oid, which(ret[,i] < 1e-3))
+      }
+      ret[oid,i] = mean(ret[-oid, i])
+    }
+  }
   ret
 }
 
@@ -126,6 +138,7 @@ PTF.soil <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
 #' \code{PTF.geol} 
 #' @param  x  data.frame or matrix, column = c(Silt_perc, Clay_perc, OrganicMatter _perc, BulkDensity g/cm3)
 #' @param topsoil TRUE/FALSE, default = FALSE
+#' @param rm.outlier Whether replace the outliers in each column with the mean value of the column.
 #' @return Hydraulic parameters, matrix
 #' @export
 #' @examples 
@@ -134,7 +147,7 @@ PTF.soil <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
 #' apply(y[,-1], 2, summary)
 #' plot(x[,3], y[,2])
 PTF.geol <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
-                     topsoil=FALSE){
+                     topsoil=FALSE, rm.outlier = FALSE){
   y = as.matrix(x, ncol = 4)
   nsoil  = nrow(y)
   ly = topsoil * matrix(1, nrow= nsoil)
@@ -154,6 +167,15 @@ PTF.geol <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
   ret[,6] = 0.01;         #vertical macropore fraction, 1_perc
   ret[,7] = ptf[,2] * 1e5 # Kmp = kmx * 100,000;
   ret[,8] = 1            # Depth of Macropore;
+  if(rm.outlier){
+    for(i in 2:ncol(ret)){
+      oid = which_outliers(ret[,i])
+      if(i %in% c(2,3) ){
+        oid = c(oid, which(ret[,i] < 1e-3))
+      }
+      ret[oid,i] = mean(ret[-oid, i])
+    }
+  }
   ret
 }
 #' The default land cover parameters from University of Marryland Classification
