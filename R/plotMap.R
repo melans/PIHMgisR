@@ -13,9 +13,9 @@
 #' extent(r) <- c(0, 610, 0, 870)
 #' r1= sin(r/100)
 #' r2= cos(r/100)
-#' compareMaps(list(r,rr), mfrow=c(1,2))
+#' compareMaps(list(r,r1), mfrow=c(1,2))
 #' compareMaps(list(r,r1,r2, r1+r2), mfrow=c(2,2))
-#' compareMaps(list(r,r1,r2, r1+r2), mfrow=c(2,2), contour = T)
+#' compareMaps(list(r,r1,r2, r1+r2), mfrow=c(2,2), contour = TRUE)
 compareMaps <- function(r, mfrow, contour=FALSE, ...){
   nr = length(r)
   is.Raster <- function(x)  {
