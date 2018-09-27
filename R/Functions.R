@@ -102,7 +102,35 @@ count <- function(x, n=NULL){
   rt
 }
 
-
+#' Find the outliers in a dataset
+#' \code{which_outliers} 
+#' @param x dataset
+#' @param na.rm Whether ignore the na value.
+#' @param probs Range of non-outlier range
+#' @param ... More options in quatile();
+#' @return Index of the outliers
+#' @export 
+#' @examples
+#' set.seed(1)
+#' x <- rnorm(100)
+#' x <- c(-10, x, 10)
+#' id <- which_outliers(x, probs=c(0.05,0.95))
+#' y = x
+#' y[id]=NA
+#' par(mfrow = c(1, 2))
+#' boxplot(x, ylim=range(x))
+#' boxplot(y, ylim=range(x))
+#' par(mfrow=c(1,1))
+which_outliers <- function(x, na.rm = TRUE, probs=c(.5, .95),...) {
+  qnt <- stats::quantile(x, probs=probs, na.rm = na.rm, ...)
+  H <- 1.5 * stats::IQR(x, na.rm = na.rm)
+  y <- x
+  y[x < (qnt[1] - H)] <- NA
+  y[x > (qnt[2] + H)] <- NA
+  id=which(is.na(y))
+  id
+}
+#' par(mfrow=c(1,1))
 #' Convert SpatialLines or SpatialPolygons a Planar Straight Line Graph object
 #' \code{sp2PSLG} 
 #' @param sp SpatialLines or SpatialPolygons
