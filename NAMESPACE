@@ -9,3 +9,5 @@ importFrom("grDevices", "adjustcolor", "dev.off", "graphics.off",
              "png", 'rgb')
 importFrom("ggplot2", "ggplot", "aes", "element_blank",
              "theme")
+importFrom("graphics", "hist", "par")
+importFrom("utils", "read.table")
