@@ -7,6 +7,7 @@ using namespace Rcpp;
 //' @param X required
 //' @param Y required
 //' @return Area
+//' @export
 // [[Rcpp::export]]
 double polygonArea(NumericVector X, NumericVector Y)  {
   int n=X.size();

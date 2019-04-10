@@ -4,6 +4,11 @@
 #' @param sp a SpatialLines or SpatialPoygons object
 #' @param split_length the length of the segments to split the lines into, in units of the SpatialLine object
 #' @param plot.results TRUE/FALSE 
+#' @importFrom grDevices dev.off graphics.off png rgb topo.colors 
+#' @importFrom graphics grid hist lines par plot points 
+#' @importFrom methods as 
+#' @importFrom stats dist rnorm time 
+#' @importFrom utils read.table 
 #' @return simplified SpatialLines
 #' @source  https://stackoverflow.com/questions/38700246/how-do-i-split-divide-polyline-shapefiles-into-equally-length-smaller-segments
 #' @export

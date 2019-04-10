@@ -5,18 +5,6 @@
 
 using namespace Rcpp;
 
-// getCentroid
-NumericMatrix getCentroid(NumericMatrix poly, NumericMatrix points);
-RcppExport SEXP _PIHMgisR_getCentroid(SEXP polySEXP, SEXP pointsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type poly(polySEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
-    rcpp_result_gen = Rcpp::wrap(getCentroid(poly, points));
-    return rcpp_result_gen;
-END_RCPP
-}
 // polygonArea
 double polygonArea(NumericVector X, NumericVector Y);
 RcppExport SEXP _PIHMgisR_polygonArea(SEXP XSEXP, SEXP YSEXP) {
@@ -54,7 +42,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_PIHMgisR_getCentroid", (DL_FUNC) &_PIHMgisR_getCentroid, 2},
     {"_PIHMgisR_polygonArea", (DL_FUNC) &_PIHMgisR_polygonArea, 2},
     {"_PIHMgisR_rowMatch", (DL_FUNC) &_PIHMgisR_rowMatch, 2},
     {"_PIHMgisR_triTopology", (DL_FUNC) &_PIHMgisR_triTopology, 1},

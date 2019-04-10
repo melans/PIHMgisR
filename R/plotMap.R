@@ -1,4 +1,22 @@
-
+#' Plot map of time-series data
+#' \code{ts2map} 
+#' @param x Time-series data
+#' @param fun Functions to summarize the TS data.
+#' @param ... More options in fun
+#' @export
+#' @examples 
+ts2map <- function(x, fun = mean, raster=TRUE, ...){
+  y = apply(x, 2, fun, ...)
+  if(raster){
+    r=MeshData2Raster(y)
+    raster::plot(r)
+  }else{
+    dbf = cbind(y); colnames(dbf) = 'tsvalue'
+    r = sp.mesh2Shape(dbf=y)
+    plot_sp(r, zcol='tsvalue')
+  }
+  return(r)
+}
 #' Plot multiple maps
 #' \code{compareMaps} 
 #' @param r List of raster or SpatialData
@@ -32,4 +50,47 @@ compareMaps <- function(r, mfrow, contour=FALSE, ...){
   }
   grid()
   par(mfrow=c(1,1))
+}
+
+#' Plot SpatialPolygons maps
+#' \code{plot.sp} 
+#' @param x Spatial*
+#' @param zcol The column to plot
+#' @param col.fun Functions of coloring.
+#' @param ncol Number of colors in color function.
+#' @export
+plot_sp <-function(x, zcol, col.fun = topo.colors, ncol = 20){
+  z = x@data[, zcol]
+  col = col.fun(length(z))
+  ord = order(z)
+  raster::plot(x[ord, ], col=col)
+}
+
+#' Plot animation maps
+#' \code{plot.animate} 
+#' @param x Time-series data.
+#' @param id Which row(s) to plot in the animation.
+#' @param nmap Number of maps to be plot.
+#' @param rlist RasterStack of the maps.
+#' @export
+plot_animate <- function(x, id = NULL, nmap = 10, rlist = NULL ){
+  if(is.null(rlist)){
+    nr = nrow(x)
+    if(is.null(id)){
+      if(nr < 20){
+        id = 1:nr
+      }else{
+        id = sort(unique( round(seq(1, nrow(x), length.out = nmap) ) ) )
+      }
+    }
+    y = x[id,]
+    tx = paste(time(y) )
+    rlist = raster::stack(apply(y, 1, FUN=function(xr){ MeshData2Raster(xr)  } ))
+    names(rlist) = tx
+  }else{
+    rlist = raster::stack(rlist)
+  }
+  par(mfrow=c(1,1))
+  raster::animate(rlist)
+  ret = rlist
 }

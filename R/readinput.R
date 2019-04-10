@@ -56,7 +56,8 @@ readriv <-function(file = PIHM.filein()['md.riv'] ){
   d = read.df(file = file);
   ret <- PIHM.river(river = data.frame(d[[1]]), 
                     rivertype = data.frame(d[[2]]),
-                    point = data.frame(d[[3]]) )
+                    point = data.frame() #data.frame(d[[3]]) 
+                    )
 }
 
 #' Read the .rivchn file
@@ -98,14 +99,13 @@ readcalib <- function(file = PIHM.filein()['md.calib'] ){
 readpc <- function(file = PIHM.filein()['md.para'] ){
   # file = fin['md.para']
   tline = readLines(file, skipNul = TRUE)
+  tline=tline[!grepl('^#', tline)]
   tmp = which(grepl('[:Alpha:]', tline) | grepl('[:alpha:]', tline))
-  
-  value = as.data.frame( utils::read.table(text = tline, header=FALSE, row.names= 1) )
-  para = unlist(value)
-  names(para) = toupper(rownames(value))
-  para
+  value = as.data.frame( utils::read.table(text = tline, header=FALSE) )
+  para = as.numeric(value[,-1])
+  names(para) = toupper(as.character(value[,1]) )
+  para <- para
 }
-
 
 #============
 #' Read the .ic file
@@ -195,5 +195,6 @@ readforc.csv <-function(file = PIHM.filein()['md.forc'], id=NULL){
     tsd=zoo::zoo(y[,-1], xt)
     ret[[i]] = tsd
   }
+  names(ret) = basename(fns)
   ret
 }

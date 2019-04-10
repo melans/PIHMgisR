@@ -31,10 +31,7 @@ pihmpara <- function( nday = 10){
              paste0('qe_', c('etp', 'prcp', 'infil', 'rech') ),
              
              paste0('yr_', c('stage')),
-             paste0('Qr_', c('chn', 'surf', 'sub'))
-             
-             # paste0('Ql_', c('chn', 'surf', 'sub')),
-             # paste0('ql_', 'et')
+             paste0('Qr_', c('down', 'surf', 'sub', 'up'))
            ))
   )
   vdt = rep(1440, length(dts))
@@ -65,13 +62,18 @@ pihmpara <- function( nday = 10){
 #' @export
 pihmcalib <- function(){
   cn = toupper( c('KSATH', 'KSATV', 'KINF', 'KMACSATH', 'KMACSATV', 'DINF', 'DROOT', 'DMAC',
-                  'POROSITY', 'ALPHA', 'BETA', 'MACVF', 'MACHF', 'VEGFRAC', 'ALBEDO', 'ROUGH',
+                  'THETAS','THETAR', 'ALPHA', 'BETA', 'MACVF', 'MACHF', 'VEGFRAC', 'ALBEDO', 'ROUGH',
                   'Aquifer', 
-                  'PRCP', 'SFCTMP', 'EC', 'ETT', 'EDIR', 'RIV_ROUGH', 'RIV_KH', 'RIV_DPTH',
-                  'RIV_WDTH', 'RIV_SINU', 'Soil_Dgd', 'ImpAF', 'ISMAX') )
+                  'PRCP', 'SFCTMP', 'EC', 'ETT', 'EDIR',
+                  'RIV_ROUGH', 'RIV_KH', 'RIV_DPTH',
+                  'RIV_WDTH', 'RIV_SINU', 'RIV_CWR', 'RIV_BSLOPE',
+                  'Soil_Dgd', 'ImpAF', 'ISMAX') )
   v=rep(1, length(cn))
   names(v) = cn
   v['SFCTMP'] = 0  
   v['AQUIFER'] = 0  
+  v['RIV_DPTH'] = 0  
+  v['RIV_WDTH'] = 0  
+  v['RIV_BSLOPE'] = 0  
   v
 }

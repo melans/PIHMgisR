@@ -16,7 +16,8 @@ ModelInfo <- function(path=get('outpath', envir=.pihm) ){
   ia = data.frame('Area' =  getArea() )
   png.control(fn = paste0('AreaHist','.png'), path=outdir, ratio = 11/9 ) 
   nb=20
-  p<-ggplot2::ggplot(ia, aes(Area)) + ggplot2::labs( x = "Area (m2)" ) +
+  Area = getArea()
+  p<-ggplot2::ggplot(ia, ggplot2::aes(Area)) + ggplot2::labs( x = "Area (m2)" ) +
     ggplot2::geom_histogram(bins=nb) + 
     ggplot2::geom_freqpoly(bins=nb, col=2, lty=2)
   print(p)

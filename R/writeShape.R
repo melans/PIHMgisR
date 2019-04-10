@@ -1,9 +1,10 @@
 #' Write ESRI shapefile out
-#' \code{writeshape} 
+#' \code{writeshape}
 #' @param shp Spatial file
-#' @param crs projection 
+#' @param crs projection
 #' @param file file path, without '.shp'.
-#' @examples 
+#' @export
+#' @examples
 #' library(sp)
 #' library(rgeos)
 #' library(rgdal)

@@ -1,12 +1,12 @@
 #' Generate the PIHM mesh data from the triangulation
-#' \code{pihmMesh} 
+#' \code{pihmMesh}
 #' @param tri Triangles defination
 #' @param dem Elevation. Projection of the DEM raster must be same as watershed boundary.
 #' @param AqDepth Aquifer depth, numeric.
 #' @param r.aq  Aquifer Thickness. Raster object
 #' @return Triangle mesh of model domain.
 #' @export
-#' @examples 
+#' @examples
 #' library(raster)
 #' data(sac)
 #' wbd=sac[['wbd']]
@@ -17,26 +17,35 @@
 #' tol.wb = 200
 #' tol.len = 500
 #' AqDepth = 10
-#' 
+#'
 #' wbbuf = rgeos::gBuffer(wbd, width = 2000)
 #' dem = raster::crop(dem, wbbuf)
-#' 
+#'
 #' wb.dis = rgeos::gUnionCascaded(wbd)
 #' wb.simp = rgeos::gSimplify(wb.dis, tol=tol.wb, topologyPreserve = TRUE)
-#' 
-#' 
+#'
+#'
 #' tri = m.DomainDecomposition(wb=wb.simp,q=q.min, a=a.max)
 #' plot(tri, asp=1)
-#' 
-#' # generate PIHM .mesh 
+#'
+#' # generate PIHM .mesh
 #' pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
 #' sm = sp.mesh2Shape(pm)
 #' raster::plot(sm)
 pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth ){
   topo=triTopology(tri$T)
   pt = tri$P;
-  m = data.frame(1:nrow(topo), tri$T, topo[,2:4])
-  colnames(m) = c('ID', paste0('Node', 1:3), paste0('Nabr',1:3))
+  pid=tri$T;
+
+  x = (pt[pid[,1],1] + pt[pid[,2],1] + pt[pid[,3], 1]) / 3
+  y = (pt[pid[,1],2] + pt[pid[,2],2] + pt[pid[,3], 2]) / 3
+
+  cxy = cbind(x, y)
+  zc=raster::extract(dem, cxy)
+
+  m = data.frame(1:nrow(topo), tri$T, topo[,2:4], zc)
+  colnames(m) = c('ID', paste0('Node', 1:3), paste0('Nabr',1:3), 'Zmax')
+
   zs=raster::extract(dem, pt)
   aq=raster::extract(r.aq, pt)
   pt = data.frame(1:nrow(pt), pt, aq, zs)
@@ -45,7 +54,7 @@ pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth ){
 }
 
 #' Centroids of the triangulation
-#' \code{Tri2Centroid} 
+#' \code{Tri2Centroid}
 #' @param tri Triangles defination
 #' @return Centroids of the triangles, m x 2;
 #' @export
@@ -57,10 +66,10 @@ Tri2Centroid <- function(tri){
   ret <- cbind(xc,yc)
 }
 #' extract Coordinates of SpatialLines or  SpatialPolygons
-#' \code{pihmAtt} 
+#' \code{pihmAtt}
 #' @param tri Triangles defination
 #' @param r.soil raster of soil classification
-#' @param r.geol raster of geology layer 
+#' @param r.geol raster of geology layer
 #' @param r.lc raster of land cover, LAI and Roughness Length
 #' @param r.forc raster of forcing data
 #' @param r.mf raster of melt factor

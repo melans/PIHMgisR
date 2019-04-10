@@ -2,15 +2,32 @@
 #' \code{m.DomainDecomposition} 
 #' @param wb SpatialPolygon or SpatialLines which define the watershed boundary
 #' @param riv SpatialLines of river network, optional
+#' @param dem DEM data, used for generate the regional highest/lowest points.
+#' @param window Size of the window for regional h/l points.
+#' @param lk SpatialPolygon of lake.
 #' @param q minimum angle of triangle
 #' @param ... more options in RTriangle::triangulate()
 #' @return Coordinates of triangles centroids
 #' @export
-m.DomainDecomposition <- function(wb, riv=NULL, q=30, ...){
+m.DomainDecomposition <- function(wb, dem = NULL, riv=NULL, lk=NULL, q=30, ...){
   #x is a spatialpolygons
   # wb=wb$wb.simp
   # riv=riv$Riv.simp
+  # wb=wb.simp
+  # lk=lk.sim
+  # plot(wb);plot(lk,add=T)
   ps1 = sp2PSLG(wb)
+  if(!is.null(dem)){
+    raster::movingFun()
+  }
+  # if(!is.null(lk)){
+  #   ps3 = sp2PSLG(lk)
+  #   n1 = nrow(ps1$P)
+  #   ps=RTriangle::pslg(P = rbind(ps1$P, ps3$P),
+  #           S = rbind(ps1$S, ps3$S + n1) )
+  # }else{
+  #   
+  # }
   if(!is.null(riv)){
     ps2 = sp2PSLG(riv)
     n1 = nrow(ps1$P)
@@ -21,6 +38,10 @@ m.DomainDecomposition <- function(wb, riv=NULL, q=30, ...){
   }
   p = RTriangle::pslg(P=ps$P,
            S = ps$S)
+  # tri <- RTriangle::triangulate(p, a=500000, q=20)
+  # plot(tri, asp=1, type='n')
+  # dim(tri$T)
+  
   if(q >35){
     q = 35;
   }

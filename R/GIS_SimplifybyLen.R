@@ -22,7 +22,7 @@ sp.simplifyLen <-function(sp, tol, threshold=tol/2){
   }
   
   simplify.line<- function(sll, tol=NULL, threshold=tol/2){
-    coord = coordinates(sll)
+    coord = sp::coordinates(sll)
     xd = getDist(coord)
     nx = length(xd)
     if(is.null(tol)){

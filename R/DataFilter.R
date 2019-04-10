@@ -1,9 +1,14 @@
 
-#' Pedotransfer function to generate soil/geol parameter from soil texture
-#' \code{autoPIHMgis} 
+#' Filter the river data with a filter
+#' \code{datafilter.riv} 
 #' @param x  Input data
 #' @param filter Data filter
-#' @param plot Whether plot the 
+#' @param plot Whether plot the data
+#' @importFrom grDevices dev.off graphics.off png rgb topo.colors 
+#' @importFrom graphics grid hist lines par plot points 
+#' @importFrom methods as 
+#' @importFrom stats dist rnorm time 
+#' @importFrom utils read.table 
 #' @return Matrix information, c('ID','Vmin','Vmax', 'Filter')
 #' @export
 datafilter.riv <-function(x, filter=NULL, plot=TRUE){
@@ -14,7 +19,7 @@ datafilter.riv <-function(x, filter=NULL, plot=TRUE){
   cb = readcalib()
   tid = pr@river[,'Type']
   uid = sort(unique(tid))
-  st=pr@rivertype[tid, 'Depth'] * cb['RIV_DPTH']
+  st=pr@rivertype[tid, 'Depth'] + cb['RIV_DPTH']
   if( is.null(filter) ){
     filter = st
   }

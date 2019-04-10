@@ -6,6 +6,7 @@
 #' @export
 PIHM.filein <- function(projname=get('PRJNAME', envir=.pihm),
                         indir = get('inpath', envir=.pihm) ){
+  dir.create(indir, showWarnings = FALSE, recursive = TRUE)
   fn.mesh = file.path(indir, paste0(projname, '.sp.mesh' ) );
   fn.att = file.path(indir, paste0(projname, '.sp.att' ) );
   fn.pt = file.path(indir, paste0(projname, '.sp.points' ) )

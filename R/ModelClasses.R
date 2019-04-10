@@ -4,6 +4,7 @@
 #' @slot mesh data.frame or matrix
 #' @slot point data.frame or matrix
 #' @return Class of PIHM.mesh
+#' @importFrom methods new
 #' @export
 PIHM.mesh <- methods::setClass("PIHM mesh",
                       slots = c(mesh="data.frame", 
@@ -14,6 +15,7 @@ PIHM.mesh <- methods::setClass("PIHM mesh",
 #' @slot rivertype data.frame or matrix
 #' @slot point data.frame or matrix
 #' @return Class of PIHM.river
+#' @importFrom methods new
 #' @export
 PIHM.river <- methods::setClass("PIHM River", 
                       slots = c(river="data.frame", 
@@ -37,6 +39,7 @@ NULL
 #' @docType data
 #' @keywords sunapee
 NULL
+
 
 #' This is .pihm environment.
 #' @name .pihm

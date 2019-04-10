@@ -1,5 +1,5 @@
 #' SpatialData to Raster
-#' \code{sp2raster} 
+#' \code{sp2raster}
 #' @param sp SpatialPolygon
 #' @param mask Raster mask of mesh domain.
 #' @param ngrids Number of grid along x direction.
@@ -8,7 +8,7 @@
 #' @return Raster map
 #' @export
 sp2raster <- function (sp, mask = get('PIHM.MASK', envir = .pihm),
-                       ngrids=200, 
+                       ngrids=200,
                        resolution=NULL, field=1) {
   if( is.null(mask) ){
     ext <-  raster::extent (sp)
@@ -29,7 +29,7 @@ sp2raster <- function (sp, mask = get('PIHM.MASK', envir = .pihm),
 }
 
 #' Generate the raster mask of Mesh domain
-#' \code{PIHM.mask} 
+#' \code{PIHM.mask}
 #' @param pm \code{PIHM.mesh}
 #' @param ngrids Number of grid along x direction.
 #' @param rr Default mask in .pihm environment
@@ -43,7 +43,7 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
   # mesh=readmesh(shp=TRUE); ngrids=100; resolution=0
   if(is.null(rr)){
     sp = sp.mesh2Shape(pm)
-    
+
     ext <-  raster::extent (sp)
     xlim=ext[1:2]
     ylim=ext[3:4]
@@ -71,14 +71,15 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
 }
 
 #' SpatialData to Raster
-#' \code{MeshData2Raster} 
+#' \code{MeshData2Raster}
 #' @param x vector or matrix, length/nrow is number of cells.
 #' @param rmask mask of PIHM mesh
 #' @param proj Projejction parameter
+#' @param pm PIHM mesh
 #' @return Raster map
 #' @export
 MeshData2Raster <- function(x=getElevation(),
-                            rmask=PIHM.mask(proj=proj), proj=NULL){
+                            rmask=PIHM.mask(proj=proj), pm=readmesh(), proj=NULL){
   #Interpolate and write ASC map out.
   # loadinglib('akima')
   if( is.matrix(x) | is.data.frame(x)){
@@ -90,9 +91,9 @@ MeshData2Raster <- function(x=getElevation(),
   if (any(is.infinite(x))){
     x[is.infinite(x)] = 0
   }
-  xy=getCentroid()[,1:2]
+  xy=getCentroid(pm=pm)[,1:2]
   tps <- fields::Tps(xy, x)
-  
+
   # use model to predict values at all locations
   r <- raster::interpolate(rmask, tps)
   ret <- raster::mask(r,rmask)
@@ -100,11 +101,11 @@ MeshData2Raster <- function(x=getElevation(),
 
 
 #' Remove the holes in polygons
-#' \code{removeholes} 
+#' \code{removeholes}
 #' @param sp SpatialPolygons or SpatialPolygonDataFrame
 #' @return Raster map
 #' @export
-#' @examples 
+#' @examples
 #' library(sp)
 #' p.out = Polygon(cbind(c(4,4,6,7,4),c(5,3,2,5,5))  )
 #' p.hole = Polygon(cbind(c(5,6,6,5,5),c(4,4,3,3,4) ), hole = TRUE)
@@ -141,14 +142,15 @@ removeholes <- function(sp){
   ret
 }
 #' Generatue fishnet
-#' \code{fishnet} 
+#' \code{fishnet}
 #' @param ext Extension of the fishnet. c(xmin, xmax, ymin, ymax)
 #' @param dx Interval of x direction
 #' @param dy Interval of y direction
-#' @param crs Projection 
+#' @param crs Projection
 #' @param polygons Whether to export SpatialPolygons
 #' @param points Whether to export SpatialPoints
 #' @param lines Whether to export SpatialLines
+#' @export
 #' @examples
 #' library(raster)
 #' pg=fishnet(ext=c(-80,80, -50,50), dx=5)
@@ -185,7 +187,7 @@ fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=1, dy=dx,
     colnames(df) = c('xmin','xmax','ymin', 'ymax','xcenter','ycenter')
     k=0
     for(i in 2:nx - 1){
-      for(j in 2:ny - 1){   
+      for(j in 2:ny - 1){
         k=k+1
         ll = cbind(xloc[i,j, ], yloc[i,j, ])
         pg=sp::Polygon(ll)
@@ -200,4 +202,137 @@ fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=1, dy=dx,
   # plot(ret, axes=T)
   raster::crs(ret) = crs
   ret
+}
+#' Add holes into Polygons
+#' \code{AddHoleToPolygon}
+#' @param poly SpatialPolygons
+#' @param hole Hole Polygon
+#' @export
+AddHoleToPolygon <-function(poly,hole){
+  # https://stackoverflow.com/questions/29624895/how-to-add-a-hole-to-a-polygon-within-a-spatialpolygonsdataframe
+  # invert the coordinates for Polygons to flag it as a hole
+  coordsHole <-  hole@polygons[[1]]@Polygons[[1]]@coords
+  newHole <- sp::Polygon(coordsHole,hole=TRUE)
+
+  # punch the hole in the main poly
+  listPol <- poly@polygons[[1]]@Polygons
+  listPol[[length(listPol)+1]] <- newHole
+  punch <-sp::Polygons(listPol,poly@polygons[[1]]@ID)
+
+  # make the polygon a SpatialPolygonsDataFrame as the entry
+  new <- sp::SpatialPolygons(list(punch),proj4string=poly@proj4string)
+  new <- sp::SpatialPolygonsDataFrame(new,data=as(poly,"data.frame"))
+}
+#' Cut sptialLines with threshold.
+#' \code{CutSptialLines}
+#' @param sl SpatialLines or SpatialLineDataFrame
+#' @param tol Tolerence. If the length of segment is larger than tolerance, cut the segment until the maximum segment is shorter than tolerance.
+#' @export
+#' @examples
+#' library(PIHMgisR)
+#' library(sp)
+#' x=1:1000/100
+#' l1 = Lines(Line(cbind(x, sin(x)) ), ID='a' )
+#' sl = SpatialLines( list(l1) )
+#' tol1=5;
+#' tol2 =2
+#' sl1 = CutSptialLines(sl, tol1)
+#' sl2 = CutSptialLines(sl, tol2)
+#' par(mfrow=c(1,2))
+#' plot(sl1, col=1:length(sl1));title(paste0('Tol=', tol1))
+#' plot(sl2, col=1:length(sl2));title(paste0('Tol=', tol2))
+CutSptialLines <- function(sl, tol){
+  ll = rgeos::gLength(sl, byid = TRUE)
+  if(all(ll < tol) ){
+    ret = sl
+  }else{
+    nsp = length(sl)
+    xsl = list(); ik=1
+    for(i in 1:nsp){
+      sx = sl[i, ]
+      pxy = extractCoords(sx,unique = TRUE)
+      np = nrow(pxy)
+      dacc = cumsum( sp::LineLength(pxy, sum = FALSE))
+      # dacc =getDist(pxy)
+      tol = max(c(tol, min(dacc) ) )
+      len= rgeos::gLength(sx)
+      if(len > tol){
+        nsplit = ceiling(len / tol)
+      }else{
+        nsplit = 1
+      }
+      dd = len / nsplit
+      v0 = 1  # Vetex 0, Vetex 1
+      message(i, '/', nsp, '\t', nsplit, '\t', round(dd, 2) )
+      for(k in 1:nsplit){
+        if(v0 >=np){
+          break
+        }
+        # message('\t', k, '/', nsplit)
+        dk = dd * k
+        v1 = order(abs(dacc - dk), decreasing = FALSE)[1] + 1
+        if(v1 + 1>=np){
+          v1 = np
+        }
+        message(v0,'\t', v1)
+        if(v0 == v1){
+          next;
+        }
+        # plot(sl[i, ]);points(pxy); points(pxy[c(v0, v1), ], pch=2, col=2)
+        xsl[[ik]]= sp::Lines(sp::Line( pxy[c(v0,v1), ]), ID=ik)
+        ik=ik+1
+        # points(pxy[v0:v1,], col=k)
+        v0=v1
+      }
+    }
+    nsl = length(xsl)
+    tmp = sp::SpatialLines(xsl, proj4string = raster::crs(sl))
+    ilen = rgeos::gLength(tmp, byid=TRUE)
+    att=data.frame('INDEX'=1:length(tmp), 'Length'=ilen)
+    ret = sp::SpatialLinesDataFrame(tmp, data = att)
+  }
+  ret
+}
+
+#'
+#' \code{extractRaster}
+#' @param r Raster
+#' @param s Slope of the line
+#' @param loc ratio on axis for (x,y), (0.5,0.5) is the center of plot
+#' @param ext extention of plot
+#' @param dx resolution
+#' @importFrom grDevices dev.off graphics.off png rgb topo.colors
+#' @importFrom graphics grid hist lines par plot points
+#' @importFrom methods as
+#' @importFrom stats dist rnorm time
+#' @importFrom utils read.table
+#' @export
+#' @examples
+#' library(raster)
+# r <- raster(ncol=36, nrow=18)
+# r[] <- 1:ncell(r)
+# xy <- cbind(-50, seq(-80, 80, by=20))
+# extract(r, xy)
+extractRaster<-function(r, s=0, loc = c(0.5, 0.5),
+                        ext = raster::extent(r),
+                        dx=raster::res(r)[1]){
+  x = seq(ext[1], ext[2], dx)
+  xlim=diff(ext[1:2])
+  ylim=diff(ext[3:4])
+  xc=xlim* loc[1] + ext[1]
+  yc=ylim * loc[2] + ext[3]
+
+  y = s * (x - xc) + yc
+  DY=ylim / diff(range(y))
+  x=(x - xc) * DY + xc
+  y = s * (x - xc) + yc
+
+  raster::plot(r);
+  points(xc,yc, col=2)
+  nx=length(x)
+  graphics::arrows(x[1], y[1], x[nx], y[nx], lty=3, lwd=1.5, col=2)
+  # lines(x,y, lwd=1.5, col=2, lty=2)
+  v = raster::extract(r, cbind(x,y))
+  ret = cbind('x'=x,'y'=y,'z'=v)
+  return(ret)
 }

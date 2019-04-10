@@ -1,39 +1,44 @@
-#' calculate river order
-#' \code{pihmRiver} 
-#' @param sp SpatialLines*
+#' calculate river order, downstream, slope and length
+#' \code{pihmRiver}
+#' @param sl SpatialLines*
 #' @param dem Raster of elevation
-#' @return Stream Order of SpatialLines*
+#' @return PIHM river
 #' @export
-pihmRiver <- function(sp, dem){
-  sp.slt = sp.Polylines2Lines(sp)
+pihmRiver <- function(sl, dem){
+  # sp.slt = sp.Polylines2Lines(sp)
+  sp.slt = sl
   nsp = length(sp.slt)
   xy = data.frame(extractCoords(sp.slt))
-  z = raster::extract(dem, xy)
-  pt = cbind(1:nrow(xy), xy, z)
-  colnames(pt) = c('Index','X', 'Y', 'Zmax')
-  
+  # z = raster::extract(dem, xy)
+  # pt = cbind(1:nrow(xy), xy, z)
+  # colnames(pt) = c('Index','X', 'Y', 'Zmax')
+  message('\nCalculate river order ...')
   rivord = sp.RiverOrder(sp.slt)
+  message('\nIdentify the downstrem ...')
   rivdown = sp.RiverDown(sp.slt)
-  
+  message('\nFrom/To nodes ...')
   ft = FromToNode(sp.slt)
+  message('\nSlope and length of river ...')
+  zf = raster::extract(dem, xy[ft[,1], ])
+  zt = raster::extract(dem, xy[ft[,2], ])
+  len = rgeos::gLength(sp.slt, byid = TRUE)
+  slp = (zf - zt) / len;
   row.names(sp.slt) = paste(1:nsp)
-  df = data.frame('Index'=1:nsp, 
-                  ft, 
+  df = data.frame('Index'=1:nsp,
                   'Down' = rivdown,
-                  'Type' = rivord
-  )
-  sp.df = SpatialLinesDataFrame(sp.slt,
-                                data=df)
+                  'Type' = rivord,
+                  'Slope' = slp,
+                  'Length' = len  )
+  rownames(df) = row.names(sp.slt)
+  sp.df = SpatialLinesDataFrame(sp.slt, data=df)
   ntype = max(rivord)
   rtype = RiverType(ntype)
-  
-  PIHM.river(river = df, 
-             rivertype = data.frame(rtype),
-             point = data.frame(pt)
+  PIHM.river(river = df,
+             rivertype = data.frame(rtype)
   )
 }
 #' Calculate the river length
-#' \code{RiverLength} 
+#' \code{RiverLength}
 #' @param pr PIHM river class
 #' @return River length, vector
 #' @export
@@ -52,7 +57,7 @@ RiverLength<- function(pr){
   d
 }
 #' Calculate the river slope
-#' \code{RiverSlope} 
+#' \code{RiverSlope}
 #' @param pr PIHM river class
 #' @return River slopes, vector
 #' @export
@@ -60,33 +65,33 @@ RiverSlope <- function(pr){
   rv = pr@river
   rt = pr@rivertype
   pt = pr@point
-  
+
   pfr = rv[,'FrNode']
   pto = rv[,'ToNode']
   z0 = pt[pfr, 'Zmax']
   z1 = pt[pto, 'Zmax']
   len = RiverLength(pr)
   s0 = (z0 - z1) / len
-  
+
   z = 0.5 * (z0 + z1)
   #=============
   idown = rv[, 'Down']
   zz = pt[pto, 'Zmax']
   oid=which(idown <= 0)
   idown[oid] = oid
-  
+
   z0 = z
   z1 = z[idown]
-  
+
   downlen = 0.5 * (len + len[idown] )
   s1 = (z0 - z1) / downlen
   s1[oid] = s0[oid]
   ret <- cbind(s0, s1)
 }
 #' Convert the bed slope of river, to avoid negative/zero slope
-#' \code{correctRiverSlope} 
+#' \code{correctRiverSlope}
 #' @param pr PIHM river class
-#' @param minSlope Minimum slope 
+#' @param minSlope Minimum slope
 #' @param maxrun Maximum number to run the loops
 #' @return SpatialLinesDataFrame
 #' @export
@@ -114,7 +119,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
       od = which(rid %in% oid)
       if(length(od) > 0){
         otid = rid[od]
-        
+
         p1 = pfr[otid]
         p2 = pto[otid]
         ll = len[otid]
@@ -140,7 +145,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
       }
     }
   }
-  
+
   flag = 1
   idown = pr@river[,'Down']
   nloop=0
@@ -168,7 +173,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
 }
 
 #' Convert the PIHM.river class to SpatialLines
-#' \code{sp.riv2shp} 
+#' \code{sp.riv2shp}
 #' @param pr PIHM river class
 #' @param dbf Attribute data for exported SpatialLines
 #' @return SpatialLinesDataFrame
@@ -177,43 +182,43 @@ sp.riv2shp <- function(pr = readriv(), dbf=NULL){
   pt = pr@point[,2:3]
   rt = pr@rivertype
   riv = pr@river
-  
+
   nr = nrow(riv)
   nt = nrow(rt)
   np = nrow(pt)
-  
+
   ft = riv[,2:3]
   sl=list()
   sls = list()
   for(i in 1:nr){
     coord = rbind(pt[ft[i,1], ], pt[ft[i,2], ])
-    sl[[i]] = Line( coord )
-    sls[[i]] = Lines(sl[[i]], i)
+    sl[[i]] = sp::Line( coord )
+    sls[[i]] = sp::Lines(sl[[i]], i)
   }
   if(is.null(dbf)){
     df = data.frame(riv, rt[riv[, 'Type'], ])
   }else{
     df = dbf
   }
-  spl = SpatialLines(sls)
+  spl = sp::SpatialLines(sls)
   rownames(df) = names(spl)
-  sp = SpatialLinesDataFrame(spl, data=df)
+  sp = sp::SpatialLinesDataFrame(spl, data=df)
   sp
 }
 
 #' Generate the river segments table
-#' \code{pihmRiverSeg} 
+#' \code{pihmRiverSeg}
 #' @param sl SpatialLinesDataFrame
 #' @return river segments table
 #' @export
 pihmRiverSeg <- function(sl){
-  df = data.frame('Index' = 1:length(sl), 
-                  sl@data, 
+  df = data.frame('Index' = 1:length(sl),
+                  sl@data,
                   'Length' = rgeos::gLength(sl, byid = T))
   df
 }
 #' Get outlet ID(s)
-#' \code{getOutlets} 
+#' \code{getOutlets}
 #' @param pr PIHM river class
 #' @return Index of outlets, numeric
 #' @export
@@ -222,4 +227,3 @@ getOutlets <- function(pr=readriv()){
   ids = which(idown < 0)
   ids
 }
-

@@ -1,10 +1,12 @@
 
 #include <Rcpp.h>
 using namespace Rcpp;
-//' Identify whether every row of \code{m} is same as \code{v};
-//' @param x required
-//' @param m required
+//' Identify whether every row of x is same as m;
+//' @param x Row vector
+//' @param m Matrix
 //' @return TRUE/FALSE of matching
+//' @useDynLib PIHMgisR
+//' @export
 // [[Rcpp::export]]
 LogicalVector rowMatch(NumericVector x, NumericMatrix m) {
   int n = x.size();

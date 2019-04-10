@@ -5,6 +5,7 @@ using namespace Rcpp;
 //' Determine the topological relation among triangles. 
 //' @param tri triangle defination, m x 3
 //' @return topological relation of triangles. m x 4; cols = c(ID, Nabor1, Nabor2, Nabor3)
+//' @export
 // [[Rcpp::export]]
 NumericMatrix triTopology(NumericMatrix tri) {
   int n = tri.nrow();

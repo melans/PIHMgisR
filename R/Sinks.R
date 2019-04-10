@@ -19,8 +19,8 @@ meshSinks <- function(pm = readmesh(), details=FALSE){
   dz = zn - zi
   tf=apply(dz, 1, FUN=function(x) {all( x >= 0, na.rm = TRUE)} )
   if(details){
-    ret = data.frame(ze, dz, (tf * 1) )
-    colnames(ret) = c('Zsurf', paste0('dz', 1:3), 'Sink')
+    ret = data.frame(ze, dz, apply(dz, 1, min, na.rm=T), (tf * 1) )
+    colnames(ret) = c('Zsurf', paste0('dz', 1:3), 'minDZ', 'Sink')
   }else{
     ret = tf
   }

@@ -3,6 +3,11 @@
 #' @param file  Full path of output file. 
 #' @param path path of the outputfile
 #' @keywords read output. Could be used for reading mesh and river format.
+#' @importFrom grDevices dev.off graphics.off png rgb topo.colors 
+#' @importFrom graphics grid hist lines par plot points 
+#' @importFrom methods as 
+#' @importFrom stats dist rnorm time 
+#' @importFrom utils read.table 
 #' @return A TimeSeries data. This list require support of xts packages.
 #' @export  
 readout <- function(keyword,
@@ -37,15 +42,17 @@ readout <- function(keyword,
 #' @return A list of TimeSeries data. 
 #' @export  
 BasicPlot <- function(
-  varname=c(paste0('YEle',c( 'surf','unsat', 'gw') ), 
-            paste0('qEle',c('prcp','etp','infil', 'rech') ),
-            paste0('qEle',paste0('et',0:2) ),
-            paste0('QRiv',c('flx', 'sub', 'surf')),
-            paste0('YRiv','stage')
+  varname=c(paste0('eley',c( 'surf','unsat', 'gw') ), 
+            paste0('elev',c('prcp','etp','infil', 'rech') ),
+            paste0('elev',paste0('et',0:2) ),
+            paste0('rivq',c('down', 'sub', 'surf')),
+            paste0('rivy','stage')
   ) ,
+  rdsfile = file.path(get('outpath', envir = .pihm), 'BasicPlot.RDS'),
   plot=TRUE, imap=FALSE,
   return=T){
   graphics.off()
+  varname = tolower(varname)
   print(varname)
   nv=length(varname)
   prjname = get('PRJNAME', envir = .pihm)
@@ -65,6 +72,7 @@ BasicPlot <- function(
     fn= paste0(prjname,'_', vn, '.png')
     message(i, '/', nv, '\t', vn, '\t', fn)
     x=readout(vn);
+    xm = xts::as.xts(apply(x, 1, mean), order.by=time(x))
     if(return){
       ret[[i]] = x;
     }
@@ -75,10 +83,11 @@ BasicPlot <- function(
       tr=paste( strftime(t0) ,'-', strftime(t1))
       png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
       pp=xts::plot.xts(x, main=vn)
+      pp = lines(xm, col=2, lwd=2, lty=2, type='b', pch=1)
       print(pp)
       dev.off()
       if(imap ){
-        if( grepl('^YEle', vn) | grepl('^qEle', vn) ){
+        if( grepl('^eley', vn) | grepl('^elev', vn) ){
           fn= paste0('Map.', prjname,'_', vn, '.png')
           y = colMeans(x)
           png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
@@ -91,6 +100,7 @@ BasicPlot <- function(
   }
   if(return){
     names(ret) = varname;
+    saveRDS(ret, file = rdsfile)
     ret
   }
 }

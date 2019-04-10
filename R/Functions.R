@@ -1,5 +1,5 @@
 #' Find the centroid of the triangles
-#' \code{toCentroid} 
+#' \code{toCentroid}
 #' @param tri Triangle, N x 3 dimension
 #' @param point Coordinates.
 #' @return Coordinates of triangles centroids
@@ -16,13 +16,13 @@ toCentroid <- function(tri, point){
   ret <- cbind('x'=xc,'y'=yc)
 }
 
-#' Eudilic Distance 
-#' \code{Eudist} 
+#' Eudilic Distance
+#' \code{Eudist}
 #' @param p1 coordinates of point 1
 #' @param p2 coordinates of point 2
 #' @return Distance between \code{p1} and \code{p2}
 #' @export
-#' @examples 
+#' @examples
 #' p1 = c(1,1)
 #' p2 = c(2,2)
 #' Eudist(p1,p2)
@@ -32,37 +32,45 @@ Eudist <- function(p1,p2){
 }
 
 #' extract Coordinates of SpatialLines or  SpatialPolygons
-#' \code{extractCoords} 
-#' @param sp SpatialLines or SpatialPolygons
-#' @param unique whether return unique coordinates or duplicated coordinates
+#' \code{extractCoords}
+#' @param x SpatialLines or SpatialPolygons
+#' @param unique Whether return unique coordinates or duplicated coordinates
+#' @param aslist Whether return as list of coordinates
 #' @return coordinates of points, m x 2.
 #' @export
-#' @examples 
-#' data('sac')
-#' wb=sac[['wbd']]
-#' extractCoords(wb)
-extractCoords<-function(sp, unique=TRUE){
-  spl <- methods::as(sp, "SpatialLines")  
-  x = coordinates(spl)
-  xy = NULL
-  for(i in 1:length(x)){
-    for(j in 1:length(x[[i]]) ){
-      xy = rbind(xy, x[[i]][[j]])
+#' @examples
+#' data('sh')
+#' wb=sh[['wbd']]
+#' p1=extractCoords(wb, aslist = TRUE)
+#' p2=extractCoords(wb, aslist = FALSE)
+#' plot(p2, asp=1)
+#' for(i in 1:length(p1)){
+#'   lines(p1[[i]], col=i+1)
+#' }
+extractCoords<-function(x, unique=TRUE, aslist = FALSE){
+  spl <- methods::as(x, "SpatialLines")
+  pl = lapply(sp::coordinates(spl), 
+              function(x) t(matrix(unlist(x), nrow =2, byrow = TRUE) ) )
+  if(aslist){
+    ret = pl
+  }else{
+    pts = do.call(rbind, pl)
+    if (unique){
+      ret = unique(pts)
+    }else{
+      ret = pts
     }
   }
-  if (unique){
-    xy = unique(xy)
-  }
-  xy
+  return(ret)
 }
 
 #' Convert the \code{xy} (X,Y) into Index in \code{coords}
-#' \code{xy2ID} 
+#' \code{xy2ID}
 #' @param xy coordinate (x,y), subset of \code{coords}
 #' @param coord coordinate set
 #' @return Index in coodinate set
 #' @export
-#' @examples 
+#' @examples
 #' coord = matrix(rnorm(10), 5,2)
 #' xy = coord[c(5,1,3),]
 #' xy2ID(xy, coord)
@@ -83,15 +91,16 @@ xy2ID <- function(xy, coord){
   id
 }
 
-#' Convert the \code{xy} (X,Y) into Index in \code{coords}
-#' \code{count} 
+#' Count the frequency of numbers
+#' \code{count}
 #' @param x target value
 #' @param n specific frequency
 #' @return count of specific frequency
 #' @export
-#' @examples 
-#' x=round(rnorm(100, 2))
+#' @examples
+#' x=c(round(rnorm(100, 2)+1), 0,0)
 #' count(x)
+#' count(x, sum(x==0))
 count <- function(x, n=NULL){
   if(is.null(n)){
     rt = table(x)
@@ -103,13 +112,13 @@ count <- function(x, n=NULL){
 }
 
 #' Find the outliers in a dataset
-#' \code{which_outliers} 
+#' \code{which_outliers}
 #' @param x dataset
 #' @param na.rm Whether ignore the na value.
 #' @param probs Range of non-outlier range
 #' @param ... More options in quatile();
 #' @return Index of the outliers
-#' @export 
+#' @export
 #' @examples
 #' set.seed(1)
 #' x <- rnorm(100)
@@ -130,14 +139,14 @@ which_outliers <- function(x, na.rm = TRUE, probs=c(.5, .95),...) {
   id=which(is.na(y))
   id
 }
-#' par(mfrow=c(1,1))
+
 #' Convert SpatialLines or SpatialPolygons a Planar Straight Line Graph object
-#' \code{sp2PSLG} 
+#' \code{sp2PSLG}
 #' @param sp SpatialLines or SpatialPolygons
 #' @return pslg class
-#' @export 
+#' @export
 #' @examples
-#' library(rgeos) 
+#' library(rgeos)
 #' sl = readWKT("MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))")
 #' x = sp2PSLG(sl)
 sp2PSLG<-function(sp){
@@ -147,8 +156,43 @@ sp2PSLG<-function(sp){
   S=NULL
   for(i in 1:nsl){
     cc = extractCoords(sl[i,], unique = FALSE)
-    e = xy2ID(cc,P)  
+    e = xy2ID(cc,P)
     S = rbind(S, cbind(e[-length(e)], e[-1]))
   }
-  ret <- list('P'=P,'S'=S)
+  ret <- RTriangle::pslg(P=P,S=unique(S) )
+}
+
+#' Find the common coordinates in two groups of coordinates.
+#' @param x,y Matrix of coodinates.
+#' @return Matrix (m*2). Columns are index of x rows and y rows.
+#' @export
+CommonPoints <- function(x, y){
+  x = rbind(x)
+  y = rbind(y)
+  k=0
+  nx = nrow(x)
+  ny = nrow(y)
+  mx = ncol(x)
+  my = ncol(y)
+  ret = matrix(0, nrow=nx, ncol=2)
+  if(mx!=my){
+    return(ret);
+  }
+  for(ix in 1:nx){
+    d1 = x[ix, 1] - y[, 1] ;
+    d2 = x[ix, 2] - y[, 2] ;
+    rowy = which(d1 ==0 & d2 ==0)
+    if(length(rowy) > 0){
+      k = k+1
+      ret[k, 2] = rowy
+      ret[k, 1] = ix
+    }
+    # ret[ix] = any( (x[ix, 1] - y[, 1] == 0) & (x[ix, 2] - y[, 2] == 0) )
+  }
+  if(k>0){
+    ret = rbind(ret[1:k, ])
+  }else{
+    ret = NULL
+  }
+  return(ret)
 }
