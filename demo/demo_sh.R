@@ -8,9 +8,9 @@ x=lapply(clib, library, character.only=T)
 
 library(PIHMgisR)
 #test_check("PIHMgisR")
-prjname = 'sac'
+prjname = 'sh'
 
-pihmout <- file.path('demo', prjname)
+pihmout <- file.path('../demo', prjname)
 fin <- PIHM.filein(prjname, indir = pihmout)
 if (dir.exists(pihmout)){
   unlink(pihmout, recursive = T, force = T)
@@ -29,11 +29,9 @@ riv=sh[['riv']]
 dem=sh[['dem']]
 
 
-
-
 riv.simp = rgeos::gSimplify(riv, tol=10, topologyPreserve = T)
 
-wb.dis = rgeos::gUnionCascaded(wb)
+wb.dis = rgeos::gUnionCascaded(wbd)
 length(wb.dis)
 wb.simp = rgeos::gSimplify(wb.dis, tol=10, topologyPreserve = T)
 
@@ -49,7 +47,7 @@ pm=pihmMesh(tri,dem=dem, AqDepth = 10)
 pa=pihmAtt(tri)
 
 # generate PIHM .riv
-pr=pihmRiver(riv.simp)
+pr=pihmRiver(riv.simp, dem = dem)
 
 # Cut the rivers with triangles
 sp.seg = sp.RiverSeg(pm, pr)
