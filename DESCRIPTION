@@ -14,7 +14,7 @@ BugReports: https://github.com/happynotes/PIHMgisR/issues
 LazyData: TRUE
 Depends: R (>= 3.0.0)
 Encoding: UTF-8
-Imports: Rcpp (>= 0.12.17),
+Imports: Rcpp,
   reshape2,
   ggplot2,
   gridExtra,
@@ -35,7 +35,7 @@ Imports: Rcpp (>= 0.12.17),
   geometry,
   methods
 LinkingTo: Rcpp, sp
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests: testthat,
     knitr,
     rmarkdown
