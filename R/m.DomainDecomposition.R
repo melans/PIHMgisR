@@ -57,9 +57,10 @@ m.DomainDecomposition <- function(wb, dem = NULL, riv=NULL, lk=NULL, q=30, ...){
 #' \code{sp.mesh2Shape} 
 #' @param pm PIHM mesh object
 #' @param dbf attribute table of the mesh triangles.
+#' @param crs  Projection parameters.
 #' @return SpatialPolygons object
 #' @export
-sp.mesh2Shape <- function(pm=readmesh(), dbf=NULL){
+sp.mesh2Shape <- function(pm=readmesh(), dbf=NULL, crs=NULL){
   tt = pm@mesh[,2:4]
   pp=pm@point[,2:3]
   dd = pm@point[,4]
@@ -71,6 +72,10 @@ sp.mesh2Shape <- function(pm=readmesh(), dbf=NULL){
     dbf = cbind(pm@mesh, 'AqDepth'= aqd, 'Zsurf'=zs)
   }
   ret <- sp.Tri2Shape(tri, dbf=dbf)
+  if(!is.null(crs)){
+    raster::crs(ret) = crs
+  }
+  return(ret)
 }
 #' Generate triangle mesh domain
 #' \code{sp.Tri2Shape} 
