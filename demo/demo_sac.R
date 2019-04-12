@@ -12,7 +12,7 @@ prjname = 'sac'
 PRJNAME=prjname
 inapth = file.path(prjname)
 
-pihmout <- file.path('../demo', prjname)
+pihmout <- file.path('../demo/input', prjname)
 fin <- PIHM.filein(prjname, indir = pihmout)
 x=list.files(pihmout, pattern = glob2rx(paste0(prjname, '.*.*')), full.names = T)
 file.remove(x)
@@ -80,10 +80,11 @@ plot(tri, asp=1)
 
 # generate PIHM .mesh 
 pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
-sm = sp.mesh2Shape(pm)
-writeshape(sm, crs(wbd), file=file.path(gisout, 'domain'))
+spm = sp.mesh2Shape(pm, crs = crs(riv))
+writeshape(spm, crs(wbd), file=file.path(gisout, 'domain'))
 
 # generate PIHM .att
+# debug(pihmAtt)
 pa=pihmAtt(tri, r.soil = rsoil, r.geol = rgeol, r.lc = rlc, r.forc = sp.forc )
 forc.fns = paste0(sp.forc@data[, 'NLDAS_ID'], '.csv')
 forc.fns
@@ -92,13 +93,16 @@ writeforc(forc.fns, path='/Users/leleshu/Dropbox/PIHM/Projects/SAC/forcing/csv20
 # generate PIHM .riv
 pr=pihmRiver(riv.simp, dem)
 # Correct river slope to avoid negative slope
-pr = correctRiverSlope(pr)
+# pr = correctRiverSlope(pr)
+
 # PIHMriver to Shapefile
-sriv = sp.riv2shp(pr)
-writeshape(sriv, crs(wbd), file=file.path(gisout, 'river'))
+# spr = sp.riv2shp(pr)
+spr = riv
+writeshape(spr, crs(wbd), file=file.path(gisout, 'river'))
 
 # Cut the rivers with triangles
-sp.seg = sp.RiverSeg(pm, pr)
+# sp.seg = sp.RiverSeg(pm, pr)
+sp.seg=sp.RiverSeg(spm, spr)
 writeshape(sp.seg, crs(wbd), file=file.path(gisout, 'seg'))
 
 # Generate the River segments table
@@ -108,7 +112,7 @@ prs = pihmRiverSeg(sp.seg)
 pic = pihm.init(nrow(pm@mesh), nrow(pr@river))
 
 # Generate shapefile of river
-spp.riv = sp.riv2shp(pr); 
+# spr = sp.riv2shp(pr); 
 
 # Generate shapefile of mesh domain
 sp.dm = sp.mesh2Shape(pm)
@@ -117,7 +121,7 @@ zz = sp.dm@data[,'Zsurf']
 ord=order(zz)
 col=terrain.colors(length(sp.dm))
 plot(sp.dm[ord, ], col = col)
-plot(spp.riv, col=spp.riv@data[,5] + 1 , add=T, lwd=3)
+plot(spr, add=T, lwd=3)
 dev.off()
 
 # model configuration, parameter
