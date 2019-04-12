@@ -179,30 +179,32 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
 #' @return SpatialLinesDataFrame
 #' @export
 sp.riv2shp <- function(pr = readriv(), dbf=NULL){
-  pt = pr@point[,2:3]
-  rt = pr@rivertype
-  riv = pr@river
-
-  nr = nrow(riv)
-  nt = nrow(rt)
-  np = nrow(pt)
-
-  ft = riv[,2:3]
-  sl=list()
-  sls = list()
-  for(i in 1:nr){
-    coord = rbind(pt[ft[i,1], ], pt[ft[i,2], ])
-    sl[[i]] = sp::Line( coord )
-    sls[[i]] = sp::Lines(sl[[i]], i)
-  }
-  if(is.null(dbf)){
-    df = data.frame(riv, rt[riv[, 'Type'], ])
-  }else{
-    df = dbf
-  }
-  spl = sp::SpatialLines(sls)
-  rownames(df) = names(spl)
-  sp = sp::SpatialLinesDataFrame(spl, data=df)
+  # pt = pr@point[,2:3]
+  # rt = pr@rivertype
+  # riv = pr@river
+  # 
+  # nr = nrow(riv)
+  # nt = nrow(rt)
+  # np = nrow(pt)
+  # 
+  # ft = riv[,2:3]
+  # sl=list()
+  # sls = list()
+  # for(i in 1:nr){
+  #   coord = rbind(pt[ft[i,1], ], pt[ft[i,2], ])
+  #   sl[[i]] = sp::Line( coord )
+  #   sls[[i]] = sp::Lines(sl[[i]], i)
+  # }
+  # if(is.null(dbf)){
+  #   df = data.frame(riv, rt[riv[, 'Type'], ])
+  # }else{
+  #   df = dbf
+  # }
+  # spl = sp::SpatialLines(sls)
+  # rownames(df) = names(spl)
+  # sp = sp::SpatialLinesDataFrame(spl, data=df)
+  fn = file.path(get('inpath', envir = .pihm), 'gis', 'river.shp')
+  sp = rgdal::readOGR(fn)
   sp
 }
 
