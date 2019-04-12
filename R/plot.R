@@ -29,7 +29,7 @@ png.control <- function(fn='figure.png',
 #' @return Raster of the x (vector) or the last row of x (matrix)
 #' @export
 map2d<-function(x=getElevation(),
-                sp.riv = sp.riv2shp() ){
+                sp.riv = NULL ){
   rmask = PIHM.mask()
   if(is.matrix(x) | is.data.frame(x)){
     y = as.numeric(x[nrow(x)])
@@ -38,7 +38,7 @@ map2d<-function(x=getElevation(),
   }
   r = MeshData2Raster(y, rmask)
   raster::plot(r)
-  if(is.null(sp.riv)){
+  if(!is.null(sp.riv)){
     #  bgcol= adjustcolor('gray80', alpha.f = 0.8)
     col = grDevices::adjustcolor(sp.riv@data[,'Type'], alpha.f = 0.7)
     lwd=sp.riv@data[,'Type']
