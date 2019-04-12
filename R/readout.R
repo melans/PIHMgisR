@@ -48,18 +48,17 @@ BasicPlot <- function(
             paste0('rivq',c('down', 'sub', 'surf')),
             paste0('rivy','stage')
   ) ,
+  sp.riv=NULL,
   rdsfile = file.path(get('outpath', envir = .pihm), 'BasicPlot.RDS'),
   plot=TRUE, imap=FALSE,
   return=T){
+  
   graphics.off()
   varname = tolower(varname)
   print(varname)
   nv=length(varname)
   prjname = get('PRJNAME', envir = .pihm)
-  if(imap ){
-    sp.riv = sp.riv2shp()
-  }
-  if(plot){
+  if(plot || imap){
     path = file.path(get('anapath', envir = .pihm), 'BasicPlot')
     if(!dir.exists(path)){
       dir.create(path, recursive = T, showWarnings = F)
@@ -86,15 +85,18 @@ BasicPlot <- function(
       pp = lines(xm, col=2, lwd=2, lty=2, type='b', pch=1)
       print(pp)
       dev.off()
-      if(imap ){
-        if( grepl('^eley', vn) | grepl('^elev', vn) ){
-          fn= paste0('Map.', prjname,'_', vn, '.png')
-          y = colMeans(x)
-          png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
-          map2d(y)
+    }
+    if(imap ){
+      # if( grepl('^eley', vn) | grepl('^elev', vn)  | grepl('^eleq', vn) ){
+      if( grepl('^ele', vn)){
+        fn= paste0('Map.', prjname,'_', vn, '.png')
+        y = colMeans(x)
+        png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
+        map2d(y)
+        if(!is.null(sp.riv)){
           raster::plot(sp.riv, col=rgb(1,0,0,0.7), lwd=2, add=T)
-          dev.off()
         }
+        dev.off()
       }
     }
   }
