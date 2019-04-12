@@ -50,15 +50,17 @@ pa=pihmAtt(tri)
 pr=pihmRiver(riv.simp, dem = dem)
 
 # Cut the rivers with triangles
-sp.seg = sp.RiverSeg(pm, pr)
+spm = sp.mesh2Shape(pm)
+crs(spm) =crs(riv)
+spr=riv
+sp.seg = sp.RiverSeg(spm, spr)
 # Generate the River segments table
 prs = pihmRiverSeg(sp.seg)
 
 # Generate initial condition
 pic = pihm.init(nrow(pm@mesh), nrow(pr@river))
 
-spp.riv = sp.riv2shp(pr); 
-plot(tri); plot(spp.riv, col=spp.riv@data[,5] + 1 , add=T, lwd=3)
+plot(tri, asp=1); plot(spr , add=T, lwd=3)
 
 # model configuration, parameter
 cfg.para = pihmpara()
@@ -74,3 +76,4 @@ write.df(pa, file=fin['md.att'])
 write.df(prs, file=fin['md.rivseg'])
 write.pc(cfg.para, fin['md.para'])
 write.pc(cfg.calib, fin['md.calib'])
+
