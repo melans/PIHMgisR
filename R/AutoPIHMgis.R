@@ -1,7 +1,7 @@
 
-#' Pedotransfer function to generate soil/geol parameter from soil texture
+#' Automatically run PIHMgis based on the input data and parameters.
 #' \code{autoPIHMgis}
-#' @param  indata  Input data, list of data.
+#' @param indata  Input data, list of data.
 #' @param forcfiles Filenames of .csv forcing data
 #' @param prjname Projectname
 #' @param outdir Output directory
@@ -73,7 +73,7 @@ autoPIHMgis <- function(
 
   # data(indata)
   wbd=indata[['wbd']]
-  riv=indata[['riv']]; plot(riv)
+  riv=indata[['riv']]; raster::plot(riv)
   dem=indata[['dem']]
   rsoil=indata[['rsoil']]
   rgeol=indata[['rsoil']]
