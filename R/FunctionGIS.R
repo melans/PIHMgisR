@@ -155,12 +155,14 @@ removeholes <- function(sp){
 #' library(raster)
 #' pg=fishnet(ext=c(-80,80, -50,50), dx=5)
 #' plot(pg)
-fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=1, dy=dx,
+fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=diff(ext[1:2])/10, dy=dx,
                     lines=FALSE, polygons=TRUE, points=FALSE){
   xmin = ext[1]
   xmax = ext[2]
   ymin = ext[3]
   ymax = ext[4]
+  dx = min(dx, diff(ext[1:2]))
+  dy = min(dy, diff(ext[3:4]))
   xx=seq(ext[1], ext[2], by=dx)
   yy=seq(ext[3], ext[4], by=dy)
   nx = length(xx)
@@ -169,39 +171,47 @@ fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=1, dy=dx,
     vline=cbind(xx, ymin, xx, ymax)
     hline =  cbind(xmin, yy, xmax, yy)
     mat = rbind(vline, hline)
-    str=paste(paste('(', mat[,1],mat[,2],',', mat[,3], mat[,4], ')'), collapse = ',')
+    str=paste(paste('(', mat[,1], mat[,2],',', mat[,3], mat[,4], ')'), collapse = ',')
     spl=rgeos::readWKT(paste('MULTILINESTRING(', str, ')'))
     df = as.data.frame(mat)
     colnames(df) = c('x1', 'y1', 'x2','y2')
     spdf=sp::SpatialLinesDataFrame(spl, data = df)
     ret = spdf
+    raster::crs(ret) = crs
+    return(ret)
   }
   if(polygons){
     xy=expand.grid(xx,yy)
     xm = matrix(xy[,1], nx,ny)
     ym = matrix(xy[,2], nx, ny)
-    xloc=abind::abind(xm[-nx, -ny], xm[-nx, -1], xm[-1, -1], xm[-1, -ny], xm[-nx, -ny], along=3)
-    yloc=abind::abind(ym[-nx, -ny], ym[-nx, -1], ym[-1, -1], ym[-1, -ny], ym[-nx, -ny], along=3)
-    pgs=list()
-    df=as.data.frame(matrix(0, nrow=(nx-1)*(ny-1), 6))
+    xloc=abind::abind(as.matrix(xm[-nx, -ny]), as.matrix(xm[-nx, -1]), as.matrix(xm[-1, -1]), 
+                      as.matrix(xm[-1, -ny]), as.matrix(xm[-nx, -ny]), along=3)
+    yloc=abind::abind(as.matrix(ym[-nx, -ny]), as.matrix(ym[-nx, -1]), as.matrix(ym[-1, -1]), 
+                      as.matrix(ym[-1, -ny]), as.matrix(ym[-nx, -ny]), along=3)
+    
+    # df=as.data.frame(matrix(0, nrow=(nx-1)*(ny-1), 6))
+    df=data.frame(as.numeric(apply(xloc, 1:2, min)),
+                  as.numeric(apply(xloc, 1:2, max)),
+                  as.numeric(apply(yloc, 1:2, min)),
+                  as.numeric(apply(yloc, 1:2, max)))
+    df = data.frame(df, rowMeans(df[,1:2]), rowMeans(df[,1:2+2]) )
     colnames(df) = c('xmin','xmax','ymin', 'ymax','xcenter','ycenter')
-    k=0
-    for(i in 2:nx - 1){
-      for(j in 2:ny - 1){
-        k=k+1
-        ll = cbind(xloc[i,j, ], yloc[i,j, ])
-        pg=sp::Polygon(ll)
-        pgs[[k]] = sp::Polygons(list(pg), ID=k)
-        df[k,]=c(min(ll[,1]), max(ll[,1]), min(ll[,2]), max(ll[,2]), mean(ll[,1]), mean(ll[,2]) )
-      }
-    }
-    pg = sp::SpatialPolygons(pgs)
-    pg.df = sp::SpatialPolygonsDataFrame(pg, data=df)
-    ret = pg.df
+    xt=paste('((', 
+             paste(xm[-nx, -ny], ym[-nx, -ny], ',' ),
+             paste(xm[-nx, -1],  ym[-nx, -1], ','),
+             paste(xm[-1, -1],   ym[-1, -1], ','),
+             paste(xm[-1, -ny],  ym[-1, -ny], ','),
+             paste(xm[-nx, -ny], ym[-nx, -ny], '' ),
+             '))')
+    str=paste('MULTIPOLYGON(', paste(xt, collapse = ', '), ')')
+    x0 = rgeos::readWKT(str)
+    x1 = x0@polygons[[1]]@Polygons
+    SRL =lapply(1:length(x1),  function(x, i) {Polygons(list(x[[i]]), ID=i)},  x=x1 )
+    ret = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(SRL), data=df, match.ID = TRUE)
+    raster::crs(ret) = crs
+    return(ret)
   }
-  # plot(ret, axes=T)
-  raster::crs(ret) = crs
-  ret
+  return(NA)
 }
 #' Add holes into Polygons
 #' \code{AddHoleToPolygon}
