@@ -19,19 +19,79 @@
 #' legend('bottomleft', paste('Theta =', theta), col=col, lty=lty, lwd=2); grid()
 #' abline(v=ksat, lwd=3, lty=2)
 
-GreenAmpt <- function(theta, thetas, ksat, Hfront){
-  dt = thetas - theta
-  dh = Hfront
-  dh[dh <= 0 ] = 1e-6
-  if(dt <= 0){
-    q = 0
+GreenAmpt <- function(theta, thetas, ksat, Hfront, y0, Time=0){
+  nt=length(Time)
+  if(nt <= 1){
+    dt = thetas - theta
+    dh = Hfront
+    dh[dh <= 0.001 ] = .0010
+    # if(y0 > ksat) y0 = ksat
+    if(dt <= 0){
+      q = 0
+    }else if(dh <= ksat){
+      q = ksat;
+    }else{
+      q = ksat * (y0 + dh) / (dh * dt)
+      # d0 = ksat * dh / dt
+      # q = dt * sqrt(d0 / 2 / 1)
+    }
+    if(q > y0){
+      q = y0
+    }
+    ret = rbind(c(Time, q, theta, 
+                  thetas, y0, ksat, Hfront) )
   }else{
-    d0 = ksat * dh / dt
-    q = dt * sqrt(d0 / 2 / 1)
+    dtime= c(0, diff(Time))
+    ret = NULL
+    hf=Hfront
+    for(it in 1:nt){
+      tt = Time[it]
+      x=GreenAmpt(theta = theta, thetas=thetas, 
+                  ksat=ksat, y0=y0,  Hfront = hf, Time=tt)
+      hf = hf + x[2]
+      # print(hf)
+      ret= rbind(ret, x)
+    }
   }
-  q
+  colnames(ret) = c('Time', 'Infiltration', 'Theta', 
+                    'ThetaS', 'Y0', 'Ksat', 'WetFront')
+  return (ret)
 }
+# y0=1:10/100
+# theta=0.5 * (0:10)/10
+# Ksat = 0.000001 #m/min
+# qi=theta * 0
+# Time = seq(0,2, length.out = 100)
+# 
+# norm <- function(x) return (x / max(x, na.rm=T))
+# # 
+# # x=GreenAmpt(theta=0.2, thetas = 0.5, ksat = Ksat, y0=y0[1], Hfront = 0, Time=Time)
+# # Qi = x[,2]
+# # WF = x[,7]
+# # plot(Time, norm(Qi), type='l',lwd=2, col=2)
+# # lines(Time, norm(WF), lwd=2, col=1)
+# # grid()
+# # stop()
+# n1 = length(Time)
+# n2 = 7
+# n3 = length(y0)
+# arr = array(0, dim=c(n1, n2, n3))
+# for( i in 1:n3){
+#   arr[,,i] = GreenAmpt(theta=0.2, thetas= 0.5, ksat = Ksat, y0=y0[i], Hfront = 0, Time=Time)
+# }
+# 
+# matplot(type='l', Time[1:30], arr[1:30, 2, ], lwd=2,
+#         ylim=range(c(arr[,2,], Ksat) ), 
+#         col=topo.colors(n3))
+# lines(Time, Time*0 + Ksat, lwd=2)
+# grid()
+# stop()
 
+# plot(Time, (Qi), type='l',lwd=2, col=2, log='x')
+# lines(Time, (WF), lwd=2, col=1)
+
+# plot(Time, WF, type='l')
+# plot(WF, Qi, lwd=3, lty=2, type='l')
 # 
 # func  <- function(p, ks=0.1, thetas = 0.5, def=10){
 #   np = length(p)

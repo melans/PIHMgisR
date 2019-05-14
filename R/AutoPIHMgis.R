@@ -73,7 +73,7 @@ autoPIHMgis <- function(
 
   # data(indata)
   wbd=indata[['wbd']]
-  riv=indata[['riv']]; raster::plot(riv)
+  riv=indata[['riv']]
   dem=indata[['dem']]
   rsoil=indata[['rsoil']]
   rgeol=indata[['rsoil']]
