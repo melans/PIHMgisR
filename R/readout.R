@@ -43,8 +43,8 @@ readout <- function(keyword,
 #' @export  
 BasicPlot <- function(
   varname=c(paste0('eley',c( 'surf','unsat', 'gw') ), 
-            paste0('elev',c('prcp','etp','infil', 'rech') ),
-            paste0('elev',paste0('et',0:2) ),
+            paste0('elev',c('prcp','infil', 'rech') ),
+            paste0('elev',c('etp', 'ev', 'et', 'ic') ),
             paste0('rivq',c('down', 'sub', 'surf')),
             paste0('rivy','stage')
   ) ,
