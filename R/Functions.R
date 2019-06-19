@@ -144,12 +144,16 @@ which_outliers <- function(x, na.rm = TRUE, probs=c(.5, .95),...) {
 #' \code{sp2PSLG}
 #' @param sp SpatialLines or SpatialPolygons
 #' @return pslg class
+#' @importFrom methods as is
 #' @export
 #' @examples
 #' library(rgeos)
 #' sl = readWKT("MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))")
 #' x = sp2PSLG(sl)
 sp2PSLG<-function(sp){
+  if(methods::is(sp, 'sf')){
+    sp=methods::as(sp, 'Spatial')
+  }
   sl = methods::as(sp, 'SpatialLines')
   nsl = length(sl)
   P = extractCoords(sl, unique = TRUE)

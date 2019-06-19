@@ -151,7 +151,7 @@ FromToNode <- function(sp, coord = extractCoords(sp) ){
 RiverType <- function(n){
   cn = c('Index', 'Depth', 'BankSlope',
          'Width', 'Sinuosity', 'Manning',
-         'Cwr', 'KsatH')
+         'Cwr', 'KsatH', 'BedThick')
   nc = length(cn)
   rtype = cbind(1:n,
                 5.0 + 0.5 * 1:n, #Depth
@@ -160,7 +160,8 @@ RiverType <- function(n){
                 1.1, #Sinuosity
                 4.63e-07, #manning's n, day/m^(1/3)
                 0.6, #CWR
-                0.1 #KsatH
+                0.1, #KsatH
+                1 # Bed Sediment Thickness.
   )
   colnames(rtype) = cn
   rtype

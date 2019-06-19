@@ -21,3 +21,10 @@ This tool kit is to convert the geospatial data into PIHM format.
 
 The version of PIHMgisR are only works for latest PIHM v3.0, that was developed in C++. 
 
+
+## Roadmap
+- Build trianglular-mesh
+- Extract the raster value based on mesh
+- Write/read the input files for PIHM
+- Read the binary PIHM output files
+- Pedotransfer functions for `soil/geol/landcover`

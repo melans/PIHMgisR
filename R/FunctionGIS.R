@@ -196,18 +196,20 @@ fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=diff(ext[1:2])/10, d
                   as.numeric(apply(yloc, 1:2, max)))
     df = data.frame(df, rowMeans(df[,1:2]), rowMeans(df[,1:2+2]) )
     colnames(df) = c('xmin','xmax','ymin', 'ymax','xcenter','ycenter')
-    xt=paste('((', 
+    str=paste('GEOMETRYCOLLECTION(', 
+              paste(paste('POLYGON((',
              paste(xm[-nx, -ny], ym[-nx, -ny], ',' ),
              paste(xm[-nx, -1],  ym[-nx, -1], ','),
              paste(xm[-1, -1],   ym[-1, -1], ','),
              paste(xm[-1, -ny],  ym[-1, -ny], ','),
-             paste(xm[-nx, -ny], ym[-nx, -ny], '' ),
-             '))')
-    str=paste('MULTIPOLYGON(', paste(xt, collapse = ', '), ')')
-    x0 = rgeos::readWKT(str)
-    x1 = x0@polygons[[1]]@Polygons
-    SRL =lapply(1:length(x1),  function(x, i) {Polygons(list(x[[i]]), ID=i)},  x=x1 )
-    ret = sp::SpatialPolygonsDataFrame( Sr=sp::SpatialPolygons(SRL), data=df, match.ID = TRUE)
+             paste(xm[-nx, -ny], ym[-nx, -ny], '' ), '))' )
+             , collapse =','),
+              ')' )
+    # str=paste('MULTIPOLYGON(', paste(xt, collapse = ', '), ')')
+    SRL = rgeos::readWKT(str)
+    # x1 = x0@polygons[[1]]@Polygons
+    # SRL =lapply(1:length(x1),  function(x, i) {Polygons(list(x[[i]]), ID=i)},  x=x1 )
+    ret = sp::SpatialPolygonsDataFrame( Sr=SRL, data=df, match.ID = TRUE)
     raster::crs(ret) = crs
     return(ret)
   }

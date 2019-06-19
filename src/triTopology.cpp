@@ -8,22 +8,23 @@ using namespace Rcpp;
 //' @export
 // [[Rcpp::export]]
 NumericMatrix triTopology(NumericMatrix tri) {
-  int n = tri.nrow();
+  long n = tri.nrow();
   int flag;
   int nid[4] = {0,1,2,0};
-  int ed0[2];
-  int ed1[2];
+  long ed0[2];
+  long ed1[2];
+  long i, j, ii,jj;
   NumericMatrix out(n, 4);
-  for(int i=0; i < n; i++){
-    for(int j=0; j < 3; j++){
+  for(i=0; i < n; i++){
+    for(j=0; j < 3; j++){
       ed0[0]=  tri(i, nid[j]);
       ed0[1] =  tri(i, nid[j+1]);
       flag = 0;
-      for(int ii=0; ii < n && !flag; ii++){
+      for(ii=0; ii < n && !flag; ii++){
         if(i == ii){
           continue;
         }
-        for(int jj=0;jj<3 && !flag;jj++){
+        for(jj=0;jj<3 && !flag;jj++){
           ed1[0]=  tri(ii, nid[jj]);
           ed1[1] =  tri(ii, nid[jj+1]);
           if(ed0[0] ==  ed1[0]){

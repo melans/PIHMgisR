@@ -33,7 +33,8 @@
 #' sm = sp.mesh2Shape(pm)
 #' raster::plot(sm)
 pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth ){
-  topo=triTopology(tri$T)
+  topo=tri$NB
+  topo[topo<0]=0
   pt = tri$P;
   pid=tri$T;
 
@@ -43,7 +44,7 @@ pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth ){
   cxy = cbind(x, y)
   zc=raster::extract(dem, cxy)
 
-  m = data.frame(1:nrow(topo), tri$T, topo[,2:4], zc)
+  m = data.frame(1:nrow(topo), tri$T, topo[,1:3], zc)
   colnames(m) = c('ID', paste0('Node', 1:3), paste0('Nabr',1:3), 'Zmax')
 
   zs=raster::extract(dem, pt)

@@ -11,7 +11,7 @@ m.DomainDecomposition(wb, dem = NULL, riv = NULL, lk = NULL,
 \arguments{
 \item{wb}{SpatialPolygon or SpatialLines which define the watershed boundary}
 
-\item{dem}{DEM data, used for generate the regional highest/lowest points.}
+\item{dem}{Elevation data.}
 
 \item{riv}{SpatialLines of river network, optional}
 
@@ -20,8 +20,6 @@ m.DomainDecomposition(wb, dem = NULL, riv = NULL, lk = NULL,
 \item{q}{minimum angle of triangle}
 
 \item{...}{more options in RTriangle::triangulate()}
-
-\item{window}{Size of the window for regional h/l points.}
 }
 \value{
 Coordinates of triangles centroids

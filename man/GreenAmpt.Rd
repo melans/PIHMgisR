@@ -5,7 +5,7 @@
 \title{Calculate infiltration with Green Ampt method
 \code{GreenAmpt}}
 \usage{
-GreenAmpt(theta, thetas, ksat, Hfront, y0, Time = 0)
+GreenAmpt(theta, thetas, ksat, Hfront, y0 = 0.01, Time = 0)
 }
 \arguments{
 \item{theta}{Soil moisture content}
@@ -22,17 +22,6 @@ Infiltration rate
 \description{
 Calculate infiltration with Green Ampt method
 \code{GreenAmpt}
-}
-\examples{
-hf= (1:200) / 100
-ksat=0.2
-theta = matrix(seq(0.1,0.4, by=0.05), ncol=1)
-q_inf=apply(theta,1, FUN=function(x) GreenAmpt(x, 0.5, ksat, hf))
-col= topo.colors(length(theta) )
-lty = 1:length(theta) 
-matplot(type='l', q_inf, -hf, col=col, lty=lty, lwd=2)
-legend('bottomleft', paste('Theta =', theta), col=col, lty=lty, lwd=2); grid()
-abline(v=ksat, lwd=3, lty=2)
 }
 \references{
 Green, W.H. and G. Ampt. 1911. Studies of soil physics, part I – the flow of air and water through soils. J. Ag. Sci. 4:1-24.

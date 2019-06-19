@@ -5,12 +5,13 @@
 \title{Calculate the water balance
 \code{wb.riv}}
 \usage{
-wb.ele(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "et0", "et1",
-  "et2"), "eleq", c("surf", "sub"), "eley", c("surf", "unsat", "gw")))),
-  fun = xts::apply.yearly, period = "years", plot = TRUE)
+wb.ele(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "etic",
+  "ettr", "etev")), paste0("eleq", c("surf", "sub")), paste0("eley",
+  c("surf", "unsat", "gw")))), fun = xts::apply.yearly,
+  period = "years", plot = TRUE)
 }
 \arguments{
-\item{xl}{List of data. Five variables are included: prcp (eleqprcp), et0 (eleqet0), et1 (eleqet1), et2 (eleqet2) and discharge (rivqflx)}
+\item{xl}{List of data. Five variables are included:}
 
 \item{fun}{function to process the time-series data. Default = apply.daily.}
 

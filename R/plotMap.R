@@ -2,6 +2,7 @@
 #' \code{ts2map} 
 #' @param x Time-series data
 #' @param fun Functions to summarize the TS data.
+#' @param raster Whether to make output as Raster
 #' @param ... More options in fun
 #' @export
 #' @examples 

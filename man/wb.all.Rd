@@ -5,12 +5,12 @@
 \title{Calculate the water balance
 \code{p.waterbalance}}
 \usage{
-wb.all(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "et0", "et1",
-  "et2")), "rivqdown"), plot = FALSE, return = TRUE),
+wb.all(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "etic",
+  "ettr", "etev")), "rivqdown"), plot = FALSE, return = TRUE),
   fun = xts::apply.yearly, plot = TRUE)
 }
 \arguments{
-\item{xl}{List of data. Five variables are included: prcp (eleqprcp), et0 (eleqet0), et1 (eleqet1), et2 (eleqet2) and discharge (rivqflx)}
+\item{xl}{List of data. Five variables are included: prcp (eleqprcp), etic (eleqetic), ettr (eleqettr), etev (eleqetev) and discharge (rivqflx)}
 
 \item{fun}{function to process the time-series data. Default = apply.daily.}
 

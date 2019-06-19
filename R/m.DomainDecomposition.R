@@ -2,8 +2,7 @@
 #' \code{m.DomainDecomposition} 
 #' @param wb SpatialPolygon or SpatialLines which define the watershed boundary
 #' @param riv SpatialLines of river network, optional
-#' @param dem DEM data, used for generate the regional highest/lowest points.
-#' @param window Size of the window for regional h/l points.
+#' @param dem Elevation data.
 #' @param lk SpatialPolygon of lake.
 #' @param q minimum angle of triangle
 #' @param ... more options in RTriangle::triangulate()
@@ -87,27 +86,24 @@ sp.mesh2Shape <- function(pm=readmesh(), dbf=NULL, crs=NULL){
 sp.Tri2Shape <- function(tri, dbf=NULL, crs=NA){
   ta = tri$T
   pt = tri$P
-
   ncell = nrow(ta)
   p.x = pt[,1]
   p.y = pt[,2]
   ipt = t (ta[,c(1:3,1)] )
   xp = matrix( p.x[ipt], nrow=4)
   yp = matrix( p.y[ipt], nrow=4)
-  pgs = list()
-  ia = rep(0,ncell)
-  for (i in 1:ncell){
-    ipg = sp::Polygon(cbind(xp[,i], yp[,i]))
-    ia[i] = polygonArea(xp[,i], yp[,i])
-    pgs[[i]] = sp::Polygons(list(ipg), i)
-  }
-  pog = sp::SpatialPolygons(pgs)
+  s.tri=matrix(paste(as.numeric(xp), as.numeric(yp)), nrow=4)
+  str=paste('GEOMETRYCOLLECTION(', 
+            paste(
+              paste('POLYGON((',apply(s.tri, 2, paste, collapse=','),'))'),
+              collapse = ','),
+            ')')
+  SRL = rgeos::readWKT(str)
+  ia=rgeos::gArea(SRL, byid = TRUE)
   dbf=cbind(dbf, 'Area'=ia)
-  rownames(dbf) = names(pog)
-  ret = sp::SpatialPolygonsDataFrame(Sr=pog, data=as.data.frame(dbf))
+  ret = sp::SpatialPolygonsDataFrame(Sr=SRL, data=as.data.frame(dbf), match.ID = FALSE)
   if(!is.na(crs) ){
     raster::crs(ret) = crs
   }
   ret
 }
-

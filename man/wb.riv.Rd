@@ -9,7 +9,7 @@ wb.riv(xl = BasicPlot(varname = paste0("rivq", c("sub", "surf", "down")),
   plot = FALSE, return = TRUE), fun = xts::apply.yearly, plot = TRUE)
 }
 \arguments{
-\item{xl}{List of data. Five variables are included: prcp (eleqprcp), et0 (eleqet0), et1 (eleqet1), et2 (eleqet2) and discharge (rivqflx)}
+\item{xl}{List of data. Five variables are included: prcp (eleqprcp),and discharge ()}
 
 \item{fun}{function to process the time-series data. Default = apply.daily.}
 

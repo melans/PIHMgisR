@@ -36,6 +36,7 @@ Imports: Rcpp,
   methods
 LinkingTo: Rcpp, sp
 RoxygenNote: 6.1.1
+Remotes: shuelele/RTriangle
 Suggests: testthat,
     knitr,
     rmarkdown

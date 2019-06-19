@@ -27,8 +27,8 @@ pihmpara <- function( nday = 10){
     paste0('dt_',
            c(paste0('ye_', c('snow', 'surf', 'unsat', 'gw') ), 
              paste0('Qe_', c('surf', 'sub') ),
-             paste0('qe_et',0:2), 
-             paste0('qe_', c('etp', 'prcp', 'infil', 'rech') ),
+             paste0('qe_et'), 
+             paste0('qe_', c('prcp', 'infil', 'rech') ),
              
              paste0('yr_', c('stage')),
              paste0('Qr_', c('down', 'surf', 'sub', 'up'))

@@ -153,9 +153,9 @@ SimplifybyLen <- function(sp, split_length = 20, plot.results = F) {
   df$ty = as.numeric(df$ty)
   sl = linedf2SpatialLines(df)
   
-  att=data.frame('Index'=1:nrow(df), df[,-1], 'Length' = SpatialLinesLengths(sl))
+  att=data.frame('Index'=1:nrow(df), df[,-1], 'Length' = sp::SpatialLinesLengths(sl))
   rownames(att) = df[,1]
-  sld=SpatialLinesDataFrame(sl, data = att)
+  sld=sp::SpatialLinesDataFrame(sl, data = att)
   return(sld) # Return a SpatialLine object
 }
 
