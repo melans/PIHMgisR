@@ -33,10 +33,12 @@ Imports: Rcpp,
   utils,
   lubridate,
   geometry,
-  methods
+  methods,
+  GGally,
+  ncdf4
 LinkingTo: Rcpp, sp
 RoxygenNote: 6.1.1
-Remotes: shuelele/RTriangle
+Remotes: shulele/RTriangle/pkg
 Suggests: testthat,
     knitr,
     rmarkdown
