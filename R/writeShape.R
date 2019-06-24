@@ -15,9 +15,13 @@
 #' plot(sp2)
 writeshape <- function(shp, file=NULL, crs = raster::crs(shp)){
   if(grepl(class(shp)[1],'SpatialPolygons' ) ){
-    shp = methods::as(shp, "SpatialPolygonsDataFrame")
+    # shp = methods::as(shp, "SpatialPolygonsDataFrame")
+    shp=sp::SpatialPolygonsDataFrame(shp, 
+                                     data=data.frame('ID'=1:length(shp)),
+                                     match.ID = FALSE)
   }else if ( grepl(class(shp)[1],'SpatialLines' )   ){
-    shp = methods::as(shp, "SpatialLinesDataFrame")
+    # shp = methods::as(shp, "SpatialLinesDataFrame")
+    shp=sp::SpatialLinesDataFrame(shp, data=data.frame('ID'=1:length(shp)),match.ID = FALSE)
   }
   if( is.null(file) ){
     # message('No file exported')
