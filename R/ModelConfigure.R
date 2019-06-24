@@ -29,28 +29,25 @@ pihmpara <- function( nday = 10){
              paste0('Qe_', c('surf', 'sub') ),
              paste0('qe_et'), 
              paste0('qe_', c('prcp', 'infil', 'rech') ),
-             
              paste0('yr_', c('stage')),
              paste0('Qr_', c('down', 'surf', 'sub', 'up'))
            ))
   )
   vdt = rep(1440, length(dts))
   
-  vn = c('VERBOSE', 'DEBUG', 'INIT_MODE',
+  vn = c('VERBOSE', 'INIT_MODE',
          'ASCII_OUTPUT', 'Binary_OUTPUT', 
          'NUM_OPENMP', 
          'ABSTOL', 'RELTOL', 
          'INIT_SOLVER_STEP', 'MAX_SOLVER_STEP', 'LSM_STEP', 
          'START', 'END', 
-         'STEPSIZE_FACTOR', 'MODEL_STEPSIZE',
          dts)
-  v = c(0, 0, 2,
+  v = c(0,  2,
         0, 1,
         8,
         1e-4, 1e-3,
         1e-3, 60, 60,
         0, nday,
-        1, 1,
         vdt
   )
   names(v) = vn
