@@ -38,6 +38,7 @@ readout <- function(keyword,
 #' @param plot Whether do the time-series plot
 #' @param imap Whether do the raster plot for Element data. Only works for element data
 #' @param return Whether return the data. Some the results are too huge to load in memoery at once.
+#' @param iRDS Whether save RDS file.
 #' @keywords read output.
 #' @return A list of TimeSeries data. 
 #' @export  
@@ -50,7 +51,7 @@ BasicPlot <- function(
   ) ,
   sp.riv=NULL,
   rdsfile = file.path(get('outpath', envir = .pihm), 'BasicPlot.RDS'),
-  plot=TRUE, imap=FALSE,
+  plot=TRUE, imap=FALSE, iRDS = TRUE,
   return=T){
   
   graphics.off()
@@ -102,7 +103,9 @@ BasicPlot <- function(
   }
   if(return){
     names(ret) = varname;
+    if(iRDS){
     saveRDS(ret, file = rdsfile)
-    ret
+    }
   }
+  ret <- ret
 }

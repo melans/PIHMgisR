@@ -43,7 +43,7 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
   # mesh=readmesh(shp=TRUE); ngrids=100; resolution=0
   if(is.null(rr)){
     sp = sp.mesh2Shape(pm)
-
+    
     ext <-  raster::extent (sp)
     xlim=ext[1:2]
     ylim=ext[3:4]
@@ -74,29 +74,34 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
 #' \code{MeshData2Raster}
 #' @param x vector or matrix, length/nrow is number of cells.
 #' @param rmask mask of PIHM mesh
+#' @param stack Whether export the stack, only when the x is a matrix, i.e. (Ntime x Ncell).
 #' @param proj Projejction parameter
 #' @param pm PIHM mesh
 #' @return Raster map
 #' @export
-MeshData2Raster <- function(x=getElevation(),
+MeshData2Raster <- function(x=getElevation(), stack=FALSE,
                             rmask=PIHM.mask(proj=proj), pm=readmesh(), proj=NULL){
-  #Interpolate and write ASC map out.
-  # loadinglib('akima')
-  if( is.matrix(x) | is.data.frame(x)){
-    x = as.numeric(x[nrow(x),])
+  
+  if(stack){
+    ret <- raster::stack(apply(x, 1, FUN = PIHMgisR::MeshData2Raster) )
+  }else{
+    if( is.matrix(x) | is.data.frame(x)){
+      x = as.numeric(x[nrow(x),])
+    }
+    if(any(is.na(x)) ){
+      x[is.na(x)] = 0
+    }
+    if (any(is.infinite(x))){
+      x[is.infinite(x)] = 0
+    }
+    xy=getCentroid(pm=pm)[,1:2]
+    tps <- fields::Tps(xy, x)
+    
+    # use model to predict values at all locations
+    r <- raster::interpolate(rmask, tps)
+    ret <- raster::mask(r,rmask)
   }
-  if(any(is.na(x)) ){
-    x[is.na(x)] = 0
-  }
-  if (any(is.infinite(x))){
-    x[is.infinite(x)] = 0
-  }
-  xy=getCentroid(pm=pm)[,1:2]
-  tps <- fields::Tps(xy, x)
-
-  # use model to predict values at all locations
-  r <- raster::interpolate(rmask, tps)
-  ret <- raster::mask(r,rmask)
+  return(ret)
 }
 
 
@@ -139,7 +144,7 @@ removeholes <- function(sp){
   if( !is.na(raster::crs(x)) & ! is.null(raster::crs(x)) ){
     raster::crs(ret) = raster::crs(x)
   }
-  ret
+  return(ret)
 }
 #' Generatue fishnet
 #' \code{fishnet}
@@ -198,12 +203,12 @@ fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=diff(ext[1:2])/10, d
     colnames(df) = c('xmin','xmax','ymin', 'ymax','xcenter','ycenter')
     str=paste('GEOMETRYCOLLECTION(', 
               paste(paste('POLYGON((',
-             paste(xm[-nx, -ny], ym[-nx, -ny], ',' ),
-             paste(xm[-nx, -1],  ym[-nx, -1], ','),
-             paste(xm[-1, -1],   ym[-1, -1], ','),
-             paste(xm[-1, -ny],  ym[-1, -ny], ','),
-             paste(xm[-nx, -ny], ym[-nx, -ny], '' ), '))' )
-             , collapse =','),
+                          paste(xm[-nx, -ny], ym[-nx, -ny], ',' ),
+                          paste(xm[-nx, -1],  ym[-nx, -1], ','),
+                          paste(xm[-1, -1],   ym[-1, -1], ','),
+                          paste(xm[-1, -ny],  ym[-1, -ny], ','),
+                          paste(xm[-nx, -ny], ym[-nx, -ny], '' ), '))' )
+                    , collapse =','),
               ')' )
     # str=paste('MULTIPOLYGON(', paste(xt, collapse = ', '), ')')
     SRL = rgeos::readWKT(str)
@@ -225,15 +230,16 @@ AddHoleToPolygon <-function(poly,hole){
   # invert the coordinates for Polygons to flag it as a hole
   coordsHole <-  hole@polygons[[1]]@Polygons[[1]]@coords
   newHole <- sp::Polygon(coordsHole,hole=TRUE)
-
+  
   # punch the hole in the main poly
   listPol <- poly@polygons[[1]]@Polygons
   listPol[[length(listPol)+1]] <- newHole
   punch <-sp::Polygons(listPol,poly@polygons[[1]]@ID)
-
+  
   # make the polygon a SpatialPolygonsDataFrame as the entry
   new <- sp::SpatialPolygons(list(punch),proj4string=poly@proj4string)
   new <- sp::SpatialPolygonsDataFrame(new,data=as(poly,"data.frame"))
+  return(new)
 }
 #' Cut sptialLines with threshold.
 #' \code{CutSptialLines}
@@ -303,16 +309,14 @@ CutSptialLines <- function(sl, tol){
     att=data.frame('INDEX'=1:length(tmp), 'Length'=ilen)
     ret = sp::SpatialLinesDataFrame(tmp, data = att)
   }
-  ret
+  return(ret)
 }
 
 #'
 #' \code{extractRaster}
 #' @param r Raster
-#' @param s Slope of the line
-#' @param loc ratio on axis for (x,y), (0.5,0.5) is the center of plot
-#' @param ext extention of plot
-#' @param dx resolution
+#' @param xy coordinates of the line, dim=(Npoints, 2); x and y must be in [0, 1]
+#' @param ext extention of value xy. 
 #' @importFrom grDevices dev.off graphics.off png rgb topo.colors
 #' @importFrom graphics grid hist lines par plot points
 #' @importFrom methods as
@@ -323,25 +327,21 @@ CutSptialLines <- function(sl, tol){
 #' library(raster)
 # r <- raster(ncol=36, nrow=18)
 # r[] <- 1:ncell(r)
-# xy <- cbind(-50, seq(-80, 80, by=20))
-# extract(r, xy)
-extractRaster<-function(r, s=0, loc = c(0.5, 0.5),
-                        ext = raster::extent(r),
-                        dx=raster::res(r)[1]){
-  x = seq(ext[1], ext[2], dx)
-  xlim=diff(ext[1:2])
-  ylim=diff(ext[3:4])
-  xc=xlim* loc[1] + ext[1]
-  yc=ylim * loc[2] + ext[3]
-
-  y = s * (x - xc) + yc
-  DY=ylim / diff(range(y))
-  x=(x - xc) * DY + xc
-  y = s * (x - xc) + yc
-
+# extractRaster(r)
+extractRaster<-function(r, xy=NULL, ext = raster::extent(r)){
+  if(is.null(xy)){
+    ndim = dim(r)
+    x=0:ndim[2] / ndim[2]
+    y = rep(0.5, length(x))
+    xy = cbind(x,y)
+  }
+  x = ext[1] + xy[,1] * (ext[2]- ext[1] )
+  y = ext[3] + xy[,2] * (ext[4]- ext[3] )
+  
   raster::plot(r);
-  points(xc,yc, col=2)
+  points(x, y, col=2)
   nx=length(x)
+  points(x,y)
   graphics::arrows(x[1], y[1], x[nx], y[nx], lty=3, lwd=1.5, col=2)
   # lines(x,y, lwd=1.5, col=2, lty=2)
   v = raster::extract(r, cbind(x,y))

@@ -8,6 +8,7 @@ getElevation <- function(pm = readmesh()){
   zz = pm@point[,5]
   zs = (zz[tt[,1]] + zz[tt[,2]] + zz[tt[,3]] ) /3
   ret <- zs
+  return(ret)
 }
 #' Calculate the AquiferDepth of mesh cells
 #' \code{getAquiferDepth} 
@@ -19,6 +20,7 @@ getAquiferDepth <- function(pm = readmesh()){
   dd = pm@point[,4]
   aqd = (dd[tt[,1]] + dd[tt[,2]] + dd[tt[,3]] ) /3
   ret <- aqd
+  return(ret)
 }
 #============
 #' Calculate the area of the cells
@@ -36,6 +38,7 @@ getArea <-function(pm=readmesh() ){
   # z=t(matrix(c(pts[tri[,1],4],pts[tri[,2],4],pts[tri[,3],4],pts[tri[,1],4]),m,4) );
   iarea <- geometry::polyarea(x,y);
   iarea
+  return(iarea)
 }
 
 #============
@@ -61,6 +64,7 @@ getVertex <- function(pm = readmesh() ){
                        paste0('Vertex.', 1:3),
                        c('X','Y', 'AqD', 'ZMAX') )
   ret
+  return(ret)
 }
 
 #' Get the centroids of the cells
@@ -82,4 +86,5 @@ getCentroid <- function(pm = readmesh() ){
   ret = cbind(xc, yc, aqd, zsurfc)
   colnames(ret) = c('X','Y', 'aqd', 'ZMAX')
   ret
+  return(ret)
 }

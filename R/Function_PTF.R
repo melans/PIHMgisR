@@ -115,7 +115,7 @@ PTF.soil <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
                     'ThetaR(m3_m3)', 'InfD(m)', 'Alpha(1_m)',
                     'Beta', 'hAreaF(m2_m2)', 'macKsatV(m_d)')
   ret[,1:3]= ptf[,1:3]
-  # ret[,2]= ptf[,2]    #
+  ret[,2]= ptf[,2]    #
   ret[,4]=0.01        #ThetaR - residual
   ret[,5]= 0.1    #infiltration depth 10cm
   ret[,6:7]= ptf[,4:5] #alpha, beta in van genuchten.
@@ -130,7 +130,7 @@ PTF.soil <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
       ret[oid,i] = mean(ret[-oid, i])
     }
   }
-  ret
+  return(ret)
 }
 
 
@@ -165,7 +165,7 @@ PTF.geol <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
   ret[,5] = 0.01        #ThetaR - residual
   # ret[,6:7] = ptf[,4:5] #alpha, beta in van genuchten.
   ret[,6] = 0.01;         #vertical macropore fraction, 1_perc
-  ret[,7] = ptf[,2] * 1e5 # Kmp = kmx * 100,000;
+  ret[,7] = ptf[,2] * 1e3 # Kmp = kmx * 100,000;
   ret[,8] = 1            # Depth of Macropore;
   if(rm.outlier){
     for(i in 2:ncol(ret)){
@@ -176,7 +176,7 @@ PTF.geol <- function(x=t(matrix(c(33, 33, 2, 1.4), ncol=5, nrow=4) ),
       ret[oid,i] = mean(ret[-oid, i])
     }
   }
-  ret
+  return(ret)
 }
 #' The default land cover parameters from University of Marryland Classification
 #' \code{lc.default} 
@@ -204,7 +204,7 @@ lc.default <- function(){
     c(16,0.70052962,0.00205233,12769262.77,0.25277193,0.160861,4.75E-07,0.6,0,0) 
   )
   colnames(v) = cn
-  v
+  return(v)
 }
 
 #' Generate the default land cover parameters of NLCD classes.
@@ -236,7 +236,8 @@ PTF.lc <- function(lc){
   y[,1] = 1:nrow(y)
   colnames(y) = toupper(c('INDEX', 'LAIMAX', 'RMIN', 'RSREF', 'ALBEDO',
                    'VEGFRAC', 'ROUGH', 'RZD', 'SOILDGRD', 'IMPAF') )
-  y
+  
+  return(y)
 }
 #' Generate the default melt factor
 #' \code{MeltFactor} 
@@ -261,5 +262,5 @@ MeltFactor <- function(years){
   tmon = as.Date( format(stats::time(DataMon), "%Y-%m-01"))
   ret = xts::as.xts(rep(mf, ny), order.by=tmon)
   colnames(ret) = 'MF'
-  ret
+  return(ret)
 }
