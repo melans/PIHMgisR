@@ -20,8 +20,8 @@ This package can be used with the AutoPIHM project, that can build modeling doma
 
 
 ## Note:
-Current PIHMgisR requires different version of RTriangle package. you must install that via github:
+Current PIHMgisR requires different version of RTriangle package. you must install that via github(June 2019):
 ```
 install.packages("devtools")
-devtools::install_github("shulele/RTriangle", subdir="pkg")
+devtools::install_github("davidcsterratt/RTriangle", subdir="pkg")
 ```
