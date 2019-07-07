@@ -36,7 +36,7 @@ map2d<-function(x=getElevation(),
   }else{
     y=x
   }
-  r = MeshData2Raster(y, rmask)
+  r = MeshData2Raster(y, rmask, stack=FALSE)
   raster::plot(r)
   if(!is.null(sp.riv)){
     #  bgcol= adjustcolor('gray80', alpha.f = 0.8)

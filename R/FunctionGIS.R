@@ -79,8 +79,9 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
 #' @param pm PIHM mesh
 #' @return Raster map
 #' @export
-MeshData2Raster <- function(x=getElevation(), stack=FALSE,
-                            rmask=PIHM.mask(proj=proj), pm=readmesh(), proj=NULL){
+MeshData2Raster <- function(x=getElevation(), 
+                            rmask=PIHM.mask(proj=proj), pm=readmesh(), proj=NULL,
+                            stack=FALSE,){
   
   if(stack){
     ret <- raster::stack(apply(x, 1, FUN = PIHMgisR::MeshData2Raster) )
