@@ -329,7 +329,7 @@ CutSptialLines <- function(sl, tol){
 # r <- raster(ncol=36, nrow=18)
 # r[] <- 1:ncell(r)
 # extractRaster(r)
-extractRaster<-function(r, xy=NULL, ext = raster::extent(r)){
+extractRaster<-function(r, xy=NULL, ext = raster::extent(r), plot=T){
   if(is.null(xy)){
     ndim = dim(r)
     x=0:ndim[2] / ndim[2]
@@ -338,13 +338,14 @@ extractRaster<-function(r, xy=NULL, ext = raster::extent(r)){
   }
   x = ext[1] + xy[,1] * (ext[2]- ext[1] )
   y = ext[3] + xy[,2] * (ext[4]- ext[3] )
-  
-  raster::plot(r);
-  points(x, y, col=2)
-  nx=length(x)
-  points(x,y)
-  graphics::arrows(x[1], y[1], x[nx], y[nx], lty=3, lwd=1.5, col=2)
-  # lines(x,y, lwd=1.5, col=2, lty=2)
+  if(plot){
+    raster::plot(r);
+    points(x, y, col=2)
+    nx=length(x)
+    points(x,y)
+    graphics::arrows(x[1], y[1], x[nx], y[nx], lty=3, lwd=1.5, col=2)
+    # lines(x,y, lwd=1.5, col=2, lty=2)
+  }
   v = raster::extract(r, cbind(x,y))
   ret = cbind('x'=x,'y'=y,'z'=v)
   return(ret)
