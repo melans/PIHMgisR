@@ -32,7 +32,7 @@
 #' pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
 #' sm = sp.mesh2Shape(pm)
 #' raster::plot(sm)
-pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth ){
+pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth){
   topo=tri$NB
   topo[topo<0]=0
   pt = tri$P;
@@ -45,7 +45,7 @@ pihmMesh <- function(tri, dem, AqDepth = 10, r.aq = dem * 0 + AqDepth ){
   zc=raster::extract(dem, cxy)
 
   m = data.frame(1:nrow(topo), tri$T, topo[,1:3], zc)
-  colnames(m) = c('ID', paste0('Node', 1:3), paste0('Nabr',1:3), 'Zmax')
+  colnames(m) = c('ID', paste0('Node', 1:3), paste0('Nabr',1:3), 'Zmax' )
 
   zs=raster::extract(dem, pt)
   aq=raster::extract(r.aq, pt)
@@ -78,12 +78,14 @@ Tri2Centroid <- function(tri){
 #' @return data.frame of PIHM .att
 #' @export
 pihmAtt <- function(tri, r.soil =NULL, r.geol=NULL, r.lc=NULL, r.forc=NULL,
-                    r.mf = NULL, r.bc = NULL){
+                    r.mf = NULL, r.bc = NULL, r.BC =0, r.SS =0){
   pt = Tri2Centroid(tri)
   ncell = nrow(pt)
-  atthead=c( "INDEX",  "SOIL", "GEOL", "LC", 'FORC', 'MF', 'BC')
+  atthead=c( "INDEX",  "SOIL", "GEOL", "LC", 
+             'FORC', 'MF', 'BC', 'SS')
   nh = length(atthead)
-  att = cbind(1:ncell, 1, 1, 1, 1, 1, 1)
+  att = cbind(1:ncell, 1, 1, 1, 
+              1, 1, 0, 0)
   extract.id <- function(r, pt){
     id = raster::extract(r, pt)
     if(is.matrix(id) | is.data.frame(id)){
