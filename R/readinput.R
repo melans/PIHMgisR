@@ -18,7 +18,8 @@ read.df <-function(file, text = readLines(file)){
       nr = nrow-2
     }else{
     }
-    xl[[i]] = as.matrix(utils::read.table(text = text[0:nr + 1 + r0], header = T))
+    xl[[i]] = utils::read.table(text = text[0:nr + 1 + r0], header = T)
+    # xl[[i]] = as.matrix(utils::read.table(text = text[0:nr + 1 + r0], header = T))
     r0 = r0 + nr + 2;
     if(r0 + 1 > nrow){
       break
@@ -77,7 +78,7 @@ readchannel <-function(file = PIHM.filein()['md.rivseg'] ){
 #' @return .para
 #' @export
 readpara <- function(file = PIHM.filein()['md.para'] ){
-  readpc(file)
+  return(readconfig(file))
 }
 
 #============
@@ -87,26 +88,27 @@ readpara <- function(file = PIHM.filein()['md.para'] ){
 #' @return .calib
 #' @export
 readcalib <- function(file = PIHM.filein()['md.calib'] ){
-  readpc(file)
+  return(readconfig(file))
 }
 
 #============
-#' Read the .para or .calib file
-#' \code{readpc} 
+#' Read the configuration (.para, .calib or .cmaes) file
+#' \code{readconfig} 
 #' @param file full path of file
 #' @return .para or .calib
+#' @importFrom utils type.convert write.table
 #' @export
-readpc <- function(file = PIHM.filein()['md.para'] ){
-  # file = fin['md.para']
+readconfig <- function(file = PIHM.filein()['md.para']){
+  # file='x.cmaes'
   tline = readLines(file, skipNul = TRUE)
   tline=tline[!grepl('^#', tline)]
   tmp = which(grepl('[:Alpha:]', tline) | grepl('[:alpha:]', tline))
-  value = as.data.frame( utils::read.table(text = tline, header=FALSE) )
-  para = as.numeric(value[,-1])
-  names(para) = toupper(as.character(value[,1]) )
-  para <- para
+  x =  utils::read.table(text = tline, header=FALSE, stringsAsFactors = FALSE)
+  xdf = data.frame(rbind(t(x[, -1]), NULL), stringsAsFactors = FALSE)
+  colnames(xdf) = as.character(as.matrix(x[, 1]))
+  ret = type.convert(xdf)
+  return(ret)
 }
-
 #============
 #' Read the .ic file
 #' \code{readic} 
