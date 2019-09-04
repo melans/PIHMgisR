@@ -114,10 +114,10 @@ wb.ele <-function(
     y = sweep(x, 2, w, '*')
   }
   fun.first<- function(x, period='month'){
-    r <- do.call(rbind, lapply(split(x, period), first))
+    r <- do.call(rbind, lapply(split(x, period), xts::first))
   }
   fun.last<- function(x, period='month'){
-    r <- do.call(rbind, lapply(split(x, period), last))
+    r <- do.call(rbind, lapply(split(x, period), xts::last))
   }
   ia=getArea()
   aa=sum(ia)
