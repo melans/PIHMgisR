@@ -34,8 +34,8 @@ Imports: Rcpp,
   lubridate,
   geometry,
   methods,
-  GGally,
-  ncdf4
+  ncdf4,
+  GGally
 LinkingTo: Rcpp, sp
 RoxygenNote: 6.1.1
 Remotes: shulele/RTriangle/pkg
