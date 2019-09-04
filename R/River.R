@@ -28,7 +28,8 @@ pihmRiver <- function(sl, dem){
                   'Down' = rivdown,
                   'Type' = rivord,
                   'Slope' = slp,
-                  'Length' = len  )
+                  'Length' = len,
+                  'BC' = len *0)
   rownames(df) = row.names(sp.slt)
   sp.df = SpatialLinesDataFrame(sp.slt, data=df)
   ntype = max(rivord)
