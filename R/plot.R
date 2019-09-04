@@ -130,15 +130,16 @@ hydrograph <- function(x, legend.position='bottom', unit = rep('', ncol(x)),
 #' \code{plot_tsd}
 #' @param x xts data
 #' @param time.col Time interval of banded background. Default is 'year'
+#' @importFrom stats time
+#' @export
 #' @examples
 #' library(xts)
 #' nday = 1000
 #' xd=as.POSIXct(as.Date('2000-01-01')+ 1:nday )
 #' x=as.xts(sin(1:1000 / 100), order.by=xd)
 #' plot_tsd(x)
-#' @export
 plot_tsd <- function(x, time.col='year'){
-  time(x) = as.POSIXct(time(x) )
+    time(x) = as.POSIXct(time(x) )
   tx = time(x)
   if(grepl(time.col,'year')){
     ty = format(tx, '%Y')
