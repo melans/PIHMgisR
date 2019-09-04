@@ -43,3 +43,27 @@ ModelInfo <- function(path=get('outpath', envir=.pihm) ){
   myhist(g, icols=c(2,3,4,4,7,8), pp=c(2,3))
   dev.off()
 }
+
+
+#' Summary of the attributions on Mesh
+#' \code{MeshAtt} 
+#' @param  pm PIHM.mesh, .sp.mesh
+#' @param  att .sp.att of input
+#' @param  soil .para.soil of input
+#' @param  geol .para.geol of input
+#' @param  lc .para.lc of input
+#' @return Attributes of each element.
+#' @export
+MeshAtt<- function(pm=readmesh(), att=readatt(), 
+                    soil=readsoil(), geol=readgeol(), lc=readlc() ){
+  # pm=readmesh();att=readatt();
+  # soil=readsoil(); geol=readgeol();
+  # lc=readlc()
+  y=data.frame('MESH'=pm@mesh,
+             'ATT'=att,
+             'SOIL'=soil[att$SOIL,],
+             'GEOL'=geol[att$GEOL,],
+             'LC'=lc[att$LC,]
+             )
+  return(y)
+}
