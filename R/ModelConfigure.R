@@ -9,10 +9,9 @@
 #' @return List of initial condition
 #' @export
 pihm.init <- function(ncell, nriv, AqD = 10, stage = 0.1, p1=0.4, p2 = p1){
-  mi = cbind(1:ncell, rep(0, ncell), 0, 0,
-             AqD * p1, AqD * p2)
-  ri = cbind(1:nriv, rep(stage, nriv))
-  
+  mi = data.frame(cbind(1:ncell, rep(0, ncell), 0, 0,
+             AqD * p1, AqD * p2))
+  ri = data.frame(cbind(1:nriv, rep(stage, nriv)))
   colnames(mi) = c('Index', 'Canopy', 'Snow', 'Surface', 'Unsat', 'GW')
   colnames(ri) = c('Index', 'Stage')
   ret = list('minit' = mi, 'rinit' = ri)
@@ -33,23 +32,25 @@ pihmpara <- function( nday = 10){
              paste0('Qr_', c('down', 'surf', 'sub', 'up'))
            ))
   )
+  
   vdt = rep(1440, length(dts))
   
   vn = c('VERBOSE', 'INIT_MODE',
          'ASCII_OUTPUT', 'Binary_OUTPUT', 
-         'NUM_OPENMP', 
+         'SpinupDay', 'NUM_OPENMP', 
          'ABSTOL', 'RELTOL', 
          'INIT_SOLVER_STEP', 'MAX_SOLVER_STEP', 'LSM_STEP', 
          'START', 'END', 
          dts)
   v = c(0,  2,
         0, 1,
-        8,
+        0, 8,
         1e-4, 1e-3,
         1e-3, 60, 60,
         0, nday,
         vdt
   )
+  v=data.frame(rbind(v))
   names(v) = vn
   v
 }
@@ -61,11 +62,11 @@ pihmcalib <- function(){
   cn = toupper( c('KSATH', 'KSATV', 'KINF', 'KMACSATH', 'KMACSATV', 'DINF', 'DROOT', 'DMAC',
                   'THETAS','THETAR', 'ALPHA', 'BETA', 'MACVF', 'MACHF', 'VEGFRAC', 'ALBEDO', 'ROUGH',
                   'Aquifer', 
-                  'PRCP', 'SFCTMP', 'EC', 'ETT', 'EDIR',
+                  'PRCP', 'SFCTMP', 'ETP', 'EC', 'ETT', 'EDIR',
                   'RIV_ROUGH', 'RIV_KH', 'RIV_DPTH',
                   'RIV_WDTH', 'RIV_SINU', 'RIV_CWR', 'RIV_BSLOPE',
                   'Soil_Dgd', 'ImpAF', 'ISMAX') )
-  v=rep(1, length(cn))
+  v=data.frame(rbind(rep(1, length(cn))))
   names(v) = cn
   v['SFCTMP'] = 0  
   v['AQUIFER'] = 0  
