@@ -221,7 +221,7 @@ autoPIHMgis <- function(
   write.df(para.soil, file=fin['md.soil'])
   write.df(para.geol, file=fin['md.geol'])
 
-  write.pc(cfg.para, fin['md.para'])
-  write.pc(cfg.calib, fin['md.calib'])
+  write.config(cfg.para, fin['md.para'])
+  write.config(cfg.calib, fin['md.calib'])
   pm <- pm
 }
