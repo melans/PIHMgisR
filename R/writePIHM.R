@@ -25,7 +25,7 @@ write.tsd <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
   nr = nrow(x)
   nc = ncol(x)
   if(!quite){
-    message('Writing ', file)
+    message('Writing to file ', file)
   }
   tt = stats::time(x)
   tday = as.numeric( difftime(tt, tt[1], units = 'days') )
@@ -56,7 +56,7 @@ write.df <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
     header = c(nr,nc)
   }
   if(!quite){
-    message('Writing ', file)
+    message('Writing to file ', file)
   }
   write(header, file = file, append = append, sep = '\t',  ncolumns = length(header))
   write(colnames(x), file = file, ncolumns = nc,append = T, sep = '\t')
@@ -66,12 +66,13 @@ write.df <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
 #' \code{writemesh}
 #' @param pm PIHMmesh class
 #' @param file file name
+#' @param backup TRUE/FALSE, if backup the existing file
 #' @export
-writemesh <- function(pm, file){
-  filebackup(file)
+writemesh <- function(pm, file,backup = TRUE){
+  filebackup(file, backup = backup)
   ncell= nrow(pm@mesh)
   np = nrow(pm@point)
-  message('Writing ', file)
+  message('Writing to file ', file)
   write.df(pm@mesh, file=file, append=F, quite = T, backup = F)
   write.df(pm@point, file=file, append=T, quite = T, backup = F)
   # write(c(ncell, np),file = file, append = F)
@@ -82,11 +83,11 @@ writemesh <- function(pm, file){
 #' \code{writemesh}
 #' @param pr PIHMmesh class
 #' @param file file name
+#' @param backup TRUE/FALSE, if backup the existing file
 #' @export
-writeriv <- function(pr, file){
-  filebackup(file)
-
-  message('Writing ', file)
+writeriv <- function(pr, file,backup = TRUE){
+  filebackup(file, backup = backup)
+  message('Writing to file ', file)
   write.df(pr@river, file=file, append=F, quite = T, backup = F)
   write.df(pr@rivertype, file=file, append=T, quite = T, backup = F)
   if(length(pr@point) >0 ){
@@ -97,24 +98,26 @@ writeriv <- function(pr, file){
 #' \code{writeinit}
 #' @param x Initial condition, list()
 #' @param file file name
+#' @param backup TRUE/FALSE, if backup the existing file
 #' @export
-writeinit <- function(x, file){
-  filebackup(file)
-  message('Writing ', file)
+writeinit <- function(x, file, backup = TRUE){
+  filebackup(file, backup = backup)
+  message('Writing to file', file)
   write.df(x[[1]], file=file, append=F, quite = T, backup = F)
   write.df(x[[2]], file=file, append=T, quite = T, backup = F)
 }
-#' Write PIHM .para or .calib file
-#' \code{write.pc}
+#' Write PIHM configuration files (.para, .calib, etc.)
 #' @param x PIHM model configure parameter or calibration
 #' @param file file name
 #' @param backup TRUE/FALSE
+#' @importFrom utils type.convert write.table
 #' @export
-write.pc <-function(x, file, backup=TRUE){
-  if(backup){ filebackup(file) }
-  message('Writing ', file)
-  out=rbind(names(x), x)
-  write(out, file, append = F, ncolumns = 2, sep = '\t')
+write.config <-function(x, file, backup=TRUE){
+  filebackup(file, backup = backup)
+  message('Writing to file ', file)
+  out=cbind(names(x), t(x))
+  write.table(out, file, append = F, sep = '\t', quote = F, 
+              row.names = FALSE, col.names = FALSE)
 }
 
 #' Write PIHM .forc file
@@ -123,11 +126,12 @@ write.pc <-function(x, file, backup=TRUE){
 #' @param path Common path of the files.
 #' @param startdate Start Date. Character. e.g. 20000101
 #' @param file file name
+#' @param backup TRUE/FALSE, if backup the existing file
 #' @export
-writeforc <- function(fns, path='', startdate='20000101', file){
-  filebackup(file)
+writeforc <- function(fns, path='', startdate='20000101', file, backup=TRUE){
+  filebackup(file, backup = backup)
   nf=length(fns)
-  message('Writing ', file)
+  message('Writing to file ', file)
   write( paste(nf, startdate), file=file, append=F)
   write( path, file=file, append=T,  ncolumns = 1)
   write( fns, file=file, append=T,  ncolumns = 1)
