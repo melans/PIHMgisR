@@ -8,7 +8,10 @@
 #' @param ... more options in RTriangle::triangulate()
 #' @return Coordinates of triangles centroids
 #' @export
-m.DomainDecomposition <- function(wb, dem = NULL, riv=NULL, lk=NULL, q=30, ...){
+m.DomainDecomposition <- function(wb, dem = NULL, 
+                                  riv=NULL, lk=NULL, 
+                                  pts=NULL,
+                                  q=30, ...){
   #x is a spatialpolygons
   # wb=wb$wb.simp
   # riv=riv$Riv.simp
@@ -34,6 +37,9 @@ m.DomainDecomposition <- function(wb, dem = NULL, riv=NULL, lk=NULL, q=30, ...){
             'S' = rbind(ps1$S, ps2$S + n1) )
   }else{
     ps = ps1
+  }
+  if(!is.null(pts) ){
+    ps$P = rbind(ps$P, pts)
   }
   p = RTriangle::pslg(P=ps$P,
            S = ps$S)
