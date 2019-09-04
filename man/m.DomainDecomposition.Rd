@@ -6,7 +6,7 @@
 \code{m.DomainDecomposition}}
 \usage{
 m.DomainDecomposition(wb, dem = NULL, riv = NULL, lk = NULL,
-  q = 30, ...)
+  pts = NULL, q = 30, ...)
 }
 \arguments{
 \item{wb}{SpatialPolygon or SpatialLines which define the watershed boundary}

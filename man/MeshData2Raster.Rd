@@ -6,7 +6,7 @@
 \code{MeshData2Raster}}
 \usage{
 MeshData2Raster(x = getElevation(), rmask = PIHM.mask(proj = proj),
-  pm = readmesh(), proj = NULL)
+  pm = readmesh(), proj = NULL, stack = FALSE)
 }
 \arguments{
 \item{x}{vector or matrix, length/nrow is number of cells.}
@@ -16,6 +16,8 @@ MeshData2Raster(x = getElevation(), rmask = PIHM.mask(proj = proj),
 \item{pm}{PIHM mesh}
 
 \item{proj}{Projejction parameter}
+
+\item{stack}{Whether export the stack, only when the x is a matrix, i.e. (Ntime x Ncell).}
 }
 \value{
 Raster map

@@ -4,19 +4,14 @@
 \alias{extractRaster}
 \title{\code{extractRaster}}
 \usage{
-extractRaster(r, s = 0, loc = c(0.5, 0.5), ext = raster::extent(r),
-  dx = raster::res(r)[1])
+extractRaster(r, xy = NULL, ext = raster::extent(r), plot = T)
 }
 \arguments{
 \item{r}{Raster}
 
-\item{s}{Slope of the line}
+\item{xy}{coordinates of the line, dim=(Npoints, 2); x and y must be in [0, 1]}
 
-\item{loc}{ratio on axis for (x,y), (0.5,0.5) is the center of plot}
-
-\item{ext}{extention of plot}
-
-\item{dx}{resolution}
+\item{ext}{extention of value xy.}
 }
 \description{
 \code{extractRaster}

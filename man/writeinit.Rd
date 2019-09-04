@@ -5,12 +5,14 @@
 \title{Write PIHM .ic file
 \code{writeinit}}
 \usage{
-writeinit(x, file)
+writeinit(x, file, backup = TRUE)
 }
 \arguments{
 \item{x}{Initial condition, list()}
 
 \item{file}{file name}
+
+\item{backup}{TRUE/FALSE, if backup the existing file}
 }
 \description{
 Write PIHM .ic file

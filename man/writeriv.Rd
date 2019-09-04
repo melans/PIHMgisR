@@ -5,12 +5,14 @@
 \title{Write PIHM .mesh file
 \code{writemesh}}
 \usage{
-writeriv(pr, file)
+writeriv(pr, file, backup = TRUE)
 }
 \arguments{
 \item{pr}{PIHMmesh class}
 
 \item{file}{file name}
+
+\item{backup}{TRUE/FALSE, if backup the existing file}
 }
 \description{
 Write PIHM .mesh file

@@ -6,7 +6,7 @@
 \code{pihmAtt}}
 \usage{
 pihmAtt(tri, r.soil = NULL, r.geol = NULL, r.lc = NULL,
-  r.forc = NULL, r.mf = NULL, r.bc = NULL)
+  r.forc = NULL, r.mf = NULL, r.bc = NULL, r.BC = 0, r.SS = 0)
 }
 \arguments{
 \item{tri}{Triangles defination}

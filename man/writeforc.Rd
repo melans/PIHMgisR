@@ -5,7 +5,8 @@
 \title{Write PIHM .forc file
 \code{writeforc}}
 \usage{
-writeforc(fns, path = "", startdate = "20000101", file)
+writeforc(fns, path = "", startdate = "20000101", file,
+  backup = TRUE)
 }
 \arguments{
 \item{fns}{filenames; Vector of character,}
@@ -15,6 +16,8 @@ writeforc(fns, path = "", startdate = "20000101", file)
 \item{startdate}{Start Date. Character. e.g. 20000101}
 
 \item{file}{file name}
+
+\item{backup}{TRUE/FALSE, if backup the existing file}
 }
 \description{
 Write PIHM .forc file

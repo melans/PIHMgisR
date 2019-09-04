@@ -5,11 +5,11 @@
 \title{Read multiply PIHM output files and do time-series plot}
 \usage{
 BasicPlot(varname = c(paste0("eley", c("surf", "unsat", "gw")),
-  paste0("elev", c("prcp", "etp", "infil", "rech")), paste0("elev",
-  paste0("et", 0:2)), paste0("rivq", c("down", "sub", "surf")),
-  paste0("rivy", "stage")), sp.riv = NULL,
-  rdsfile = file.path(get("outpath", envir = .pihm), "BasicPlot.RDS"),
-  plot = TRUE, imap = FALSE, return = T)
+  paste0("elev", c("prcp", "infil", "rech")), paste0("elev", c("etp", "ev",
+  "et", "ic")), paste0("rivq", c("down", "sub", "surf")), paste0("rivy",
+  "stage")), sp.riv = NULL, rdsfile = file.path(get("outpath", envir =
+  .pihm), "BasicPlot.RDS"), plot = TRUE, imap = FALSE, iRDS = TRUE,
+  return = T)
 }
 \arguments{
 \item{varname}{vector of output keywords}
@@ -17,6 +17,8 @@ BasicPlot(varname = c(paste0("eley", c("surf", "unsat", "gw")),
 \item{plot}{Whether do the time-series plot}
 
 \item{imap}{Whether do the raster plot for Element data. Only works for element data}
+
+\item{iRDS}{Whether save RDS file.}
 
 \item{return}{Whether return the data. Some the results are too huge to load in memoery at once.}
 }
