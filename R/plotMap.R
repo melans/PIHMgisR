@@ -5,7 +5,6 @@
 #' @param raster Whether to make output as Raster
 #' @param ... More options in fun
 #' @export
-#' @examples 
 ts2map <- function(x, fun = mean, raster=TRUE, ...){
   y = apply(x, 2, fun, ...)
   if(raster){
