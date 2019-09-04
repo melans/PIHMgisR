@@ -15,16 +15,20 @@ readout <- function(keyword,
                     file = file.path(path, paste0(get('PRJNAME', envir=.pihm),'.', keyword,'.dat') ) 
 ){
   fid=file(file, 'rb');
-  nc=readBin(fid, what=integer(), n=1)
-  st=readBin(fid, what=integer(), n=1, size = 8) #Long integer
+  # nc=readBin(fid, what=integer(), n=1, size = 4)
+  # st=readBin(fid, what=integer(), n=1, size = 8) #Long integer
   tmp=readBin(fid, what=numeric(), n=1e9, size=8)
+  dat=tmp[-1 * (1:2)]
+  nc=tmp[1]
+  st=tmp[2]
   close(fid)
-  nrr = length(tmp)/(nc+1)
+  
+  nrr = length(dat)/(nc+1)
   nr = round(nrr)
   if(nr < nrr){
     message('File may not completed. ', nrr, "X", nc+1)
   }
-  mat=t(matrix(tmp[1:( nr*(nc+1) )], nrow=nc+1))
+  mat=t(matrix(dat[1:( nr*(nc+1) )], nrow=nc+1))
   tmove = diff(mat[,1])
   tmove = c(tmove, tmove[length(tmove)])
   tsec =   ( mat[,1] -  tmove) * 60 # time must shift back ONE dt.
