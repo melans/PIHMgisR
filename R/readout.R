@@ -33,7 +33,7 @@ readout <- function(keyword,
   tmove = c(tmove, tmove[length(tmove)])
   tsec =   ( mat[,1] -  tmove) * 60 # time must shift back ONE dt.
   xt = as.POSIXct(as.character(st), format='%Y%m%d') + tsec
-  tsd = xts::as.xts(mat[,-1], order.by = xt)
+  tsd = xts::as.xts(rbind(mat[,-1]), order.by = xt)
   tsd
 }
 
