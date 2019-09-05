@@ -37,16 +37,16 @@ pihmpara <- function( nday = 10){
   
   vn = c('VERBOSE', 'INIT_MODE',
          'ASCII_OUTPUT', 'Binary_OUTPUT', 
-         'SpinupDay', 'NUM_OPENMP', 
+         'SpinupDay', 'SCR_INTV', 'NUM_OPENMP', 
          'ABSTOL', 'RELTOL', 
-         'INIT_SOLVER_STEP', 'MAX_SOLVER_STEP', 'LSM_STEP', 
+         'INIT_SOLVER_STEP', 'MAX_SOLVER_STEP', 'ET_STEP', 
          'START', 'END', 
          dts)
   v = c(0,  2,
         0, 1,
-        0, 8,
+        0, 360, 8,
         1e-4, 1e-3,
-        1e-3, 60, 60,
+        1e-2, 30, 60,
         0, nday,
         vdt
   )
