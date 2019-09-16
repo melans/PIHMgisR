@@ -6,10 +6,10 @@
 #' @return A matrix, contains the colums of water balance factors
 #' @export
 wb.all <-function(
-  xl=BasicPlot(varname=c(paste0('elev', c('prcp', 'etic', 'ettr', 'etev') )
+  xl=BasicPlot(varname=c(paste0('elev', c('prcp', 'etic', 'ettr', 'etev', 'etp') )
                          , 'rivqdown'), plot = FALSE, return = TRUE),
 
-  fun = xts::apply.yearly, plot=TRUE
+  fun = xts::apply.monthly, plot=TRUE
 ){
 
   func <-function(x, w){
@@ -21,20 +21,24 @@ wb.all <-function(
   w = ia/aa
   pr = readriv()
   oid=getOutlets(pr)
-  P = fun( func(xl[['elevprcp']], w ), FUN=sum)
-  Q = fun(xl[['rivqdown']][,oid], FUN=sum) / aa
-  IC = fun( func(xl[['elevetic']], w ), FUN=sum)
-  ET = fun( func(xl[['elevettr']], w ), FUN=sum)
-  EV = fun( func(xl[['elevetev']], w ), FUN=sum)
+  P = fun( func(xl$elevprcp, w ), FUN=sum)
+  Q = fun(xl$rivqdown[,oid], FUN=sum) / aa
+  IC = fun( func(xl$elevetic, w ), FUN=sum)
+  ET = fun( func(xl$elevettr, w ), FUN=sum)
+  EV = fun( func(xl$elevetev, w ), FUN=sum)
+  ETP = fun( func(xl$elevetp, w ), FUN=sum)
   dh = P-Q-IC-EV-ET
-  x=cbind(P,Q,IC, ET,EV)
-  colnames(x)=c('P','Q','ET_IC', 'ET_TR','ET_EV')
-  y = cbind(dh, x)
-  colnames(y)=c('DH', 'P','Q','ET_IC', 'ET_TR','ET_EV')
+  x=cbind(dh, P,ETP, Q,IC, ET,EV)
+  # colnames(x)=c('P', 'ETP','Q','ET_IC', 'ET_TR','ET_EV')
+  # y = cbind(dh, x)
+  colnames(x)=c('DH', 'P', 'ETP','Q','ET_IC', 'ET_TR','ET_EV')
   if(plot){
-      PIHMgisR::hydrograph(y)
+      PIHMgisR::hydrograph(x)
   }
-  y
+  y=apply(x, 2, sum, na.rm=TRUE)
+  mat = rbind('H'=y, '%'=y/y[2]*100)
+  print(mat)
+  return(x)
 }
 
 #' Convert Time-Series data to data.frame
@@ -59,6 +63,14 @@ wb.riv <-function(
   xl=BasicPlot(varname=paste0('rivq', c('sub', 'surf', 'down') ), plot = FALSE, return = TRUE),
   fun = xts::apply.yearly, plot=TRUE
 ){
+  fun.read <- function(xx, val){
+    cn=names(xx)
+    if( val %in% cn ){
+      return(xx[[val]])
+    }else{
+      return(readout(val))
+    }
+  }
   # xl=BasicPlot(varname=paste0('rivq', c('sub', 'surf', 'flx') ) )
   # fun = xts::apply.daily
 
@@ -70,9 +82,9 @@ wb.riv <-function(
   aa=sum(ia)
   pr = readriv()
   oid=getOutlets(pr)
-  qr = xl[['rivqdown']][,oid]
-  qsf = xl[['rivqsurf']][,]
-  qsb = xl[['rivqsub']][,]
+  qr = fun.read(xl, 'rivqdown')[,oid]
+  qsf = fun.read(xl, 'rivqsurf')[,]
+  qsb = fun.read(xl, 'rivqsub')[,]
 
   Q = fun(qr, FUN=sum)
   Qsf = fun(qsf, FUN=sum)
@@ -122,16 +134,37 @@ wb.ele <-function(
   ia=getArea()
   aa=sum(ia)
   w=1/ia
-  P = fun(xl[['elevprcp']], FUN=mean)
-  IC = fun( xl[['elevetic']], FUN=mean)
-  ET = fun( xl[['elevettr']], FUN=mean)
-  EV = fun( xl[['elevetev']], FUN=mean)
-  QS = fun( xl[['eleqsurf']], FUN=mean)
-  Qg = fun( xl[['eleqsub']], FUN=mean)
+  fun.read <- function(xx, val){
+    cn=names(xx)
+    if( val %in% cn ){
+      return(xx[[val]])
+    }else{
+      return(readout(val))
+    }
+  }
+  P = fun(fun.read(xl, 'elevprcp'), FUN=mean)
+  IC = fun( fun.read(xl, 'elevetic'), FUN=mean)
+  ET = fun( fun.read(xl, 'elevettr'), FUN=mean)
+  EV = fun( fun.read(xl, 'elevetev'), FUN=mean)
+  QS = fun( fun.read(xl, 'eleqsurf'), FUN=mean)
+  Qg = fun( fun.read(xl, 'eleqsub'), FUN=mean)
   dys = fun(xts::diff.xts(xl$eleysurf), FUN=colSums, na.rm=T)
   dyg = fun(xts::diff.xts(xl$eleygw), FUN=colSums, na.rm=T)
   dyu = fun(xts::diff.xts(xl$eleyunsat), FUN=colSums, na.rm=T)
   arr=abind::abind(P, IC, ET, EV, QS/aa, Qg/aa, dys, dyu, dyg, along=3)
   dimnames(arr)[[3]] = c('P','ET_IC', 'ET_TR','ET_EV', 'qs', 'qg','dys','dyu', 'dyg')
   arr
+}
+
+#' Calculate the Change of Storage.
+#' \code{wb.DS}
+#' @param x Time-Serres Matrix
+#' @param x0 Intial condition or the values of first time-step
+#' @param t1 Time-step one, default = 1
+#' @param t2 Time-step two, default = nrow(x)
+#' @return A vector
+#' @export
+wb.DS<-function(x, x0=x[t1, ], t1=1, t2=nrow(x)){
+  ds = (as.numeric(x[t2]) - as.numeric(x0))
+  return(ds)
 }
