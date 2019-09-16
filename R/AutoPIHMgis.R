@@ -47,23 +47,17 @@ autoPIHMgis <- function(
   cfg.para = pihmpara(nday = 365*length(years) +round(length(years)/4) ),
   cfg.calib = pihmcalib(),
   mf = MeltFactor(years = years),
-  rm.outlier = TRUE
+  rm.outlier = TRUE, 
+  backup=TRUE
 ){
   pihmout = file.path(outdir)
   dir.create(pihmout, showWarnings = FALSE, recursive = TRUE)
   ny=length(years)
 
-  clib=c('rgdal', 'rgeos', 'raster', 'sp')
-  x=lapply(clib, library, character.only=T)
-  library(PIHMgisR)
-
   inapth = file.path(prjname)
 
   fin <- PIHM.filein(prjname, indir = pihmout)
   x=list.files(pihmout, pattern = utils::glob2rx(paste0(prjname, '.*.*')), full.names = T)
-  if(clean) {
-    file.remove(x)
-  }
 
   pngout = file.path(pihmout, 'fig')
   gisout = file.path(pihmout, 'gis')
@@ -82,26 +76,26 @@ autoPIHMgis <- function(
   ageol=indata[['asoil']]
   alc =indata[['alc']]
   sp.forc =indata[['forc']]
-  plot(sp.forc)
+  raster::plot(sp.forc)
 
   wbbuf = rgeos::gBuffer(wbd, width = max(c(2000, tol.wb) ) )
   dem = raster::crop(dem, wbbuf)
 
   png(filename = file.path(pngout, 'data_0.png'), height=11, width=11, res=100, units='in')
-  plot(dem); plot(wbd, add=T, border=2, lwd=2); plot(riv, add=T, lwd=2, col=4)
+  raster::plot(dem); raster::plot(wbd, add=T, border=2, lwd=2); raster::plot(riv, add=T, lwd=2, col=4)
   dev.off()
 
   riv.s1 = rgeos::gSimplify(riv, tol=tol.riv, topologyPreserve = TRUE)
   riv.s2 = sp.simplifyLen(riv, tol.len)
-  # plot(riv.s1); plot(riv.s2, add=T, col=3)
+  # raster::plot(riv.s1); raster::plot(riv.s2, add=T, col=3)
 
   wb.dis = rgeos::gUnionCascaded(wbd)
   wb.s1 = rgeos::gSimplify(wb.dis, tol=tol.wb, topologyPreserve = TRUE)
   wb.s2 = sp.simplifyLen(wb.s1, tol.len)
 
   png(filename = file.path(pngout, 'data_1.png'), height=11, width=11, res=100, units='in')
-  plot(dem); plot(wb.s2, add=TRUE, border=2, lwd=2);
-  plot(riv.s2, add=T, lwd=2, col=4)
+  raster::plot(dem); raster::plot(wb.s2, add=TRUE, border=2, lwd=2);
+  raster::plot(riv.s2, add=T, lwd=2, col=4)
   dev.off()
 
 
@@ -120,47 +114,39 @@ autoPIHMgis <- function(
   # }
   # generate PIHM .mesh
   pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
-  sm = sp.mesh2Shape(pm)
-  writeshape(sm, raster::crs(wbd), file=file.path(gisout, 'domain'))
-  plot(sm)
+  spm = sp.mesh2Shape(pm, crs = raster::crs(wb.s2))
+  writeshape(spm, raster::crs(wbd), file=file.path(gisout, 'domain'))
+  raster::plot(spm)
   png(filename = file.path(pngout, 'data_Mesh.png'), height=11, width=11, res=100, units='in')
-  plot(sm)
+  raster::plot(spm)
   dev.off()
 
   # generate PIHM .att
   pa=pihmAtt(tri, r.soil = rsoil, r.geol = rgeol, r.lc = rlc, r.forc = sp.forc )
 
-  writeforc(forcfiles,
-            file=fin['md.forc'])
+  writeforc(forcfiles,  file=fin['md.forc'])
 
   # generate PIHM .riv
   pr=pihmRiver(riv.simp, dem)
   oid = getOutlets(pr)
   message('Number of Rivers = ', nrow(pr@river))
   # Correct river slope to avoid negative slope
-  pz0 = pr@point[, 'Zmax']
-  pr = correctRiverSlope(pr)
-  dz = pz0 - pr@point[, 'Zmax']
-  plot(dz)
-  png(filename = file.path(pngout, 'data_RiverDZ.png'), height=11, width=11, res=100, units='in')
-  plot(dz)
-  dev.off()
 
   # PIHMriver to Shapefile
-  sriv = sp.riv2shp(pr)
-  writeshape(sriv, raster::crs(wbd), file=file.path(gisout, 'river'))
+  spr = riv.simp
+  writeshape(spr, raster::crs(wbd), file=file.path(gisout, 'river'))
 
   if(length(oid)>1){
     warning("There are ", length(oid), ' outlets in streams')
     dev.off();
-    plot(sriv); plot(sriv[oid, ], add=TRUE, col=2, lwd=3)
+    raster::plot(spr); raster::plot(spr[oid, ], add=TRUE, col=2, lwd=3)
     flag = readline('Continue?')
     if(flag =='N' | flag =='n'){
       stop('Exit the autoPIHMgis')
     }
   }
   # Cut the rivers with triangles
-  sp.seg = sp.RiverSeg(pm, pr)
+  sp.seg = sp.RiverSeg(spm, spr)
   writeshape(sp.seg, raster::crs(wbd), file=file.path(gisout, 'seg'))
 
   # Generate the River segments table
@@ -170,7 +156,8 @@ autoPIHMgis <- function(
   pic = pihm.init(nrow(pm@mesh), nrow(pr@river))
 
   # Generate shapefile of river
-  spp.riv = sp.riv2shp(pr);
+  # spp.riv = sp.riv2shp(pr);
+  
 
   # Generate shapefile of mesh domain
   message('Generate shapefile of mesh domain')
@@ -179,8 +166,8 @@ autoPIHMgis <- function(
   zz = sp.dm@data[,'Zsurf']
   ord=order(zz)
   col=grDevices::terrain.colors(length(sp.dm))
-  plot(sp.dm[ord, ], col = col)
-  plot(spp.riv, col=spp.riv@data[,5] + 1 , add=TRUE, lwd=3)
+  raster::plot(sp.dm[ord, ], col = col)
+  raster::plot(spr, col=pr@river$Type+1 , add=TRUE, lwd=3)
   dev.off()
 
   #soil/geol/landcover
@@ -205,23 +192,27 @@ autoPIHMgis <- function(
   zoo::plot.zoo(lr$RL, col=col, main='Roughness Length');
   graphics::legend('top', paste0(lc), col=col, lwd=1)
   dev.off()
-  write.tsd(lr$LAI, file = fin['md.lai'])
-  write.tsd(lr$RL, file = fin['md.rl'])
+  write.tsd(backup=backup,lr$LAI, file = fin['md.lai'])
+  write.tsd(backup=backup,lr$RL, file = fin['md.rl'])
 
-  write.tsd(mf, file=fin['md.mf'])
+  write.tsd(backup=backup,mf, file=fin['md.mf'])
 
   # write PIHM input files.
-  writemesh(pm, file = fin['md.mesh'])
-  writeriv(pr, file=fin['md.riv'])
-  writeinit(pic, file=fin['md.ic'])
+  writemesh(backup=backup,pm, file = fin['md.mesh'])
+  writeriv(backup=backup,pr, file=fin['md.riv'])
+  writeinit(backup=backup,pic, file=fin['md.ic'])
 
-  write.df(pa, file=fin['md.att'])
-  write.df(prs, file=fin['md.rivseg'])
-  write.df(para.lc, file=fin['md.lc'])
-  write.df(para.soil, file=fin['md.soil'])
-  write.df(para.geol, file=fin['md.geol'])
+  write.df(backup=backup,pa, file=fin['md.att'])
+  write.df(backup=backup,prs, file=fin['md.rivseg'])
+  write.df(backup=backup,para.lc, file=fin['md.lc'])
+  write.df(backup=backup,para.soil, file=fin['md.soil'])
+  write.df(backup=backup,para.geol, file=fin['md.geol'])
 
-  write.config(cfg.para, fin['md.para'])
-  write.config(cfg.calib, fin['md.calib'])
+  write.config(backup=backup,cfg.para, fin['md.para'])
+  write.config(backup=backup,cfg.calib, fin['md.calib'])
+  message('Ncell=', nrow(pm@mesh), '\t',
+          'Nriv=', nrow(pr@river), '\t',
+          'Nseg=', nrow(prs), '\n'
+          )
   pm <- pm
 }
