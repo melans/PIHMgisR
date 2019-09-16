@@ -27,14 +27,18 @@ PIHM.filein <- function(projname=get('PRJNAME', envir=.pihm),
   fn.lai = file.path(indir, paste0(projname, '.tsd.lai' ) )
   fn.rl = file.path(indir, paste0(projname, '.tsd.rl' ) )
   fn.mf = file.path(indir, paste0(projname, '.tsd.mf' ) )
-  
+  outdir = file.path('output', paste0(projname, '.out'))
+  gisdir = file.path(indir, 'gis')
   fns = c(
+    indir, outdir, gisdir, 
     fn.mesh, fn.pt, fn.edge, fn.mdseg, fn.mdriv, fn.att,
     fn.ic,fn.para, fn.calib,
           fn.soil, fn.geol, fn.lc,
           fn.forc, fn.bc, fn.lai, fn.rl, fn.mf
   )
-  names(fns) = c("md.mesh","md.pt", "md.edge", "md.rivseg", "md.riv", "md.att",
+  names(fns) = c(
+    'inpath', 'outpath', 'gispath',
+    "md.mesh","md.pt", "md.edge", "md.rivseg", "md.riv", "md.att",
                  'md.ic', 'md.para', 'md.calib',
                  'md.soil', 'md.geol', 'md.lc',
                  'md.forc', 'md.bc', 'md.lai', 'md.rl', 'md.mf' )
