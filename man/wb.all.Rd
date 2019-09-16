@@ -6,8 +6,8 @@
 \code{p.waterbalance}}
 \usage{
 wb.all(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "etic",
-  "ettr", "etev")), "rivqdown"), plot = FALSE, return = TRUE),
-  fun = xts::apply.yearly, plot = TRUE)
+  "ettr", "etev", "etp")), "rivqdown"), plot = FALSE, return = TRUE),
+  fun = xts::apply.monthly, plot = TRUE)
 }
 \arguments{
 \item{xl}{List of data. Five variables are included: prcp (eleqprcp), etic (eleqetic), ettr (eleqettr), etev (eleqetev) and discharge (rivqflx)}

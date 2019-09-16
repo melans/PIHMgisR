@@ -6,7 +6,7 @@
 \code{MeshData2Raster}}
 \usage{
 MeshData2Raster(x = getElevation(), rmask = PIHM.mask(proj = proj),
-  pm = readmesh(), proj = NULL, stack = FALSE)
+  pm = readmesh(), proj = NULL, stack = FALSE, plot = FALSE)
 }
 \arguments{
 \item{x}{vector or matrix, length/nrow is number of cells.}
