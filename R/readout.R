@@ -49,7 +49,7 @@ readout <- function(keyword,
 BasicPlot <- function(
   varname=c(paste0('eley',c( 'surf','unsat', 'gw') ), 
             paste0('elev',c('prcp','infil', 'rech') ),
-            paste0('elev',c('etp', 'ev', 'et', 'ic') ),
+            paste0('elev',c('etp', 'etev', 'ettr', 'etic') ),
             paste0('rivq',c('down', 'sub', 'surf')),
             paste0('rivy','stage')
   ) ,

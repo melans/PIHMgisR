@@ -94,3 +94,23 @@ plot_animate <- function(x, id = NULL, nmap = 10, rlist = NULL ){
   raster::animate(rlist)
   ret = rlist
 }
+
+
+#' Highlight elements with id.
+#' \code{highlight_id} 
+#' @param EleID Index of element
+#' @param RivID Index of river reaches
+#' @export
+highlight_id <- function(EleID=NULL, RivID=NULL){
+  spm=sp.mesh2Shape()
+  spr=rgdal::readOGR(file.path(inpath, 'gis', 'riv.shp'))
+  raster::plot(spm)
+  if(!is.null(EleID)){
+    raster::plot(spm[EleID, ], add=T, col=2)
+  }
+  
+  raster::plot(spr, add=T, col=3)
+  if(!is.null(RivID)){
+    raster::plot(spr[RivID, ], add=T, col=2, lwd=2)
+  }
+}

@@ -105,7 +105,7 @@ readconfig <- function(file = PIHM.filein()['md.para']){
   tmp = which(grepl('[:Alpha:]', tline) | grepl('[:alpha:]', tline))
   x =  utils::read.table(text = tline, header=FALSE, stringsAsFactors = FALSE)
   xdf = data.frame(rbind(t(x[, -1]), NULL), stringsAsFactors = FALSE)
-  colnames(xdf) = as.character(as.matrix(x[, 1]))
+  colnames(xdf) =toupper(as.character(as.matrix(x[, 1])) )
   ret = type.convert(xdf)
   return(ret)
 }

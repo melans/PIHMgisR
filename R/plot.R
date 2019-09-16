@@ -1,3 +1,4 @@
+
 #' Prepare png figure out.
 #' \code{png.control}
 #' @param fn Filename
@@ -61,7 +62,7 @@ map2d<-function(x=getElevation(),
 hydrograph <- function(x, legend.position='bottom', unit = rep('', ncol(x)),
                        col = c(3,4), heights = c(3,7), bg=TRUE
                        ){
-  time(x) = as.POSIXct(time(x) )
+  index(x) = as.POSIXct(time(x) )
   Time = NULL
   rain = NULL
   varialbe = NULL
