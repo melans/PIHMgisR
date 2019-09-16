@@ -15,6 +15,7 @@ pihm.init <- function(ncell, nriv, AqD = 10, stage = 0.1, p1=0.4, p2 = p1){
   colnames(mi) = c('Index', 'Canopy', 'Snow', 'Surface', 'Unsat', 'GW')
   colnames(ri) = c('Index', 'Stage')
   ret = list('minit' = mi, 'rinit' = ri)
+  return(ret)
 }
 #' Generate the default PIHM model configuration
 #' \code{pihm.para} 
@@ -37,41 +38,45 @@ pihmpara <- function( nday = 10){
   
   vn = c('VERBOSE', 'INIT_MODE',
          'ASCII_OUTPUT', 'Binary_OUTPUT', 
-         'SpinupDay', 'SCR_INTV', 'NUM_OPENMP', 
+         'SpinupDay', 'NUM_OPENMP', 'SCR_INTV',
          'ABSTOL', 'RELTOL', 
-         'INIT_SOLVER_STEP', 'MAX_SOLVER_STEP', 'ET_STEP', 
+         'INIT_SOLVER_STEP', 'MAX_SOLVER_STEP', 'LSM_STEP', 
          'START', 'END', 
          dts)
-  v = c(0,  2,
+  v = c(0,  3,
         0, 1,
-        0, 360, 8,
-        1e-4, 1e-3,
-        1e-2, 30, 60,
+        0, 8, 1440,
+        1e-6, 1e-6,
+        1e-2, 10, 60,
         0, nday,
         vdt
   )
   v=data.frame(rbind(v))
   names(v) = vn
-  v
+  return(v)
 }
 #' Generate the default PIHM model calibration
 #' \code{pihmcalib} 
 #' @return Default calibration values for PIHM
 #' @export
 pihmcalib <- function(){
-  cn = toupper( c('KSATH', 'KSATV', 'KINF', 'KMACSATH', 'KMACSATV', 'DINF', 'DROOT', 'DMAC',
-                  'THETAS','THETAR', 'ALPHA', 'BETA', 'MACVF', 'MACHF', 'VEGFRAC', 'ALBEDO', 'ROUGH',
-                  'Aquifer', 
-                  'PRCP', 'SFCTMP', 'ETP', 'EC', 'ETT', 'EDIR',
-                  'RIV_ROUGH', 'RIV_KH', 'RIV_DPTH',
-                  'RIV_WDTH', 'RIV_SINU', 'RIV_CWR', 'RIV_BSLOPE',
-                  'Soil_Dgd', 'ImpAF', 'ISMAX') )
+  cn = toupper( c(
+    'GEOL_KSATH', 'GEOL_KSATV', 'GEOL_KMACSATH','GEOL_MACVF', 'GEOL_THETAS','GEOL_THETAR',  'GEOL_DMAC',
+    'SOIL_KINF',  'SOIL_KMACSATV', 'SOIL_DINF', 'SOIL_ALPHA', 'SOIL_BETA', 'SOIL_MACHF', 
+    'LC_VEGFRAC', 'LC_ALBEDO', 'LC_ROUGH', 'LC_DROOT','LC_ISMAX', 'LC_ImpAF', 'LC_SoilDgd', 
+    'TS_PRCP', 'TS_LAI',
+    'TS_SFCTMP+', 
+    'ET_ETP', 'ET_IC', 'ET_TR', 'ET_Soil',
+    'RIV_ROUGH', 'RIV_KH', 
+    'RIV_SINU', 'RIV_CWR', 'RIV_BedThick',
+    'RIV_BSLOPE+','RIV_DPTH+','RIV_WDTH+', 
+    'IC_GW+', 'IC_RIV+',
+    'AQ_DEPTH+' 
+    ) )
   v=data.frame(rbind(rep(1, length(cn))))
   names(v) = cn
-  v['SFCTMP'] = 0  
-  v['AQUIFER'] = 0  
-  v['RIV_DPTH'] = 0  
-  v['RIV_WDTH'] = 0  
-  v['RIV_BSLOPE'] = 0  
-  v
+  id=which(grepl('\\+', cn))
+  # id
+  v[id] = 0
+  return(v)
 }
