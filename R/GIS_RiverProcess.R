@@ -157,11 +157,11 @@ RiverType <- function(n){
                 5.0 + 0.5 * 1:n, #Depth
                 0, #bankslope
                 2*1:n, #Width
-                1.1, #Sinuosity
+                1.0, #Sinuosity
                 4.63e-07, #manning's n, day/m^(1/3)
                 0.6, #CWR
                 0.1, #KsatH
-                1 # Bed Sediment Thickness.
+                .1 # Bed Sediment Thickness.
   )
   colnames(rtype) = cn
   rtype
@@ -173,12 +173,12 @@ RiverType <- function(n){
 #' @return SpatialLinesDataFrame, the \code{PIHM.river} was cut by \code{PIHM.mesh}
 #' @export
 sp.RiverSeg <- function(sp.mesh, sp.riv){
-  # sp  = sp.mesh2Shape(pm)
-  sp = sp.mesh
-  sp@data = data.frame('iEle'=1:length(sp))
-  # sr = sp.riv2shp(pr)
-  sr = sp.riv
-  sr@data = data.frame('iRiv' = 1:length(sr))
+  sp = sp::SpatialPolygonsDataFrame(sp.mesh, 
+                                 data = data.frame('iEle'=1:length(sp.mesh) ),
+                                 match.ID = FALSE)
+  sr =sp::SpatialLinesDataFrame(sp.riv, 
+                                data = data.frame('iRiv' = 1:length(sp.riv)),
+                                match.ID = FALSE )
   seg = raster::intersect(sr, sp)
   seg
 }
