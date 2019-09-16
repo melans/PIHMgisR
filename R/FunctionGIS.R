@@ -81,7 +81,8 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
 #' @export
 MeshData2Raster <- function(x=getElevation(), 
                             rmask=PIHM.mask(proj=proj), pm=readmesh(), proj=NULL,
-                            stack=FALSE){
+                            stack=FALSE, 
+                            plot =FALSE){
   
   if(stack){
     ret <- raster::stack(apply(x, 1, FUN = PIHMgisR::MeshData2Raster) )
@@ -101,6 +102,9 @@ MeshData2Raster <- function(x=getElevation(),
     # use model to predict values at all locations
     r <- raster::interpolate(rmask, tps)
     ret <- raster::mask(r,rmask)
+  }
+  if(plot){
+    raster::plot(ret)
   }
   return(ret)
 }
@@ -243,7 +247,7 @@ AddHoleToPolygon <-function(poly,hole){
   return(new)
 }
 #' Cut sptialLines with threshold.
-#' \code{CutSptialLines}
+#' \code{sp.CutSptialLines}
 #' @param sl SpatialLines or SpatialLineDataFrame
 #' @param tol Tolerence. If the length of segment is larger than tolerance, cut the segment until the maximum segment is shorter than tolerance.
 #' @export
@@ -255,12 +259,21 @@ AddHoleToPolygon <-function(poly,hole){
 #' sl = SpatialLines( list(l1) )
 #' tol1=5;
 #' tol2 =2
-#' sl1 = CutSptialLines(sl, tol1)
-#' sl2 = CutSptialLines(sl, tol2)
+#' sl1 = sp.CutSptialLines(sl, tol1)
+#' sl2 = sp.CutSptialLines(sl, tol2)
 #' par(mfrow=c(1,2))
 #' plot(sl1, col=1:length(sl1));title(paste0('Tol=', tol1))
 #' plot(sl2, col=1:length(sl2));title(paste0('Tol=', tol2))
-CutSptialLines <- function(sl, tol){
+#' 
+#' data(sh)
+#' riv=sh$riv
+#' x = sp.CutSptialLines(riv, tol=5)
+#' par(mfrow=c(2,1))
+#' plot(riv, col=1:length(riv), lwd=3); 
+#' 
+#' plot(riv, col='gray', lwd=3); 
+#' plot(add=T, x, col=1:length(x))
+sp.CutSptialLines <- function(sl, tol){
   ll = rgeos::gLength(sl, byid = TRUE)
   if(all(ll < tol) ){
     ret = sl
@@ -290,7 +303,7 @@ CutSptialLines <- function(sl, tol){
         # message('\t', k, '/', nsplit)
         dk = dd * k
         v1 = order(abs(dacc - dk), decreasing = FALSE)[1] + 1
-        if(v1 + 1>=np){
+        if(v1 + 1>np){
           v1 = np
         }
         message(v0,'\t', v1)
@@ -298,7 +311,7 @@ CutSptialLines <- function(sl, tol){
           next;
         }
         # plot(sl[i, ]);points(pxy); points(pxy[c(v0, v1), ], pch=2, col=2)
-        xsl[[ik]]= sp::Lines(sp::Line( pxy[c(v0,v1), ]), ID=ik)
+        xsl[[ik]]= sp::Lines(sp::Line( pxy[c(v0:v1), ]), ID=ik)
         ik=ik+1
         # points(pxy[v0:v1,], col=k)
         v0=v1
