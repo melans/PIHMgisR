@@ -165,6 +165,6 @@ wb.ele <-function(
 #' @return A vector
 #' @export
 wb.DS<-function(x, x0=x[t1, ], t1=1, t2=nrow(x)){
-  ds = (as.numeric(x[t2]) - as.numeric(x0))
+  ds = (as.numeric(x[t2,]) - as.numeric(x0))
   return(ds)
 }
