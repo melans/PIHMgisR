@@ -139,7 +139,7 @@ SimplifybyLen <- function(sp, split_length = 20, plot.results = F) {
   
   #### Visualise the results to check ####
   if (plot.results) {
-    plot(sp)
+    raster::plot(sp)
     coords = cbind(as.numeric(df$fx), as.numeric(df$fy))
     coords = rbind(coords, as.numeric(df$tx[nrow(df)]), as.numeric(df$ty)[nrow(df)])
     sp_points = sp::SpatialPoints(coords)
