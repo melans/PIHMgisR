@@ -92,21 +92,21 @@ readcalib <- function(file = PIHM.filein()['md.calib'] ){
 }
 
 #============
-#' Read the configuration (.para, .calib or .cmaes) file
+#' Read the configuration (.para, .calib) file
 #' \code{readconfig} 
 #' @param file full path of file
 #' @return .para or .calib
 #' @importFrom utils type.convert write.table
 #' @export
 readconfig <- function(file = PIHM.filein()['md.para']){
-  # file='x.cmaes'
   tline = readLines(file, skipNul = TRUE)
   tline=tline[!grepl('^#', tline)]
   tmp = which(grepl('[:Alpha:]', tline) | grepl('[:alpha:]', tline))
   x =  utils::read.table(text = tline, header=FALSE, stringsAsFactors = FALSE)
   xdf = data.frame(rbind(t(x[, -1]), NULL), stringsAsFactors = FALSE)
   colnames(xdf) =toupper(as.character(as.matrix(x[, 1])) )
-  ret = type.convert(xdf)
+  # ret = type.convert(xdf)
+  ret = xdf;
   return(ret)
 }
 #============
