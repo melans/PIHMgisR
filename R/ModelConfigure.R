@@ -46,7 +46,7 @@ pihmpara <- function( nday = 10){
   v = c(0,  3,
         0, 1,
         0, 8, 1440,
-        1e-6, 1e-6,
+        1e-4, 1e-4,
         1e-2, 10, 60,
         0, nday,
         vdt
