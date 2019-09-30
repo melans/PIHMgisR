@@ -49,7 +49,7 @@ pre.files <- function(iGen, pop, CV){
   prjname=CV$prjname
   calib=CV$calib
   calibrange = CV$range
-  dir.out = as.character(as.matrix(CV$method$path_out))
+  dir.out = as.character(as.matrix(CV$method$PATH_OUT))
   njob =ncol(pop)
   # dir.png = file.path(dir.out, 'png')
   dir.calib = file.path(dir.out, 'cfg.calib')
@@ -124,8 +124,8 @@ EXEC <- function(CV, CMD.EXE, calibfile, outpath, fn.log){
   outpath=as.character(outpath)
   fn.log=as.character(fn.log)
   CMD.EXE=as.character(CMD.EXE)
-  walltime = CV$method$walltime
-  cmd = paste(paste0('./', CMD.EXE),  paste('-c', calibfile), paste('-o', outpath), prjname)
+  walltime = CV$method$WALLTIME
+  cmd = paste(paste0(CMD.EXE),  paste('-c', calibfile), paste('-o', outpath), prjname)
   message('Walltime: ',walltime)
   if(grepl('Darwin', Sys.info()['sysname'])){  
     message(cmd)

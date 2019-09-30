@@ -88,13 +88,13 @@ sp.RiverOrder <- function(sp, coord = extractCoords(sp)){
       cr = tid[i]
       for(j in 1:100000){
         # message('Stream ',i,'\tSeg ', j, '\tFrom Node ', cr)
-        rid = which(fr == cr)
+        rid = which(fr %in% cr)
         ret=c(ret, rid)
         sid= to[rid] #ID of to-point;
         # if(length(sid) < 1 | length(sid)>1){
         #   print(sid)
         # }
-        if( sid  %in% p.key){ #if sid IS IN key-points(outlets or joint point).
+        if( any(sid  %in% p.key) ){ #if sid IS IN key-points(outlets or joint point).
           break;
         }else{
           cr = sid;

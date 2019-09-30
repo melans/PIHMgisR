@@ -33,18 +33,27 @@ write.cmaes <- function(x=NULL, file, backup = TRUE){
 #' @param CV  Input data, list of data.
 #' @param cmd Command to run the model.
 #' @param objfunc  User-defined objective function which return the objective values.
+#' @param lambda Number of children in each generation
+#' @param maxstep Maximum generations
+#' @param ncores Number of cores to simulate. 1 = one thread.
+#' @param sigma Sigma Value to sample (0, 1)
+#' @param stopfitness The optimal value. When the objective value is smaller than stopfitness, calibration success.
 #' @param ... More options passing to objfunc.
 #' @export
-CMAES<- function (CV, cmd='pihm++', objfunc=NULL, ...){
+CMAES<- function (CV, cmd='./pihm++', objfunc=NULL, 
+                  lambda = CV$method$LAMBDA,
+                  maxstep = CV$method$MAXGEN,
+                  ncores = max(CV$method$NCORES, 1),
+                  sigma = CV$method$SIGMA,
+                  stopfitness=CV$method$STOPFITNESS,
+                  ...){
   # stopifnot(is.numeric(par))
   stopifnot(!is.null(objfunc))
-  if( !file.exists(cmd) ){
+  # if( !file.exists(cmd) ){
+  if(system(cmd, ignore.stdout = TRUE, ignore.stderr = TRUE)!=0){
     stop(paste(cmd, "does not exist.\n"))
   }
-  lambda = CV$method$lambda
-  maxstep = CV$method$maxgen
-  ncores = max(CV$method$ncores, 1)
-  dir.out = as.character(type.convert(CV$method$path_out))
+  dir.out = as.character(type.convert(CV$method$PATH_OUT))
   range = CV$range
   message('Output path: ', dir.out)
   dir.create(dir.out, showWarnings = FALSE, recursive = TRUE)
@@ -58,7 +67,6 @@ CMAES<- function (CV, cmd='pihm++', objfunc=NULL, ...){
   
   message('Calibration on parameters: ')
   print(CV$range[,para.id])
-  sigma = CV$method$sigma
   
   if(is.null(lambda) ){ lambda = 4 + floor(3 * log(N))}
   if (sigma < 0.1 || sigma > 0.9){
@@ -102,7 +110,6 @@ CMAES<- function (CV, cmd='pihm++', objfunc=NULL, ...){
   rownames(arx) = rownames(para.name[para.id])
   arfitness <- numeric(lambda)
   
-  stopfitness=CV$method$stopfitness
   write.config(CV$range, file=file.path(dir.out, paste0(CV$prjname,'.range.txt')), backup = FALSE)
   for(iGen in 1:maxstep) {
     message('\n\n')
@@ -124,7 +131,7 @@ CMAES<- function (CV, cmd='pihm++', objfunc=NULL, ...){
                       CV=CV, CMD.EXE = cmd, objfunc=objfunc, ...)
     
     # print(xout$fitness)
-    arfitness = abs(CV$method$bestgof - xout$fitness)
+    arfitness = abs(CV$method$BESTGOF - xout$fitness)
     message('Fitness at Geneartion ', iGen, '/', maxstep, ':')
     print(arfitness)
     
@@ -166,7 +173,7 @@ CMAES<- function (CV, cmd='pihm++', objfunc=NULL, ...){
       break
     }
     if( diff(range(arfitness, na.rm=TRUE)) / mean(arfitness, na.rm=TRUE) < 0.01){
-      message('The POSSIBLE best fitness is reached: ', arfitness[1], ').')
+      message('The POSSIBLE best fitness is reached: ', arfitness[1], '.')
       message('Current Generation = ', iGen)
       message('Best Calib:')
       print(bestcalib)
@@ -180,3 +187,11 @@ CMAES<- function (CV, cmd='pihm++', objfunc=NULL, ...){
               BestOBJ  = BestOBJ[1:iGen])
   )
 }
+# 
+# sol1 <- CMAES(CV = CV, objfunc = Obj.Func)
+
+# sol1 <- CMAES(CV = CV, objfunc = Obj.Func, ncores = 2)
+
+# x=PIHMgisR::write.cmaes(file='test.cmaes')
+# 
+# CMAES(CV, cmd='ls', objfunc = objFun)
