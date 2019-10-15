@@ -31,9 +31,13 @@ readout <- function(keyword,
   mat=t(matrix(dat[1:( nr*(nc+1) )], nrow=nc+1))
   tmove = diff(mat[,1])
   tmove = c(tmove, tmove[length(tmove)])
-  tsec =   ( mat[,1] -  tmove) * 60 # time must shift back ONE dt.
+  tsec =   ( mat[,1]) * 60 
   xt = as.POSIXct(as.character(st), format='%Y%m%d') + tsec
-  tsd = xts::as.xts(rbind(mat[,-1]), order.by = xt)
+  if(nc<=1){
+    tsd = xts::as.xts(cbind(mat[,-1]), order.by = xt)
+  }else{
+    tsd = xts::as.xts(rbind(mat[,-1]), order.by = xt)
+  }
   tsd
 }
 
