@@ -153,6 +153,10 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
       write.table(gof.tab, file = file.path(CV$method$PATH_OUT, 'gof.csv'),
                   append = TRUE, quote = FALSE, row.names = FALSE, col.names = FALSE)
     }
+    message('================================')
+    message('\n\nOBJECTIVE VALUES in Genearation ', iGen)
+    print(gof.tab)
+    message('================================')
     # CV$calib = bestcalib # UPDATE THE CALIB into the CV
     write.config(bestcalib, file=file.path(dir.out, paste0('calib_Gen.', iGen, '.calib') ), backup = FALSE)
     # vlist = pre.files(iGen = iGen, pop = pop, CV=CV);
@@ -179,10 +183,6 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
       invsqrtC <- B %*% diag(D^-1) %*% t(B)
     }
     BestOBJ[iGen] = arfitness[1]
-    message('================================')
-    message('\n\nOBJECTIVE VALUES in Genearation ', iGen)
-    print(arfitness)
-    message('================================')
     if (arfitness[1] <= stopfitness || max(D) > 1e+07 * min(D)){
       message('The best fitness (', arfitness[1], ') is less than threshold (', stopfitness, ').')
       message('Current Generation = ', iGen)
