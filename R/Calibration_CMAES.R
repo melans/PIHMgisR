@@ -40,19 +40,20 @@ write.cmaes <- function(x=NULL, file, backup = TRUE){
 #' @param stopfitness The optimal value. When the objective value is smaller than stopfitness, calibration success.
 #' @param ... More options passing to objfunc.
 #' @export
-CMAES<- function (CV, cmd='./pihm++', objfunc=NULL, 
+CMAES<- function (CV, cmd, objfunc,  Call_Model, 
                   lambda = CV$method$LAMBDA,
                   maxstep = CV$method$MAXGEN,
                   ncores = max(CV$method$NCORES, 1),
                   sigma = CV$method$SIGMA,
                   stopfitness=CV$method$STOPFITNESS,
+                  debug=FALSE,
                   ...){
   # stopifnot(is.numeric(par))
   stopifnot(!is.null(objfunc))
   # if( !file.exists(cmd) ){
-  if(system(cmd, ignore.stdout = TRUE, ignore.stderr = TRUE)!=0){
-    stop(paste(cmd, "does not exist.\n"))
-  }
+  # if(system(cmd, ignore.stdout = TRUE, ignore.stderr = TRUE)!=0){
+  #   stop(paste(cmd, "does not exist.\n"))
+  # }
   dir.out = as.character(type.convert(CV$method$PATH_OUT))
   range = CV$range
   message('Output path: ', dir.out)
@@ -128,7 +129,9 @@ CMAES<- function (CV, cmd='./pihm++', objfunc=NULL,
     # run PIHM  and get GOF back.
     # debug(Call_Model)
     xout = Call_Model(iGen=iGen, pop = arx, ncores=ncores, 
-                      CV=CV, CMD.EXE = cmd, objfunc=objfunc, ...)
+                      CV=CV, CMD.EXE = cmd, objfunc=objfunc, 
+                      debug=debug,
+                      ...)
     
     # print(xout$fitness)
     arfitness = abs(CV$method$BESTGOF - xout$fitness)
@@ -141,8 +144,19 @@ CMAES<- function (CV, cmd='./pihm++', objfunc=NULL,
     iBest = SortID[1]
     calibmat = xout$varlist$calibmat
     bestcalib = calibmat[SortID[1], ]
+    
+    gof.tab = cbind(iGen, SortID[1:5], arfitness[1:5]);
+    if(iGen ==1){
+      write.table(gof.tab, file = file.path(CV$method$PATH_OUT, 'gof.csv'),
+                  append = FALSE, quote = FALSE, row.names = FALSE, col.names = FALSE)
+    }else{
+      write.table(gof.tab, file = file.path(CV$method$PATH_OUT, 'gof.csv'),
+                  append = TRUE, quote = FALSE, row.names = FALSE, col.names = FALSE)
+    }
     # CV$calib = bestcalib # UPDATE THE CALIB into the CV
     write.config(bestcalib, file=file.path(dir.out, paste0('calib_Gen.', iGen, '.calib') ), backup = FALSE)
+    # vlist = pre.files(iGen = iGen, pop = pop, CV=CV);
+    # Obj.Func(jobid = SortID[1], CV = CV, vlist = )
     # if( arfitness < 1) { #if the simulation is good enough.
     #   fun.updateinit(CV, iBest)
     # }
@@ -165,6 +179,10 @@ CMAES<- function (CV, cmd='./pihm++', objfunc=NULL,
       invsqrtC <- B %*% diag(D^-1) %*% t(B)
     }
     BestOBJ[iGen] = arfitness[1]
+    message('================================')
+    message('\n\nOBJECTIVE VALUES in Genearation ', iGen)
+    print(arfitness)
+    message('================================')
     if (arfitness[1] <= stopfitness || max(D) > 1e+07 * min(D)){
       message('The best fitness (', arfitness[1], ') is less than threshold (', stopfitness, ').')
       message('Current Generation = ', iGen)
