@@ -6,11 +6,14 @@
 \code{p.waterbalance}}
 \usage{
 wb.all(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "etic",
-  "ettr", "etev", "etp")), "rivqdown"), plot = FALSE, return = TRUE),
-  fun = xts::apply.monthly, plot = TRUE)
+  "ettr", "etev", "etp")), "rivqdown", paste0("eley", c("surf", "unsat",
+  "gw")), paste0("rivy", "stage")), plot = FALSE, return = TRUE),
+  ic = readic(), fun = xts::apply.monthly, plot = TRUE)
 }
 \arguments{
 \item{xl}{List of data. Five variables are included: prcp (eleqprcp), etic (eleqetic), ettr (eleqettr), etev (eleqetev) and discharge (rivqflx)}
+
+\item{ic}{Initial Condition.}
 
 \item{fun}{function to process the time-series data. Default = apply.daily.}
 

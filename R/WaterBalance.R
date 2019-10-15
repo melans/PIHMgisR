@@ -2,16 +2,18 @@
 #' \code{p.waterbalance}
 #' @param xl List of data. Five variables are included: prcp (eleqprcp), etic (eleqetic), ettr (eleqettr), etev (eleqetev) and discharge (rivqflx)
 #' @param fun function to process the time-series data. Default = apply.daily.
+#' @param ic Initial Condition.
 #' @param plot Whether plot the result
 #' @return A matrix, contains the colums of water balance factors
 #' @export
 wb.all <-function(
   xl=BasicPlot(varname=c(paste0('elev', c('prcp', 'etic', 'ettr', 'etev', 'etp') )
-                         , 'rivqdown'), plot = FALSE, return = TRUE),
-
+                         , 'rivqdown', 
+                         paste0('eley', c('surf', 'unsat', 'gw') ),
+                         paste0('rivy', 'stage') ),plot = FALSE, return = TRUE), 
+               ic=readic(),
   fun = xts::apply.monthly, plot=TRUE
 ){
-
   func <-function(x, w){
     aa= sum(ia)
     y = sweep(x, 2, w, '*')
@@ -27,15 +29,20 @@ wb.all <-function(
   ET = fun( func(xl$elevettr, w ), FUN=sum)
   EV = fun( func(xl$elevetev, w ), FUN=sum)
   ETP = fun( func(xl$elevetp, w ), FUN=sum)
+  ETA=IC+EV+ET
+  ds = wb.DS(xl=xl, ic=ic)
   dh = P-Q-IC-EV-ET
-  x=cbind(dh, P,ETP, Q,IC, ET,EV)
+  x=cbind(dh, P, Q, ETA, ETP,IC, ET,EV)
   # colnames(x)=c('P', 'ETP','Q','ET_IC', 'ET_TR','ET_EV')
   # y = cbind(dh, x)
-  colnames(x)=c('DH', 'P', 'ETP','Q','ET_IC', 'ET_TR','ET_EV')
+  colnames(x)=c('DH', 'P', 'Q','ETA','ETP','ET_IC', 'ET_TR','ET_EV')
   if(plot){
       PIHMgisR::hydrograph(x)
   }
-  y=apply(x, 2, sum, na.rm=TRUE)
+  dse = sum( apply(ds$Ele, 2, sum) * w)
+  dsr = sum(ds$Riv)
+  dss = dse + dsr
+  y=c(apply(x, 2, sum, na.rm=TRUE), DS=dss, DS.Ele=dse, DS.Riv = dsr)
   mat = rbind('H'=y, '%'=y/y[2]*100)
   print(mat)
   return(x)
@@ -86,14 +93,14 @@ wb.riv <-function(
   qsf = fun.read(xl, 'rivqsurf')[,]
   qsb = fun.read(xl, 'rivqsub')[,]
 
-  Q = fun(qr, FUN=sum)
+  Qo = fun(qr, FUN=sum)
   Qsf = fun(qsf, FUN=sum)
   Qsub = fun(qsb, FUN=sum)
-  q3=cbind(Q, -Qsf, -Qsub)  / aa
-  plot(q3)
+  q3=cbind(Qo, -Qsf, -Qsub)  / aa
+  # plot(q3)
 
-  dh = ( Q + Qsf + Qsub ) /aa
-  plot(dh)
+  dh = -( Qo + Qsf + Qsub ) /aa
+  # plot(dh)
 
   x=cbind(dh, q3)
   colnames(x)=c('DH', 'Qout','Qin_sf','Qin_gw')
@@ -102,7 +109,8 @@ wb.riv <-function(
   }
   x
 }
-
+# 
+# wbr=wb.riv(xl=xl, fun=apply.daily)
 
 #' Calculate the water balance
 #' \code{wb.riv}
@@ -157,14 +165,42 @@ wb.ele <-function(
 }
 
 #' Calculate the Change of Storage.
-#' \code{wb.DS}
+#' \code{DeltaS}
 #' @param x Time-Serres Matrix
 #' @param x0 Intial condition or the values of first time-step
 #' @param t1 Time-step one, default = 1
 #' @param t2 Time-step two, default = nrow(x)
 #' @return A vector
 #' @export
-wb.DS<-function(x, x0=x[t1, ], t1=1, t2=nrow(x)){
+DeltaS<-function(x, x0=x[t1, ], t1=1, t2=nrow(x)){
   ds = (as.numeric(x[t2,]) - as.numeric(x0))
   return(ds)
+}
+
+#' Calculate the Change of Storage.
+#' \code{wb.DS}
+#' @param xl List of data. Five variables are included: surface (eleysurf), unsat zone (eleyunsat), groundwater (eleygw) and river stage (rivystage)
+#' @param ic Initial Condition.
+#' @return A list. list(Ele, Riv)
+#' @export
+wb.DS<-function(xl=BasicPlot(varname = c(paste0('eley', c('surf', 'unsat', 'gw')),
+                                         paste0('rivy', 'stage')),plot = FALSE, return = TRUE),
+                ic=readic() ){
+  ic=readic()
+  g=readgeol()
+  att=readatt()
+  cfg.calib=readcalib()
+  pr=readriv()
+  rtype = pr@river$Type
+  ra = pr@rivertype$Width[rtype] * pr@river$Length
+  AA = sum(getArea())
+  por=g$ThetaS.m3_m3.[att$GEOL] * cfg.calib$GEOL_THETAS
+  ds.sf=DeltaS(xl$eleysurf, x0=ic$minit$Surface)
+  ds.us=DeltaS(xl$eleyunsat, x0=ic$minit$Unsat) * por
+  ds.gw=DeltaS(xl$eleygw, x0=ic$minit$GW) * por
+  ds.riv=DeltaS(xl$rivystage, x0=ic$rinit$Stage) * ra / AA
+  r = list(Ele = rbind(ds.sf, ds.us, ds.gw),
+           Riv = rbind(ds.riv)
+  )
+  return(r)
 }

@@ -44,3 +44,4 @@ NULL
 #' This is .pihm environment.
 #' @name .pihm
 .pihm<-new.env()
+

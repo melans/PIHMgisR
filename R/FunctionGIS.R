@@ -154,6 +154,7 @@ removeholes <- function(sp){
 #' Generatue fishnet
 #' \code{fishnet}
 #' @param ext Extension of the fishnet. c(xmin, xmax, ymin, ymax)
+#' @param n Number of dx
 #' @param dx Interval of x direction
 #' @param dy Interval of y direction
 #' @param crs Projection
@@ -165,7 +166,9 @@ removeholes <- function(sp){
 #' library(raster)
 #' pg=fishnet(ext=c(-80,80, -50,50), dx=5)
 #' plot(pg)
-fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), dx=diff(ext[1:2])/10, dy=dx,
+fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), 
+                    n=10,
+                    dx=diff(ext[1:2])/n, dy=dx,
                     lines=FALSE, polygons=TRUE, points=FALSE){
   xmin = ext[1]
   xmax = ext[2]
@@ -362,4 +365,61 @@ extractRaster<-function(r, xy=NULL, ext = raster::extent(r), plot=T){
   v = raster::extract(r, cbind(x,y))
   ret = cbind('x'=x,'y'=y,'z'=v)
   return(ret)
+}
+
+#' Simplify SpatialData.
+#' \code{SimpleSpatial}
+#' @param x SpatialData
+#' @return Simplified SpatialData
+#' @export
+SimpleSpatial <-function(x){
+  # n1=length(x@polygons)
+  # nj=unlist(lapply(1:n1, function(i){ length(x@polygons[[i]]@Polygons) } ))
+  # x@polygons[[1]]@Polygons[[1]]@coords
+  ni = length(x@polygons)
+  k=1
+  sl=list()
+  for(i in 1:ni){
+    nj = length(x@polygons[[1]]@Polygons)
+    for(j in 1:nj){
+      cd = x@polygons[[i]]@Polygons[[j]]@coords
+      np=nrow(cd)
+      message(i,'-',j ,'\t', np)
+      sl[[k]] = paste('POLYGON((', paste( paste(cd[,1], cd[,2]), collapse = ',' ), '))')
+      if(k==1){
+        str = sl[[k]]
+      }else{
+        str = paste(str, ',', sl[[k]] )
+      }
+      k=k+1
+    }
+  }
+  r=rgeos::readWKT(paste('GEOMETRYCOLLECTION(', str, ')'))
+}
+
+#' Simplify SpatialData.
+#' \code{PointInDistance}
+#' @param x 2-column 
+#' @param tol Tolerance 
+#' @return Index of points that within tol
+#' @export
+PointInDistance <- function(pt, tol){
+  dm = as.matrix(stats::dist(pt, diag  = TRUE))
+  dm[dm==0]=NA
+  # View(dm)
+  dmin=apply(dm, 1, min, na.rm=T)
+  id=which(dmin < 100)
+  id1=id2=NULL
+  tmp1=tmp=dmin[id]
+  i=2
+  for(i in 1:length(id)){
+    if(id[i] %in% id2){next }
+    id1 = c(id1, i); id1
+    tmp1[id1] = NA; tmp1
+    id[which(tmp1 %in% tmp[id1])]
+    id2=unique(c(id2,  id[which(tmp1 %in% tmp[id1])]))
+    id2
+    tmp1=tmp
+  }
+  cbind('P1'=id[id1], P2=id2)
 }

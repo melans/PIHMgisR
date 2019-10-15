@@ -5,7 +5,10 @@
 \title{Automatically calibrate model, that requires user-defined model and objective function.
 \code{CMAES}}
 \usage{
-CMAES(CV, cmd = "pihm++", objfunc = NULL, ...)
+CMAES(CV, cmd = "./pihm++", objfunc = NULL,
+  lambda = CV$method$LAMBDA, maxstep = CV$method$MAXGEN,
+  ncores = max(CV$method$NCORES, 1), sigma = CV$method$SIGMA,
+  stopfitness = CV$method$STOPFITNESS, ...)
 }
 \arguments{
 \item{CV}{Input data, list of data.}
@@ -13,6 +16,16 @@ CMAES(CV, cmd = "pihm++", objfunc = NULL, ...)
 \item{cmd}{Command to run the model.}
 
 \item{objfunc}{User-defined objective function which return the objective values.}
+
+\item{lambda}{Number of children in each generation}
+
+\item{maxstep}{Maximum generations}
+
+\item{ncores}{Number of cores to simulate. 1 = one thread.}
+
+\item{sigma}{Sigma Value to sample (0, 1)}
+
+\item{stopfitness}{The optimal value. When the objective value is smaller than stopfitness, calibration success.}
 
 \item{...}{More options passing to objfunc.}
 }

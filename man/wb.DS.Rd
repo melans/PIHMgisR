@@ -5,19 +5,17 @@
 \title{Calculate the Change of Storage.
 \code{wb.DS}}
 \usage{
-wb.DS(x, x0 = x[t1, ], t1 = 1, t2 = nrow(x))
+wb.DS(xl = BasicPlot(varname = c(paste0("eley", c("surf", "unsat",
+  "gw")), paste0("rivy", "stage")), plot = FALSE, return = TRUE),
+  ic = readic())
 }
 \arguments{
-\item{x}{Time-Serres Matrix}
+\item{xl}{List of data. Five variables are included: surface (eleysurf), unsat zone (eleyunsat), groundwater (eleygw) and river stage (rivystage)}
 
-\item{x0}{Intial condition or the values of first time-step}
-
-\item{t1}{Time-step one, default = 1}
-
-\item{t2}{Time-step two, default = nrow(x)}
+\item{ic}{Initial Condition.}
 }
 \value{
-A vector
+A list. list(Ele, Riv)
 }
 \description{
 Calculate the Change of Storage.

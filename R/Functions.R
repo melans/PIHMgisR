@@ -49,19 +49,26 @@ Eudist <- function(p1,p2){
 #' }
 extractCoords<-function(x, unique=TRUE, aslist = FALSE){
   spl <- methods::as(x, "SpatialLines")
-  pl = lapply(sp::coordinates(spl), 
-              function(x) t(matrix(unlist(x), nrow =2, byrow = TRUE) ) )
-  if(aslist){
-    ret = pl
+  spp <- methods::as(spl, "SpatialPoints")
+  pts = sp::coordinates(spp)
+  if (unique){
+    ret = unique(pts)
   }else{
-    pts = do.call(rbind, pl)
-    if (unique){
-      ret = unique(pts)
-    }else{
-      ret = pts
-    }
+    ret = pts
   }
   return(ret)
+  # pl = lapply(sp::coordinates(spl), 
+  #             function(x) t(matrix(unlist(x), nrow =2, byrow = TRUE) ) )
+  # if(aslist){
+  #   ret = pl
+  # }else{
+  #   pts = do.call(rbind, pl)
+  #   if (unique){
+  #     ret = unique(pts)
+  #   }else{
+  #     ret = pts
+  #   }
+  # }
 }
 
 #' Convert the \code{xy} (X,Y) into Index in \code{coords}

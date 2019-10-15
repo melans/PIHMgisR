@@ -16,7 +16,7 @@ pihmRiver <- function(sl, dem){
   rivord = sp.RiverOrder(sp.slt)
   message('\nIdentify the downstrem ...')
   rivdown = sp.RiverDown(sp.slt)
-  message('\nFrom/To nodes ...')
+  message('\nFrom/To nodes ...') 
   ft = FromToNode(sp.slt)
   message('\nSlope and length of river ...')
   zf = raster::extract(dem, xy[ft[,1], ])
@@ -24,6 +24,7 @@ pihmRiver <- function(sl, dem){
   len = rgeos::gLength(sp.slt, byid = TRUE)
   slp = (zf - zt) / len;
   row.names(sp.slt) = paste(1:nsp)
+  
   df = data.frame('Index'=1:nsp,
                   'Down' = rivdown,
                   'Type' = rivord,
@@ -31,11 +32,18 @@ pihmRiver <- function(sl, dem){
                   'Length' = len,
                   'BC' = len *0)
   rownames(df) = row.names(sp.slt)
+  
+  p.df = data.frame(xy[ft[, 1], ], zf, xy[ft[,2], ], zt)
+  colnames(p.df) = c('From.x','From.y','From.z', 'To.x', 'To.y', 'To.z')
+  rownames(p.df) = row.names(sp.slt)
+  
   sp.df = SpatialLinesDataFrame(sp.slt, data=df)
   ntype = max(rivord)
   rtype = RiverType(ntype)
+  p.z=raster::extract(dem, xy)
   PIHM.river(river = df,
-             rivertype = data.frame(rtype)
+             rivertype = data.frame(rtype), 
+             point=p.df
   )
 }
 #' Calculate the river length

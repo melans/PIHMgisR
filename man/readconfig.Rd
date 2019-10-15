@@ -2,7 +2,7 @@
 % Please edit documentation in R/readinput.R
 \name{readconfig}
 \alias{readconfig}
-\title{Read the configuration (.para, .calib or .cmaes) file
+\title{Read the configuration (.para, .calib) file
 \code{readconfig}}
 \usage{
 readconfig(file = PIHM.filein()["md.para"])
@@ -14,6 +14,6 @@ readconfig(file = PIHM.filein()["md.para"])
 .para or .calib
 }
 \description{
-Read the configuration (.para, .calib or .cmaes) file
+Read the configuration (.para, .calib) file
 \code{readconfig}
 }
