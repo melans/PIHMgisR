@@ -101,7 +101,7 @@ pre.files <- function(iGen, pop, CV){
                   'fn.calib' = fn.calib,
                   'fn.log'= fn.log,
                   'dir.in' = file.path('input', prjname),
-                  'dir.out' = file.path('output', paste0(prjname, '.out'), paste0(prjname, 1:njob) ) 
+                  'dir.out' = file.path('output', paste0(prjname, '.out'), paste0(prjname, '_', 1:njob) ) 
                 ),
               'fn.cmat' = fn.mat,
               'calibmat' = calibmat)
