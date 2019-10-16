@@ -52,7 +52,7 @@ pihmpara <- function( nday = 10){
         vdt
   )
   v=data.frame(rbind(v))
-  names(v) = vn
+  names(v) = toupper( vn )
   return(v)
 }
 #' Generate the default PIHM model calibration
@@ -74,7 +74,7 @@ pihmcalib <- function(){
     'AQ_DEPTH+' 
     ) )
   v=data.frame(rbind(rep(1, length(cn))))
-  names(v) = cn
+  names(v) = toupper(cn)
   id=which(grepl('\\+', cn))
   # id
   v[id] = 0
