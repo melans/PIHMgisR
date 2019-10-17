@@ -122,6 +122,7 @@ pre.files <- function(iGen, pop, CV){
 EXEC <- function(CV, CMD.EXE, calibfile, outpath, fn.log){
   calibfile=as.character(calibfile)
   outpath=as.character(outpath)
+  dir.create(outpath, showWarnings = FALSE, recursive = TRUE)
   fn.log=as.character(fn.log)
   CMD.EXE=as.character(CMD.EXE)
   walltime = CV$method$WALLTIME
