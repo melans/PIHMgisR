@@ -125,7 +125,9 @@ EXEC <- function(CV, CMD.EXE, calibfile, outpath, fn.log){
   fn.log=as.character(fn.log)
   CMD.EXE=as.character(CMD.EXE)
   walltime = CV$method$WALLTIME
-  cmd = paste(paste0(CMD.EXE),  paste('-c', calibfile), paste('-o', outpath), prjname)
+  cmd = paste(paste0(CMD.EXE),  paste('-c', calibfile), 
+              paste('-o', outpath), prjname, 
+              '2>&1 >', file.path(outpath, paste0(prjname, 'log')) )
   message('Walltime: ',walltime)
   if(grepl('Darwin', Sys.info()['sysname'])){  
     message(cmd)
