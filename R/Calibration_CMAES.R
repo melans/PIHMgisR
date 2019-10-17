@@ -56,7 +56,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
   # }
   dir.out = as.character(type.convert(CV$method$PATH_OUT))
   range = CV$range
-  message('Output path: ', dir.out)
+  message('CMAES::Output path: ', dir.out)
   dir.create(dir.out, showWarnings = FALSE, recursive = TRUE)
   if(ncores > 1){
     registerDoParallel(ncores)
@@ -66,7 +66,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
   N = sum(length(para.id)) # number of parameters to calibration.
   stopifnot( N > 0)
   
-  message('Calibration on parameters: ')
+  message('CMAES::Calibration on parameters: ')
   print(CV$range[,para.id])
   
   if(is.null(lambda) ){ lambda = 4 + floor(3 * log(N))}
@@ -115,7 +115,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
   for(iGen in 1:maxstep) {
     message('\n\n')
     message('\t========================')
-    message(iGen, '/', maxstep)
+    message('CMAES::', iGen, '/', maxstep)
     message('\t========================')
     arx = arx * 0;
     for (k in 1:lambda) {
@@ -123,7 +123,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
       arxk <- ifelse(arxk > lower, ifelse(arxk < upper, arxk, upper),lower)
       arx[, k] <- arxk
     }
-    message('sigma = ') ; print(sigma); message('')
+    message('CMAES::',' sigma = ') ; print(sigma); message('')
     
     # Range + arx to .calib files
     # run PIHM  and get GOF back.
@@ -135,7 +135,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
     
     # print(xout$fitness)
     arfitness = abs(CV$method$BESTGOF - xout$fitness)
-    message('Fitness at Geneartion ', iGen, '/', maxstep, ':')
+    message('CMAES::Fitness at Geneartion ', iGen, '/', maxstep, ':')
     print(arfitness)
     
     arr[,,iGen] = arx;
@@ -146,6 +146,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
     bestcalib = calibmat[SortID[1], ]
     
     gof.tab = cbind(iGen, SortID[1:5], arfitness[1:5]);
+    colnames(gof.tab) = c('Gen', 'Job', 'GOF')
     if(iGen ==1){
       write.table(gof.tab, file = file.path(CV$method$PATH_OUT, 'gof.csv'),
                   append = FALSE, quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -154,7 +155,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
                   append = TRUE, quote = FALSE, row.names = FALSE, col.names = FALSE)
     }
     message('================================')
-    message('\n\nOBJECTIVE VALUES in Genearation ', iGen)
+    message('CMAES::','\n\nOBJECTIVE VALUES in Genearation ', iGen)
     print(gof.tab)
     message('================================')
     # CV$calib = bestcalib # UPDATE THE CALIB into the CV
@@ -184,16 +185,16 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
     }
     BestOBJ[iGen] = arfitness[1]
     if (arfitness[1] <= stopfitness || max(D) > 1e+07 * min(D)){
-      message('The best fitness (', arfitness[1], ') is less than threshold (', stopfitness, ').')
-      message('Current Generation = ', iGen)
-      message('Best Calib:')
+      message('CMAES::','The best fitness (', arfitness[1], ') is less than threshold (', stopfitness, ').')
+      message('CMAES::','Current Generation = ', iGen)
+      message('CMAES::','Best Calib:')
       print(bestcalib)
       break
     }
     if( diff(range(arfitness, na.rm=TRUE)) / mean(arfitness, na.rm=TRUE) < 0.01){
-      message('The POSSIBLE best fitness is reached: ', arfitness[1], '.')
-      message('Current Generation = ', iGen)
-      message('Best Calib:')
+      message('CMAES::','The POSSIBLE best fitness is reached: ', arfitness[1], '.')
+      message('CMAES::','Current Generation = ', iGen)
+      message('CMAES::','Best Calib:')
       print(bestcalib)
       break
     }
@@ -207,9 +208,3 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
 }
 # 
 # sol1 <- CMAES(CV = CV, objfunc = Obj.Func)
-
-# sol1 <- CMAES(CV = CV, objfunc = Obj.Func, ncores = 2)
-
-# x=PIHMgisR::write.cmaes(file='test.cmaes')
-# 
-# CMAES(CV, cmd='ls', objfunc = objFun)
