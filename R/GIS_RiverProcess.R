@@ -67,6 +67,7 @@ sp.RiverPath <- function(sp, idown = sp.RiverDown(sp, coord = coord)){
 #' @return Stream Order of SpatialLines*
 #' @export
 sp.RiverOrder <- function(sp, coord = extractCoords(sp)){
+  msg='sp.RiverOrder::'
   get1st <- function(x){
     fr = x[,2]
     to = x[,3]
@@ -83,11 +84,11 @@ sp.RiverOrder <- function(sp, coord = extractCoords(sp)){
     # points(coord[p.key,], col=2)
     nd = length(tid)
     ret = NULL
-    # message('Number of Streams = ', nd)
+    # message(msg, 'Number of Streams = ', nd)
     for(i in 1:nd){
       cr = tid[i]
       for(j in 1:100000){
-        # message('Stream ',i,'\tSeg ', j, '\tFrom Node ', cr)
+        # message(msg, 'Stream ',i,'\tSeg ', j, '\tFrom Node ', cr)
         rid = which(fr %in% cr)
         ret=c(ret, rid)
         sid= to[rid] #ID of to-point;
@@ -112,12 +113,12 @@ sp.RiverOrder <- function(sp, coord = extractCoords(sp)){
   x.ord =x[,1]*0
   for(i in 1:10000){
     ids = y[,1]
-    message('Order = ', i)
+    message(msg, 'Order = ', i)
     id = get1st(y)
     x.ord[ ids[id] ] = i
     y=rbind(y[-1 * id ,])
     ny = length(y)
-    # message('Left Segments =', ny)
+    # message(msg, 'Left Segments =', ny)
     if(ny<=0){ break }
   }
   x.ord
@@ -189,6 +190,7 @@ sp.RiverSeg <- function(sp.mesh, sp.riv){
 #' @return SpatialLinesDataFrame
 #' @export
 sp.DissolveLines <- function(sp){
+  msg='sp.DissolveLines::'
   id2Line <- function(id, key){
     lp=key
     ct = count(as.numeric(id))
@@ -199,7 +201,7 @@ sp.DissolveLines <- function(sp){
     pto = which( cn == id[lfr,2] )
     if( ct[pto] == 2 ) {
       # 1 - header/outlet, >2 - joint point
-      # message(key, '\t', pto)
+      # message(msg, key, '\t', pto)
       ret = id2Line(id, key = pto)
       return (c(lp, ret) )
     }else{
@@ -220,7 +222,7 @@ sp.DissolveLines <- function(sp){
     points(cdu[key, 1], cdu[key, 2], pch=20)
     if( length(which(ft[,1] == key)) > 0){
       k = k +1
-      # message(k, '\t', i, '/', nnode )
+      # message(msg, k, '\t', i, '/', nnode )
       ids = id2Line(ft, key)
       # cdf[ids] = k
       points(cdu[ids, ], col=k, pch=k)
@@ -238,8 +240,14 @@ sp.DissolveLines <- function(sp){
   sld
 }
 
+#' Find Shared points in SpatialLine*
+#' \code{SharedPoints}
+#' @param sp SpatialLines
+#' @return Topologic relationship between components of SpatialLines.
+#' @export
 SharedPoints <- function(sp){
-  sp=riv
+  msg='SharedPoints::'
+#  sp=riv
   pl = extractCoords(sp, aslist = TRUE)
   nsp = length(sp)
   ret = matrix(0, nrow = nsp, ncol=nsp)
@@ -252,7 +260,7 @@ SharedPoints <- function(sp){
       if( is.null(cp) ){
         
       }else{
-        message(i, '/', j)
+        message(msg, i, '/', j)
         # print(ret)
         # print(cp)
         # readline("go")

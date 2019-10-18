@@ -33,12 +33,15 @@ write.cmaes <- function(x=NULL, file, backup = TRUE){
 #' @param CV  Input data, list of data.
 #' @param cmd Command to run the model.
 #' @param objfunc  User-defined objective function which return the objective values.
+#' @param Call_Model Function that calls model simulation.
 #' @param lambda Number of children in each generation
 #' @param maxstep Maximum generations
 #' @param ncores Number of cores to simulate. 1 = one thread.
 #' @param sigma Sigma Value to sample (0, 1)
 #' @param stopfitness The optimal value. When the objective value is smaller than stopfitness, calibration success.
+#' @param debug Whether debug Model. 
 #' @param ... More options passing to objfunc.
+#' @importFrom doParallel registerDoParallel
 #' @export
 CMAES<- function (CV, cmd, objfunc,  Call_Model, 
                   lambda = CV$method$LAMBDA,
@@ -59,7 +62,7 @@ CMAES<- function (CV, cmd, objfunc,  Call_Model,
   message('CMAES::Output path: ', dir.out)
   dir.create(dir.out, showWarnings = FALSE, recursive = TRUE)
   if(ncores > 1){
-    registerDoParallel(ncores)
+      doParallel::registerDoParallel(ncores)
   }
   para.name = names(CV$range)
   para.id = which(CV$range[1, ]!=0)

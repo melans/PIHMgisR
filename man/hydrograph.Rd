@@ -9,7 +9,7 @@ hydrograph(x, legend.position = "bottom", unit = rep("", ncol(x)),
   col = c(3, 4), heights = c(3, 7), bg = TRUE)
 }
 \arguments{
-\item{x}{time-seres matrix. Column 1 is rainfall data.}
+\item{x}{time-seres matrix. The first column will be plot on top subfigure.}
 
 \item{legend.position}{Location to put the legend for discharge.}
 

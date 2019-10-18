@@ -178,6 +178,7 @@ readforc.fn <-function( file = PIHM.filein()['md.forc']){
 #' @return forcing data, list.
 #' @export
 readforc.csv <-function(file = PIHM.filein()['md.forc'], id=NULL){
+  msg='readforc.csv::'
   fns=readforc.fn(file=file)
   tstr = colnames(fns)
   t0 = as.POSIXct(tstr, format = '%Y%m%d')
@@ -190,7 +191,7 @@ readforc.csv <-function(file = PIHM.filein()['md.forc'], id=NULL){
   nf = length(fn)
   ret = list()
   for(i in 1:nf){
-    message(i, '/', nf,'\t', fn[i])
+    message(msg, i, '/', nf,'\t', fn[i])
     x=read.df(fns[id[i]]) 
     y=x[[1]]
     xt = t0+y[,1]*86400

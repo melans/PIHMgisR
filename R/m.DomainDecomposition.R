@@ -5,6 +5,7 @@
 #' @param dem Elevation data.
 #' @param lk SpatialPolygon of lake.
 #' @param q minimum angle of triangle
+#' @param pts Extra pts to build triangular mesh.
 #' @param ... more options in RTriangle::triangulate()
 #' @return Coordinates of triangles centroids
 #' @export

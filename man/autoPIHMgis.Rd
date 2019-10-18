@@ -44,6 +44,8 @@ autoPIHMgis(indata, forcfiles, prjname = "sac", outdir = getwd(),
 \item{mf}{Meltfactor}
 
 \item{rm.outlier}{Whether to remove the outlier in soil/geol;}
+
+\item{backup}{Whether to write backup files.}
 }
 \value{
 \code{PIHM.mesh}

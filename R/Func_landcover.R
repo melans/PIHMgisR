@@ -1,16 +1,16 @@
 
 #' Generate the default landcover parameters for NLCD classification
-#' \code{fun.lairl} 
-#' @param lc land classe codes in NLCD classes. 
+#' \code{fun.lairl}
+#' @param lc land classe codes in NLCD classes.
 #' @param years numeric years.
 #' @return Default fun.lairl parameters, a list $LAI, $RL
 #' @export
 #' @examples
-#' lc = c(43, 23, 81, 11) 
+#' lc = c(43, 23, 81, 11)
 #' lr=fun.lairl(lc, years=2000:2001)
 #' par(mfrow=c(2,1))
 #' col=1:length(lc)
-#' plot(lr$LAI, col=col, main='LAI'); 
+#' plot(lr$LAI, col=col, main='LAI');
 #' legend('top', paste0(lc), col=col, lwd=1)
 #' plot(lr$RL, col=col, main='Roughness Length');
 #' legend('top', paste0(lc), col=col, lwd=1)
@@ -64,7 +64,7 @@ fun.lairl <- function(lc, years=2000){
   }
   colnames(mlai) = lc
   colnames(mrl) = lc
-  
+
   rep.row<-function(x,n){
     ret=NULL
     for(i in 1:n){
@@ -72,12 +72,12 @@ fun.lairl <- function(lc, years=2000){
     }
     return(ret)
   }
-  
+
   ts.lai = xts::as.xts(rbind(rep.row(mlai, ny), mlai[1,]), order.by =tday)
   ts.rl = xts::as.xts(rbind(rep.row(mrl, ny), mrl[1,]), order.by =tday)
   # ts.lai = zoo::zoo(rbind(rep.row(mlai, ny), mlai[1,]), order.by =tday)
   # ts.rl = zoo::zoo(rbind(rep.row(mrl, ny), mrl[1,]), order.by =tday)
-  
+
   colnames(ts.lai) = paste(lc)
   colnames(ts.rl) = paste(lc)
   ret = list(LAI = ts.lai, RL=ts.rl, nLAI=nlc)
@@ -85,9 +85,9 @@ fun.lairl <- function(lc, years=2000){
 }
 
 #' convert equation from Univeristy of Marryland classes to NLCD classes
-#' \code{lc_EQ} 
+#' \code{lc_EQ}
 #' @param dtab conversion table.
-#' @param lc land classe codes in NLCD classes. 
+#' @param lc land classe codes in NLCD classes.
 #' @return Converted values.
 #' @references Lele Shu(2017), Gopal Bhatt(2012)
 #' @export
@@ -175,23 +175,23 @@ lc_EQ <-function(dtab, lc){
     0	,	0	,	0	,	0		,	#	79	0
     10	,	0.9	,	0	,	0		,	#	80	1
     11	,	0.6	,	10	,	0.4		,	#	81	1	Pasture/Hay
-    11	,	0.9	,	12	,	0.1		,	#	82	1	Cultivated Crops 
-    0	,	0	,	0	,	0		,	#	83	0	
-    0	,	0	,	0	,	0		,	#	84	0	
-    0	,	0	,	0	,	0		,	#	85	0	
-    0	,	0	,	0	,	0		,	#	86	0	
-    0	,	0	,	0	,	0		,	#	87	0	
-    0	,	0	,	0	,	0		,	#	88	0	
-    0	,	0	,	0	,	0		,	#	89	0	
-    8	,	0.6	,	0	,	0.4		,	#	90	1	Woody Wetlands 
-    6	,	0.6	,	0	,	0		,	#	91	1	
-    7	,	0.6	,	0	,	0		,	#	92	1	
-    6	,	0.6	,	0	,	0		,	#	93	1	
-    7	,	0.6	,	0	,	0		,	#	94	1	
-    10	,	0.8	,	0	,	0.2		,	#	95	1	Emergent Herbaceous Wetlands 
-    10	,	0.8	,	2	,	0.2		,	#	96	1	
-    10	,	0.8	,	4	,	0.2		,	#	97	1	
-    10	,	0.2	,	0	,	0.8		,	#	98	1	
+    11	,	0.9	,	12	,	0.1		,	#	82	1	Cultivated Crops
+    0	,	0	,	0	,	0		,	#	83	0
+    0	,	0	,	0	,	0		,	#	84	0
+    0	,	0	,	0	,	0		,	#	85	0
+    0	,	0	,	0	,	0		,	#	86	0
+    0	,	0	,	0	,	0		,	#	87	0
+    0	,	0	,	0	,	0		,	#	88	0
+    0	,	0	,	0	,	0		,	#	89	0
+    8	,	0.6	,	0	,	0.4		,	#	90	1	Woody Wetlands
+    6	,	0.6	,	0	,	0		,	#	91	1
+    7	,	0.6	,	0	,	0		,	#	92	1
+    6	,	0.6	,	0	,	0		,	#	93	1
+    7	,	0.6	,	0	,	0		,	#	94	1
+    10	,	0.8	,	0	,	0.2		,	#	95	1	Emergent Herbaceous Wetlands
+    10	,	0.8	,	2	,	0.2		,	#	96	1
+    10	,	0.8	,	4	,	0.2		,	#	97	1
+    10	,	0.2	,	0	,	0.8		,	#	98	1
     10	,	0.2	,	0	,	0.8		)	#	99	1
     , ncol=99, nrow=4)
   c1= tab[2, lc]

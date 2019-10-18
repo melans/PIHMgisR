@@ -14,6 +14,7 @@ readout <- function(keyword,
                     path=get('outpath', envir=.pihm) ,
                     file = file.path(path, paste0(get('PRJNAME', envir=.pihm),'.', keyword,'.dat') ) 
 ){
+  msg='readout::'
   fid=file(file, 'rb');
   # nc=readBin(fid, what=integer(), n=1, size = 4)
   # st=readBin(fid, what=integer(), n=1, size = 8) #Long integer
@@ -26,7 +27,7 @@ readout <- function(keyword,
   nrr = length(dat)/(nc+1)
   nr = round(nrr)
   if(nr < nrr){
-    message('File may not completed. ', nrr, "X", nc+1)
+    message(msg, 'File may not completed. ', nrr, "X", nc+1)
   }
   mat=t(matrix(dat[1:( nr*(nc+1) )], nrow=nc+1))
   tmove = diff(mat[,1])
@@ -47,6 +48,8 @@ readout <- function(keyword,
 #' @param imap Whether do the raster plot for Element data. Only works for element data
 #' @param return Whether return the data. Some the results are too huge to load in memoery at once.
 #' @param iRDS Whether save RDS file.
+#' @param sp.riv River SpatialLine*
+#' @param rdsfile Save RDS file
 #' @keywords read output.
 #' @return A list of TimeSeries data. 
 #' @export  
@@ -61,7 +64,7 @@ BasicPlot <- function(
   rdsfile = file.path(get('outpath', envir = .pihm), 'BasicPlot.RDS'),
   plot=TRUE, imap=FALSE, iRDS = TRUE,
   return=T){
-  
+  msg='BasicPlot::'
   graphics.off()
   varname = tolower(varname)
   print(varname)
@@ -78,7 +81,7 @@ BasicPlot <- function(
   for(i in 1:nv){
     vn=varname[i]
     fn= paste0(prjname,'_', vn, '.png')
-    message(i, '/', nv, '\t', vn, '\t', fn)
+    message(msg, i, '/', nv, '\t', vn, '\t', fn)
     x=readout(vn);
     xm = xts::as.xts(apply(x, 1, mean), order.by=time(x))
     if(return){

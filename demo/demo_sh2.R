@@ -10,27 +10,28 @@ library(PIHMgisR)
 #test_check("PIHMgisR")
 prjname = 'sh'
 
-pihmout <- file.path('../demo', prjname)
+pihmout <- file.path('../demo/input', prjname)
 fin <- PIHM.filein(prjname, indir = pihmout)
 if (dir.exists(pihmout)){
   unlink(pihmout, recursive = T, force = T)
 }
 dir.create(pihmout, showWarnings = F, recursive = T)
 
-a.max = 200;
+a.max = 1000;
 q.min = 33;
-tol.riv=50
+tol.riv=50 
 tol.wb=50
-aqd=3
 
 
 data(sh)
 wbd=sh[['wbd']]
 riv=sh[['riv']]
 dem=sh[['dem']]
-
-
-riv.simp = rgeos::gSimplify(riv, tol=10, topologyPreserve = T)
+riv = rgeos::gSimplify(riv, tol = 2)
+ord=PIHMgisR::sp.RiverOrder(riv)
+plot(riv, col=ord, lwd=1:length(riv))
+riv2 = CutSptialLines(riv, tol=100)
+# riv.simp = rgeos::gSimplify(riv, tol=10, topologyPreserve = T)
 
 wb.dis = rgeos::gUnionCascaded(wbd)
 length(wb.dis)
@@ -40,37 +41,35 @@ wb.simp = rgeos::gSimplify(wb.dis, tol=10, topologyPreserve = T)
 # shp.wb = raster::intersect( wb.simp, riv.simp)
 
 tri = m.DomainDecomposition(wb=wb.simp,q=q.min, a=a.max)
-# generate PIHM .mesh 
-pm=pihmMesh(tri,dem=dem, AqDepth = aqd)
+plot(tri)
 
+# generate PIHM .mesh 
+pm=pihmMesh(tri,dem=dem, AqDepth = 10)
 # generate PIHM .att
-# debug(pihmAtt)
 pa=pihmAtt(tri)
 
+
 # generate PIHM .riv
-pr=pihmRiver(riv.simp, dem = dem)
-stop()
+pr=pihmRiver2(riv2, dem = dem)
+riv2@data = data.frame( pr@river)
+sp.mesh = sp.mesh2Shape(pm)
+crs(sp.mesh) = crs(riv2)
 # Cut the rivers with triangles
-spm = sp.mesh2Shape(pm)
-crs(spm) =crs(riv)
-spr=riv
-sp.seg = sp.RiverSeg(spm, spr)
+sp.seg = sp.RiverSeg(sp.mesh, riv2)
 # Generate the River segments table
 prs = pihmRiverSeg(sp.seg)
 
 # Generate initial condition
-pic = pihm.init(nrow(pm@mesh), nrow(pr@river), AqD = aqd)
+pic = pihm.init(nrow(pm@mesh), nrow(pr@river))
 
-plot(tri, asp=1, type='n'); plot(spr , add=T, lwd=3)
-
+# spp.riv = sp.riv2shp(pr); 
+spp.riv = riv2
+plot(tri); plot(spp.riv, col=spp.riv@data[,3] , add=T, lwd=3)
+writeshape(spp.riv, file = 'sh_cell')
 # model configuration, parameter
-cfg.para = pihmpara(nday=365)
+cfg.para = pihmpara()
 # calibration
 cfg.calib = pihmcalib()
-
-para.lc = PTF.lc(43)
-para.soil = PTF.soil()
-para.geol = PTF.geol()
 
 # write PIHM input files.
 writemesh(pm, file = fin['md.mesh'])
@@ -82,8 +81,3 @@ write.df(prs, file=fin['md.rivseg'])
 write.config(cfg.para, fin['md.para'])
 write.config(cfg.calib, fin['md.calib'])
 
-write.df(para.lc, file=fin['md.lc'])
-write.df(para.soil, file=fin['md.soil'])
-write.df(para.geol, file=fin['md.geol'])
-writeshape(riv.simp, file=file.path(dirname(fin['md.att']), 'riv'))
-print(nrow(pm@mesh))

@@ -15,6 +15,7 @@
 #' @param clean Whether clean the existing model files in output directory.
 #' @param cfg.para  model configuration, parameter
 #' @param cfg.calib model calibration
+#' @param backup Whether to write backup files.
 #' @param rm.outlier Whether to remove the outlier in soil/geol;
 #' @param mf Meltfactor
 #' @importFrom grDevices dev.off graphics.off png rgb topo.colors
@@ -50,6 +51,7 @@ autoPIHMgis <- function(
   rm.outlier = TRUE, 
   backup=TRUE
 ){
+  msg = paste0('autoPIHMgis(', prjname, ')::')
   pihmout = file.path(outdir)
   dir.create(pihmout, showWarnings = FALSE, recursive = TRUE)
   ny=length(years)
@@ -107,7 +109,7 @@ autoPIHMgis <- function(
   tri = m.DomainDecomposition(wb=wb.simp,q=q.min, a=a.max)
   # graphics.off()
   # plot(tri, asp=1)
-  message('Number of Triangles = ', nrow(tri$T))
+  message(msg, 'Number of Triangles = ', nrow(tri$T))
   # cin = readline(prompt = "See the plot. Go on?\n")
   # if( cin %in% c('n','N')){
   #   return(NULL);
@@ -129,7 +131,7 @@ autoPIHMgis <- function(
   # generate PIHM .riv
   pr=pihmRiver(riv.simp, dem)
   oid = getOutlets(pr)
-  message('Number of Rivers = ', nrow(pr@river))
+  message(msg, 'Number of Rivers = ', nrow(pr@river))
   # Correct river slope to avoid negative slope
 
   # PIHMriver to Shapefile
@@ -160,7 +162,7 @@ autoPIHMgis <- function(
   
 
   # Generate shapefile of mesh domain
-  message('Generate shapefile of mesh domain')
+  message(msg, 'Generate shapefile of mesh domain')
   sp.dm = sp.mesh2Shape(pm)
   png(filename = file.path(pngout, 'data_2.png'), height=11, width=11, res=100, units='in')
   zz = sp.dm@data[,'Zsurf']
@@ -210,7 +212,8 @@ autoPIHMgis <- function(
 
   write.config(backup=backup,cfg.para, fin['md.para'])
   write.config(backup=backup,cfg.calib, fin['md.calib'])
-  message('Ncell=', nrow(pm@mesh), '\t',
+  message(msg, 
+          'Ncell=', nrow(pm@mesh), '\t',
           'Nriv=', nrow(pr@river), '\t',
           'Nseg=', nrow(prs), '\n'
           )

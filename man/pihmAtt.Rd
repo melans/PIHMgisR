@@ -6,7 +6,7 @@
 \code{pihmAtt}}
 \usage{
 pihmAtt(tri, r.soil = NULL, r.geol = NULL, r.lc = NULL,
-  r.forc = NULL, r.mf = NULL, r.bc = NULL, r.BC = 0, r.SS = 0)
+  r.forc = NULL, r.mf = NULL, r.BC = 0, r.SS = 0)
 }
 \arguments{
 \item{tri}{Triangles defination}
@@ -21,7 +21,9 @@ pihmAtt(tri, r.soil = NULL, r.geol = NULL, r.lc = NULL,
 
 \item{r.mf}{raster of melt factor}
 
-\item{r.bc}{raster of boundary condition}
+\item{r.BC}{raster of boundary condition}
+
+\item{r.SS}{raster of Source/Sink}
 }
 \value{
 data.frame of PIHM .att

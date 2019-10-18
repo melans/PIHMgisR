@@ -5,6 +5,7 @@
 #' @return PIHM river
 #' @export
 pihmRiver <- function(sl, dem){
+  msg='pihmRiver::'
   # sp.slt = sp.Polylines2Lines(sp)
   sp.slt = sl
   nsp = length(sp.slt)
@@ -12,13 +13,13 @@ pihmRiver <- function(sl, dem){
   # z = raster::extract(dem, xy)
   # pt = cbind(1:nrow(xy), xy, z)
   # colnames(pt) = c('Index','X', 'Y', 'Zmax')
-  message('\nCalculate river order ...')
+  message(msg, '\nCalculate river order ...')
   rivord = sp.RiverOrder(sp.slt)
-  message('\nIdentify the downstrem ...')
+  message(msg, '\nIdentify the downstrem ...')
   rivdown = sp.RiverDown(sp.slt)
-  message('\nFrom/To nodes ...') 
+  message(msg, '\nFrom/To nodes ...') 
   ft = FromToNode(sp.slt)
-  message('\nSlope and length of river ...')
+  message(msg, '\nSlope and length of river ...')
   zf = raster::extract(dem, xy[ft[,1], ])
   zt = raster::extract(dem, xy[ft[,2], ])
   len = rgeos::gLength(sp.slt, byid = TRUE)
@@ -37,7 +38,7 @@ pihmRiver <- function(sl, dem){
   colnames(p.df) = c('From.x','From.y','From.z', 'To.x', 'To.y', 'To.z')
   rownames(p.df) = row.names(sp.slt)
   
-  sp.df = SpatialLinesDataFrame(sp.slt, data=df)
+  sp.df = sp::SpatialLinesDataFrame(sp.slt, data=df)
   ntype = max(rivord)
   rtype = RiverType(ntype)
   p.z=raster::extract(dem, xy)
@@ -105,6 +106,7 @@ RiverSlope <- function(pr){
 #' @return SpatialLinesDataFrame
 #' @export
 correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
+    msg='correctRiverSlope::'
   EPS = 1e-9
   # pr = ppr
   # minSlope = 1e-4
@@ -123,7 +125,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
     rid = which(s[,1] < minSlope )
     nflag = length(rid)
     if(nflag >= 1){
-      message(nflag, ' rivers in type 1 (reverse)')
+      message(msg, nflag, ' rivers in type 1 (reverse)')
       idn = idown[rid]
       od = which(rid %in% oid)
       if(length(od) > 0){
@@ -165,7 +167,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
     rid = which(s[,2] < minSlope )
     nflag = length(rid)
     if(nflag > 0){
-      message(nflag, ' rivers in type 2 (revers down)')
+      message(msg, nflag, ' rivers in type 2 (revers down)')
       p1 = pfr[rid]
       p2 = pto[rid]
       p3 = pto[idown[rid]]
@@ -176,7 +178,7 @@ correctRiverSlope <- function(pr, minSlope = 1e-5, maxrun = 500){
   }
   dz = pz0 - pz
   dz0 = dz[ dz!= 0]
-  message(length(dz0), ' points was changed.')
+  message(msg, length(dz0), ' points was changed.')
   print(summary(dz0))
   pr
 }

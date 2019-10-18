@@ -107,7 +107,7 @@ highlight_id <- function(EleID=NULL, RivID=NULL){
   if(!is.null(EleID)){
     raster::plot(spm[EleID, ], add=T, col=2)
   }
-  
+  inpath=PIHM.filein()['inpath']
   fn = file.path(inpath, 'gis', 'riv.shp')
   if(file.exists(fn)){
     spr=rgdal::readOGR()

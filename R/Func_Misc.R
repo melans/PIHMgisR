@@ -57,7 +57,7 @@ extractCoords<-function(x, unique=TRUE, aslist = FALSE){
     ret = pts
   }
   return(ret)
-  # pl = lapply(sp::coordinates(spl), 
+  # pl = lapply(sp::coordinates(spl),
   #             function(x) t(matrix(unlist(x), nrow =2, byrow = TRUE) ) )
   # if(aslist){
   #   ret = pl

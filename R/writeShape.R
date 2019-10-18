@@ -14,6 +14,7 @@
 #' sp2=readOGR(file.path(tempdir(), 'sp1.shp'))
 #' plot(sp2)
 writeshape <- function(shp, file=NULL, crs = raster::crs(shp)){
+  msg='writeshape::'
   if(grepl(class(shp)[1],'SpatialPolygons' ) ){
     # shp = methods::as(shp, "SpatialPolygonsDataFrame")
     shp=sp::SpatialPolygonsDataFrame(shp, 
@@ -24,7 +25,7 @@ writeshape <- function(shp, file=NULL, crs = raster::crs(shp)){
     shp=sp::SpatialLinesDataFrame(shp, data=data.frame('ID'=1:length(shp)),match.ID = FALSE)
   }
   if( is.null(file) ){
-    # message('No file exported')
+    # message(msg, 'No file exported')
   }else{
     path = dirname(file)
     fn = basename(file)
@@ -41,6 +42,6 @@ writeshape <- function(shp, file=NULL, crs = raster::crs(shp)){
       raster::extension(fn.prj) = '.prj'
       invisible(rgdal::showWKT(prj, file = fn.prj))
     }
-    message(file, ' is saved')
+    message(msg, file, ' is saved')
   }
 }

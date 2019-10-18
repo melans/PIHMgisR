@@ -17,6 +17,8 @@ m.DomainDecomposition(wb, dem = NULL, riv = NULL, lk = NULL,
 
 \item{lk}{SpatialPolygon of lake.}
 
+\item{pts}{Extra pts to build triangular mesh.}
+
 \item{q}{minimum angle of triangle}
 
 \item{...}{more options in RTriangle::triangulate()}

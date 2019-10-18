@@ -6,20 +6,22 @@
 #' @param range Range of the calib value.
 #' @export
 Pop2Calib <- function(x, calib, range){
+  msg = paste0('Pop2Calib::')
   nx = length(x)
   ret = calib
   para.name = names(range)
   para.id = which(range[1, ]!=0)
   if(length(x) !=  length(para.id)){
+    message(msg)
     cat('\nLenghth of parameter does not match number of parameters in range file')
     cat('\nParameter in range file:', para.name[para.id], '\n')
     cat('Population is: ', x, '\n')
-    stop('\nERROR')
+    stop(paste0(msg, 'ERROR') )
   }
   cn = para.name[para.id]
   names(x) = cn
   for(i in 1:nx){
-    # message(i,'/', nx, '\t', cn[i])
+    # message(msg, i,'/', nx, '\t', cn[i])
     y = calib[cn[i]] #the value
     dy = x[cn[i]]
     lim = range[ c('min', 'max'), cn[i]] #limits
@@ -31,7 +33,7 @@ Pop2Calib <- function(x, calib, range){
       sig = diff(lim )
       val = y +  sig * dy
     }
-    # message(cn[i],'\t', y,'\t', sig, '\t', dy, '\t', val)
+    # message(msg, cn[i],'\t', y,'\t', sig, '\t', dy, '\t', val)
     # readline('goon')
     val = min(lim[2], max(val, lim[1]) )
     ret[ cn[i] ] = val
@@ -46,6 +48,7 @@ Pop2Calib <- function(x, calib, range){
 #' @param CV Calibration variables, list.
 #' @export
 pre.files <- function(iGen, pop, CV){
+  msg = paste0('pre.files::')
   prjname=CV$prjname
   calib=CV$calib
   calibrange = CV$range
@@ -72,6 +75,7 @@ pre.files <- function(iGen, pop, CV){
     calibmat=rbind(calibmat, Pop2Calib(pop[,i], calib, calibrange))
   }
   # calibmat = apply(pop, 2, function(x) Pop2Calib(x, calib, calibrange))
+  message(msg, 'Calibration Matrix:')
   print(calibmat)
   fn.mat = file.path(dir.gen, paste0('Generation_', iGen, '.csv') )
   write.table(calibmat, file=fn.mat, quote = FALSE, append = FALSE, row.names = TRUE, col.names = FALSE, sep = '\t')
@@ -106,10 +110,6 @@ pre.files <- function(iGen, pop, CV){
               'fn.cmat' = fn.mat,
               'calibmat' = calibmat)
 }
-# pop=rbind(rep(1, 48), rep(1,48), rep(1,48))
-# x=pre.files(1, pop, CV = CV)
-
-# pre.files(2, pop, CV = CV)
 
 #' Execute the program in terminal.
 #' \code{EXEC}
@@ -120,6 +120,8 @@ pre.files <- function(iGen, pop, CV){
 #' @param fn.log Path of log file saving program stdout.
 #' @export
 EXEC <- function(CV, CMD.EXE, calibfile, outpath, fn.log){
+  prjname=CV$prjname
+  msg = paste0('EXEC::')
   calibfile=as.character(calibfile)
   outpath=as.character(outpath)
   dir.create(outpath, showWarnings = FALSE, recursive = TRUE)
@@ -129,16 +131,16 @@ EXEC <- function(CV, CMD.EXE, calibfile, outpath, fn.log){
   cmd = paste(paste0(CMD.EXE),  paste('-c', calibfile), 
               paste('-o', outpath), prjname, 
               '2>&1 >', file.path(outpath, paste0(prjname, '.log')) )
-  message('Walltime: ',walltime)
+  message(msg, 'Walltime: ',walltime)
   if(grepl('Darwin', Sys.info()['sysname'])){  
-    message(cmd)
+    message(msg, cmd)
     sret = system(cmd, intern = TRUE, ignore.stdout = FALSE,
                   wait = TRUE, timeout=walltime)
   }else{
-    message(cmd)
+    message(msg, cmd)
     sret = system(cmd, intern = TRUE, ignore.stdout = FALSE, 
                   wait = TRUE, timeout=walltime)
   }
   write(sret, file= fn.log)
-  message('Finish model, to output:', outpath)
+  message(msg, 'Finish model, to output:', outpath)
 }

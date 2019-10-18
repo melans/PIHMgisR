@@ -15,6 +15,10 @@ GreenAmpt(theta, thetas, ksat, Hfront, y0 = 0.01, Time = 0)
 \item{ksat}{Saturated hydraulic conductivity}
 
 \item{Hfront}{Depth of wetting front.}
+
+\item{y0}{Depth of ponding water.}
+
+\item{Time}{Time.}
 }
 \value{
 Infiltration rate

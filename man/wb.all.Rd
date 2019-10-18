@@ -3,7 +3,7 @@
 \name{wb.all}
 \alias{wb.all}
 \title{Calculate the water balance
-\code{p.waterbalance}}
+\code{wb.all}}
 \usage{
 wb.all(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "etic",
   "ettr", "etev", "etp")), "rivqdown", paste0("eley", c("surf", "unsat",
@@ -24,5 +24,5 @@ A matrix, contains the colums of water balance factors
 }
 \description{
 Calculate the water balance
-\code{p.waterbalance}
+\code{wb.all}
 }

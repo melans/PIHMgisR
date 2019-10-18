@@ -74,11 +74,12 @@ Tri2Centroid <- function(tri){
 #' @param r.lc raster of land cover, LAI and Roughness Length
 #' @param r.forc raster of forcing data
 #' @param r.mf raster of melt factor
-#' @param r.bc raster of boundary condition
+#' @param r.BC raster of boundary condition
+#' @param r.SS raster of Source/Sink
 #' @return data.frame of PIHM .att
 #' @export
 pihmAtt <- function(tri, r.soil =NULL, r.geol=NULL, r.lc=NULL, r.forc=NULL,
-                    r.mf = NULL, r.bc = NULL, r.BC =0, r.SS =0){
+                    r.mf = NULL, r.BC = 0, r.SS =0){
   pt = Tri2Centroid(tri)
   ncell = nrow(pt)
   atthead=c( "INDEX",  "SOIL", "GEOL", "LC", 
@@ -111,8 +112,8 @@ pihmAtt <- function(tri, r.soil =NULL, r.geol=NULL, r.lc=NULL, r.forc=NULL,
   if (!is.null(r.mf)){
     att[,6] = extract.id(r.mf, pt)
   }
-  if (!is.null(r.bc)){
-    att[,7] = extract.id(r.bc, pt)
+  if (!is.null(r.BC)){
+    att[,7] = extract.id(r.BC, pt)
   }
   att
 }

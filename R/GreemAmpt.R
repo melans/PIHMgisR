@@ -4,6 +4,8 @@
 #' @param thetas  Saturated moisture content
 #' @param ksat  Saturated hydraulic conductivity
 #' @param Hfront Depth of wetting front.
+#' @param y0 Depth of ponding water.
+#' @param Time Time.
 #' @return Infiltration rate 
 #' @references Green, W.H. and G. Ampt. 1911. Studies of soil physics, part I – the flow of air and water through soils. J. Ag. Sci. 4:1-24.
 #' @export

@@ -3,7 +3,7 @@
 \name{wb.ele}
 \alias{wb.ele}
 \title{Calculate the water balance
-\code{wb.riv}}
+\code{wb.ele}}
 \usage{
 wb.ele(xl = BasicPlot(varname = c(paste0("elev", c("prcp", "etic",
   "ettr", "etev")), paste0("eleq", c("surf", "sub")), paste0("eley",
@@ -24,5 +24,5 @@ A matrix, contains the colums of water balance factors
 }
 \description{
 Calculate the water balance
-\code{wb.riv}
+\code{wb.ele}
 }

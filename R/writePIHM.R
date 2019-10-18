@@ -5,7 +5,7 @@
 #' @export
 filebackup <- function(file, backup = TRUE){
   if(file.exists(file) & backup){
-    bakFile <- paste0(file,format(Sys.time(), '%Y%m%d.%H%M%S'),'-',rnorm(1));
+    bakFile <- paste0(file,format(Sys.time(), '%Y%m%d.%H%M%S'),'-',round(rnorm(1),2));
     file.copy(file,bakFile)
   }
 }
@@ -19,13 +19,14 @@ filebackup <- function(file, backup = TRUE){
 #' @param backup TRUE/FALSE, if backup the existing file
 #' @export
 write.tsd <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
+    msg='write.tsd::'
   filebackup(file, backup = backup)
    # x=lr$LAI
   mat = as.matrix(rbind(x))
   nr = nrow(x)
   nc = ncol(x)
   if(!quite){
-    message('Writing to file ', file)
+    message(msg, 'Writing to file ', file)
   }
   tt = stats::time(x)
   tday = as.numeric( difftime(tt, tt[1], units = 'days') )
@@ -48,6 +49,7 @@ write.tsd <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
 #' @param backup TRUE/FALSE, if backup the existing file
 #' @export
 write.df <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
+    msg='write.df::'
   filebackup(file, backup = backup)
   x=as.matrix(rbind(x))
   nr = nrow(x)
@@ -56,7 +58,7 @@ write.df <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
     header = c(nr,nc)
   }
   if(!quite){
-    message('Writing to file ', file)
+    message(msg, 'Writing to file ', file)
   }
   write(header, file = file, append = append, sep = '\t',  ncolumns = length(header))
   write(colnames(x), file = file, ncolumns = nc,append = T, sep = '\t')
@@ -69,10 +71,11 @@ write.df <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
 #' @param backup TRUE/FALSE, if backup the existing file
 #' @export
 writemesh <- function(pm, file,backup = TRUE){
+    msg='writemesh::'
   filebackup(file, backup = backup)
   ncell= nrow(pm@mesh)
   np = nrow(pm@point)
-  message('Writing to file ', file)
+  message(msg, 'Writing to file ', file)
   write.df(pm@mesh, file=file, append=F, quite = T, backup = F)
   write.df(pm@point, file=file, append=T, quite = T, backup = F)
   # write(c(ncell, np),file = file, append = F)
@@ -86,8 +89,9 @@ writemesh <- function(pm, file,backup = TRUE){
 #' @param backup TRUE/FALSE, if backup the existing file
 #' @export
 writeriv <- function(pr, file,backup = TRUE){
+    msg='writeriv::'
   filebackup(file, backup = backup)
-  message('Writing to file ', file)
+  message(msg, 'Writing to file ', file)
   write.df(pr@river, file=file, append=F, quite = T, backup = F)
   write.df(pr@rivertype, file=file, append=T, quite = T, backup = F)
   if(length(pr@point) >0 ){
@@ -101,8 +105,9 @@ writeriv <- function(pr, file,backup = TRUE){
 #' @param backup TRUE/FALSE, if backup the existing file
 #' @export
 writeinit <- function(x, file, backup = TRUE){
+    msg='writeinit::'
   filebackup(file, backup = backup)
-  message('Writing to file', file)
+  message(msg, 'Writing to file', file)
   write.df(x[[1]], file=file, append=F, quite = T, backup = F)
   write.df(x[[2]], file=file, append=T, quite = T, backup = F)
 }
@@ -113,8 +118,9 @@ writeinit <- function(x, file, backup = TRUE){
 #' @importFrom utils type.convert write.table
 #' @export
 write.config <-function(x, file, backup=TRUE){
+    msg='write.config::'
   filebackup(file, backup = backup)
-  message('Writing to file ', file)
+  message(msg, 'Writing to file ', file)
   out=cbind(names(x), t(x))
   write.table(out, file, append = F, sep = '\t', quote = F, 
               row.names = FALSE, col.names = FALSE)
@@ -129,9 +135,10 @@ write.config <-function(x, file, backup=TRUE){
 #' @param backup TRUE/FALSE, if backup the existing file
 #' @export
 writeforc <- function(fns, path='', startdate='20000101', file, backup=TRUE){
+    msg='writeforc::'
   filebackup(file, backup = backup)
   nf=length(fns)
-  message('Writing to file ', file)
+  message(msg, 'Writing to file ', file)
   write( paste(nf, startdate), file=file, append=F)
   write( path, file=file, append=T,  ncolumns = 1)
   write( fns, file=file, append=T,  ncolumns = 1)

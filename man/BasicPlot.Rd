@@ -14,6 +14,10 @@ BasicPlot(varname = c(paste0("eley", c("surf", "unsat", "gw")),
 \arguments{
 \item{varname}{vector of output keywords}
 
+\item{sp.riv}{River SpatialLine*}
+
+\item{rdsfile}{Save RDS file}
+
 \item{plot}{Whether do the time-series plot}
 
 \item{imap}{Whether do the raster plot for Element data. Only works for element data}

@@ -1,18 +1,14 @@
 rm(list=ls())
 clib=c('rgdal', 'rgeos', 'raster', 'sp')
 x=lapply(clib, library, character.only=T)
-# fns=list.files('R/', glob2rx('*.R'), full.names = T)
-# x=lapply(fns, source)
-# fns=list.files('src/', glob2rx('*.cpp'), full.names = T)
-# x=lapply(fns, Rcpp::sourceCpp)
 
 library(PIHMgisR)
 #test_check("PIHMgisR")
-prjname = 'sac'
+prjname = 'snp'
 PRJNAME=prjname
 inapth = file.path(prjname)
 
-pihmout <- file.path('../demo/input', prjname)
+pihmout <- file.path('../demo', prjname)
 fin <- PIHM.filein(prjname, indir = pihmout)
 x=list.files(pihmout, pattern = glob2rx(paste0(prjname, '.*.*')), full.names = T)
 file.remove(x)
@@ -27,30 +23,32 @@ a.max = 1e6 * .2;
 q.min = 33;
 tol.riv = 200
 tol.wb = 200
+tol.lake = 200
 tol.len = 500
-AqDepth = 10
+AqDepth = 30
 years = 2000:2010
 ny=length(years)
 nday = 365*ny +round(ny/4)
+ # source('../PIHMgisR.code/Data_Sunapee.R')
 
-# source('../PIHMgisR.code/Data_Sac5.R')
-# devtools::use_data(sac, overwrite = T)
-
-data(sac)
-wbd=sac[['wbd']]
-riv=sac[['riv']]; plot(riv)
-dem=sac[['dem']]
-rsoil=sac[['rsoil']]
-rgeol=sac[['rsoil']]
-rlc=sac[['rlc']]
-asoil=sac[['asoil']]
-ageol=sac[['asoil']]
-alc =sac[['alc']]
-sp.forc =sac[['forc']]
-plot(sp.forc)
+data("sunapee")
+indata = sunapee
+wbd=indata[['wbd']]
+riv=indata[['riv']]; plot(riv)
+dem=indata[['dem']]
+rsoil=indata[['rsoil']]
+rgeol=indata[['rsoil']]
+rlc=indata[['rlc']]
+asoil=indata[['asoil']]
+ageol=indata[['asoil']]
+alc =indata[['alc']]
+lake = indata[['lake']]
+plot(dem)
+plot(lake, add=T)
 
 wbbuf = rgeos::gBuffer(wbd, width = 2000)
 dem = raster::crop(dem, wbbuf)
+
 
 png(file = file.path(pngout, 'data_0.png'), height=11, width=11, res=100, unit='in')
 plot(dem); plot(wbd, add=T, border=2, lwd=2); plot(riv, add=T, lwd=2, col=4)
@@ -59,14 +57,22 @@ dev.off()
 riv.s1 = rgeos::gSimplify(riv, tol=tol.riv, topologyPreserve = T)
 riv.s2 = sp.simplifyLen(riv, tol.len)
 plot(riv.s1); plot(riv.s2, add=T, col=3)
+# lake.simp = rgeos::gSimplify(lake, tol=tol.lake, topologyPreserve = T)
+# lk.sim = rgeos::gSimplify(lake, tol=tol.lake, topologyPreserve = T)
 
-wb.dis = rgeos::gUnionCascaded(wbd)
+wblk = AddHoleToPolygon(wbd, lake)
+riv.s2=raster::crop(riv.s2, wblk)
+plot(riv.s2)
+
+wb.dis = rgeos::gUnionCascaded(wblk)
 wb.s1 = rgeos::gSimplify(wb.dis, tol=tol.wb, topologyPreserve = T)
 wb.s2 = sp.simplifyLen(wb.s1, tol.len)
 
 png(file = file.path(pngout, 'data_1.png'), height=11, width=11, res=100, unit='in')
-plot(dem); plot(wb.s2, add=T, border=2, lwd=2); 
+plot(dem); 
+plot(wb.s2, add=T, border=2, lwd=2); 
 plot(riv.s2, add=T, lwd=2, col=4)
+# plot(lk.sim, add=T, lwd=2, border=2)
 dev.off()
 
 
@@ -75,18 +81,18 @@ dev.off()
 wb.simp = wb.s2
 riv.simp = riv.s2
 
+stop()
 tri = m.DomainDecomposition(wb=wb.simp,q=q.min, a=a.max)
-
 plot(tri, asp=1)
 
 # generate PIHM .mesh 
 pm=pihmMesh(tri,dem=dem, AqDepth = AqDepth)
-spm = sp.mesh2Shape(pm, crs = crs(riv))
-writeshape(spm, crs(wbd), file=file.path(gisout, 'domain'))
+sm = sp.mesh2Shape(pm)
+writeshape(sm, crs(wbd), file=file.path(gisout, 'domain'))
 
 # generate PIHM .att
 # debug(pihmAtt)
-pa=pihmAtt(tri, r.soil = rsoil, r.geol = rgeol, r.lc = rlc, r.forc = sp.forc )
+pa=pihmAtt(tri, r.soil = rsoil, r.geol = rgeol, r.lc = rlc)
 forc.fns = paste0(sp.forc@data[, 'NLDAS_ID'], '.csv')
 forc.fns
 writeforc(forc.fns, path='/Users/leleshu/Dropbox/PIHM/Projects/SAC/forcing/csv2000-2017', file=fin['md.forc'])
@@ -94,16 +100,13 @@ writeforc(forc.fns, path='/Users/leleshu/Dropbox/PIHM/Projects/SAC/forcing/csv20
 # generate PIHM .riv
 pr=pihmRiver(riv.simp, dem)
 # Correct river slope to avoid negative slope
-# pr = correctRiverSlope(pr)
-
+pr = correctRiverSlope(pr)
 # PIHMriver to Shapefile
-# spr = sp.riv2shp(pr)
-spr = riv
-writeshape(spr, crs(wbd), file=file.path(gisout, 'river'))
+sriv = sp.riv2shp(pr)
+writeshape(sriv, crs(wbd), file=file.path(gisout, 'river'))
 
 # Cut the rivers with triangles
-# sp.seg = sp.RiverSeg(pm, pr)
-sp.seg=sp.RiverSeg(spm, spr)
+sp.seg = sp.RiverSeg(pm, pr)
 writeshape(sp.seg, crs(wbd), file=file.path(gisout, 'seg'))
 
 # Generate the River segments table
@@ -113,7 +116,7 @@ prs = pihmRiverSeg(sp.seg)
 pic = pihm.init(nrow(pm@mesh), nrow(pr@river))
 
 # Generate shapefile of river
-# spr = sp.riv2shp(pr); 
+spp.riv = sp.riv2shp(pr); 
 
 # Generate shapefile of mesh domain
 sp.dm = sp.mesh2Shape(pm)
@@ -122,7 +125,7 @@ zz = sp.dm@data[,'Zsurf']
 ord=order(zz)
 col=terrain.colors(length(sp.dm))
 plot(sp.dm[ord, ], col = col)
-plot(spr, add=T, lwd=3)
+plot(spp.riv, col=spp.riv@data[,5] + 1 , add=T, lwd=3)
 dev.off()
 
 # model configuration, parameter

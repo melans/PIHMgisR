@@ -12,6 +12,7 @@
 #' @return Matrix information, c('ID','Vmin','Vmax', 'Filter')
 #' @export
 datafilter.riv <-function(x, filter=NULL, plot=TRUE){
+  msg=paste0('datafilter.riv::')
   # y=x[['YRivstage']]
   y = x
   # plot(y)
@@ -33,7 +34,7 @@ datafilter.riv <-function(x, filter=NULL, plot=TRUE){
   if(plot ){
     if(length(id) > 0){
       id = id
-      message( length(id), ' rivers are filtered.')
+      message(msg, length(id), ' rivers are filtered.')
     }else{
       id = 1:ncol(x)
     }

@@ -12,7 +12,7 @@ URL: http:://www.pihm.psu.edu
 License: GPL (>= 3)
 BugReports: https://github.com/shulele/PIHMgisR/issues
 LazyData: TRUE
-Depends: R (>= 3.0.0)
+Depends: R (>= 3.5.0)
 Encoding: UTF-8
 Imports: Rcpp,
   reshape2,
@@ -34,7 +34,8 @@ Imports: Rcpp,
   geometry,
   methods,
   ncdf4,
-  GGally
+  GGally,
+  doParallel
 LinkingTo: Rcpp, sp
 RoxygenNote: 6.1.1
 Remotes: shulele/RTriangle/pkg

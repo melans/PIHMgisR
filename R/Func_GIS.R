@@ -43,7 +43,7 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
   # mesh=readmesh(shp=TRUE); ngrids=100; resolution=0
   if(is.null(rr)){
     sp = sp.mesh2Shape(pm)
-    
+
     ext <-  raster::extent (sp)
     xlim=ext[1:2]
     ylim=ext[3:4]
@@ -77,13 +77,14 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
 #' @param stack Whether export the stack, only when the x is a matrix, i.e. (Ntime x Ncell).
 #' @param proj Projejction parameter
 #' @param pm PIHM mesh
+#' @param plot Whether plot the result.
 #' @return Raster map
 #' @export
-MeshData2Raster <- function(x=getElevation(), 
+MeshData2Raster <- function(x=getElevation(),
                             rmask=PIHM.mask(proj=proj), pm=readmesh(), proj=NULL,
-                            stack=FALSE, 
+                            stack=FALSE,
                             plot =FALSE){
-  
+
   if(stack){
     ret <- raster::stack(apply(x, 1, FUN = PIHMgisR::MeshData2Raster) )
   }else{
@@ -98,7 +99,7 @@ MeshData2Raster <- function(x=getElevation(),
     }
     xy=getCentroid(pm=pm)[,1:2]
     tps <- fields::Tps(xy, x)
-    
+
     # use model to predict values at all locations
     r <- raster::interpolate(rmask, tps)
     ret <- raster::mask(r,rmask)
@@ -166,7 +167,7 @@ removeholes <- function(sp){
 #' library(raster)
 #' pg=fishnet(ext=c(-80,80, -50,50), dx=5)
 #' plot(pg)
-fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"), 
+fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"),
                     n=10,
                     dx=diff(ext[1:2])/n, dy=dx,
                     lines=FALSE, polygons=TRUE, points=FALSE){
@@ -197,11 +198,11 @@ fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"),
     xy=expand.grid(xx,yy)
     xm = matrix(xy[,1], nx,ny)
     ym = matrix(xy[,2], nx, ny)
-    xloc=abind::abind(as.matrix(xm[-nx, -ny]), as.matrix(xm[-nx, -1]), as.matrix(xm[-1, -1]), 
+    xloc=abind::abind(as.matrix(xm[-nx, -ny]), as.matrix(xm[-nx, -1]), as.matrix(xm[-1, -1]),
                       as.matrix(xm[-1, -ny]), as.matrix(xm[-nx, -ny]), along=3)
-    yloc=abind::abind(as.matrix(ym[-nx, -ny]), as.matrix(ym[-nx, -1]), as.matrix(ym[-1, -1]), 
+    yloc=abind::abind(as.matrix(ym[-nx, -ny]), as.matrix(ym[-nx, -1]), as.matrix(ym[-1, -1]),
                       as.matrix(ym[-1, -ny]), as.matrix(ym[-nx, -ny]), along=3)
-    
+
     # df=as.data.frame(matrix(0, nrow=(nx-1)*(ny-1), 6))
     df=data.frame(as.numeric(apply(xloc, 1:2, min)),
                   as.numeric(apply(xloc, 1:2, max)),
@@ -209,7 +210,7 @@ fishnet <- function(ext, crs=sp::CRS("+init=epsg:4326"),
                   as.numeric(apply(yloc, 1:2, max)))
     df = data.frame(df, rowMeans(df[,1:2]), rowMeans(df[,1:2+2]) )
     colnames(df) = c('xmin','xmax','ymin', 'ymax','xcenter','ycenter')
-    str=paste('GEOMETRYCOLLECTION(', 
+    str=paste('GEOMETRYCOLLECTION(',
               paste(paste('POLYGON((',
                           paste(xm[-nx, -ny], ym[-nx, -ny], ',' ),
                           paste(xm[-nx, -1],  ym[-nx, -1], ','),
@@ -238,12 +239,12 @@ AddHoleToPolygon <-function(poly,hole){
   # invert the coordinates for Polygons to flag it as a hole
   coordsHole <-  hole@polygons[[1]]@Polygons[[1]]@coords
   newHole <- sp::Polygon(coordsHole,hole=TRUE)
-  
+
   # punch the hole in the main poly
   listPol <- poly@polygons[[1]]@Polygons
   listPol[[length(listPol)+1]] <- newHole
   punch <-sp::Polygons(listPol,poly@polygons[[1]]@ID)
-  
+
   # make the polygon a SpatialPolygonsDataFrame as the entry
   new <- sp::SpatialPolygons(list(punch),proj4string=poly@proj4string)
   new <- sp::SpatialPolygonsDataFrame(new,data=as(poly,"data.frame"))
@@ -267,16 +268,17 @@ AddHoleToPolygon <-function(poly,hole){
 #' par(mfrow=c(1,2))
 #' plot(sl1, col=1:length(sl1));title(paste0('Tol=', tol1))
 #' plot(sl2, col=1:length(sl2));title(paste0('Tol=', tol2))
-#' 
+#'
 #' data(sh)
 #' riv=sh$riv
 #' x = sp.CutSptialLines(riv, tol=5)
 #' par(mfrow=c(2,1))
-#' plot(riv, col=1:length(riv), lwd=3); 
-#' 
-#' plot(riv, col='gray', lwd=3); 
-#' plot(add=T, x, col=1:length(x))
+#' plot(riv, col=1:length(riv), lwd=3);
+#'
+#' plot(riv, col='gray', lwd=3);
+#' plot(add=TRUE, x, col=1:length(x))
 sp.CutSptialLines <- function(sl, tol){
+  msg='sp.CutSptialLines::'
   ll = rgeos::gLength(sl, byid = TRUE)
   if(all(ll < tol) ){
     ret = sl
@@ -298,18 +300,18 @@ sp.CutSptialLines <- function(sl, tol){
       }
       dd = len / nsplit
       v0 = 1  # Vetex 0, Vetex 1
-      message(i, '/', nsp, '\t', nsplit, '\t', round(dd, 2) )
+      message(msg, i, '/', nsp, '\t', nsplit, '\t', round(dd, 2) )
       for(k in 1:nsplit){
         if(v0 >=np){
           break
         }
-        # message('\t', k, '/', nsplit)
+        # message(msg, '\t', k, '/', nsplit)
         dk = dd * k
         v1 = order(abs(dacc - dk), decreasing = FALSE)[1] + 1
         if(v1 + 1>np){
           v1 = np
         }
-        message(v0,'\t', v1)
+        message(msg, v0,'\t', v1)
         if(v0 == v1){
           next;
         }
@@ -329,11 +331,12 @@ sp.CutSptialLines <- function(sl, tol){
   return(ret)
 }
 
-#'
+#' Extract values on Raster map. The line is a straight line between (0,1). 
 #' \code{extractRaster}
 #' @param r Raster
 #' @param xy coordinates of the line, dim=(Npoints, 2); x and y must be in [0, 1]
-#' @param ext extention of value xy. 
+#' @param ext extension of value xy.
+#' @param plot Whether plot result.
 #' @importFrom grDevices dev.off graphics.off png rgb topo.colors
 #' @importFrom graphics grid hist lines par plot points
 #' @importFrom methods as
@@ -368,7 +371,6 @@ extractRaster<-function(r, xy=NULL, ext = raster::extent(r), plot=T){
 }
 
 #' Simplify SpatialData.
-#' \code{SimpleSpatial}
 #' @param x SpatialData
 #' @return Simplified SpatialData
 #' @export
@@ -376,6 +378,7 @@ SimpleSpatial <-function(x){
   # n1=length(x@polygons)
   # nj=unlist(lapply(1:n1, function(i){ length(x@polygons[[i]]@Polygons) } ))
   # x@polygons[[1]]@Polygons[[1]]@coords
+  msg='SimpleSpatial'
   ni = length(x@polygons)
   k=1
   sl=list()
@@ -384,7 +387,7 @@ SimpleSpatial <-function(x){
     for(j in 1:nj){
       cd = x@polygons[[i]]@Polygons[[j]]@coords
       np=nrow(cd)
-      message(i,'-',j ,'\t', np)
+      message(msg, i,'-',j ,'\t', np)
       sl[[k]] = paste('POLYGON((', paste( paste(cd[,1], cd[,2]), collapse = ',' ), '))')
       if(k==1){
         str = sl[[k]]
@@ -399,11 +402,12 @@ SimpleSpatial <-function(x){
 
 #' Simplify SpatialData.
 #' \code{PointInDistance}
-#' @param x 2-column 
-#' @param tol Tolerance 
+#' @param pt 2-column coordinates (x,y).
+#' @param tol Tolerance
 #' @return Index of points that within tol
 #' @export
 PointInDistance <- function(pt, tol){
+  msg='PointInDistance'
   dm = as.matrix(stats::dist(pt, diag  = TRUE))
   dm[dm==0]=NA
   # View(dm)

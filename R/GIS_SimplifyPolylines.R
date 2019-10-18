@@ -68,7 +68,7 @@ SimplifybyLen <- function(sp, split_length = 20, plot.results = F) {
     for (i in 1:nrow(linedf)) {
       c1 = cbind(rbind(linedf$fx[i], linedf$tx[i]),
                  rbind(linedf$fy[i], linedf$ty[i]))
-      l1 = Line(c1)
+      l1 = sp::Line(c1)
       sl[[i]] = sp::Lines(list(l1), ID = linedf$id[i])
     }
     SL = sp::SpatialLines(sl)

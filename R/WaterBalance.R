@@ -1,5 +1,5 @@
 #' Calculate the water balance
-#' \code{p.waterbalance}
+#' \code{wb.all}
 #' @param xl List of data. Five variables are included: prcp (eleqprcp), etic (eleqetic), ettr (eleqettr), etev (eleqetev) and discharge (rivqflx)
 #' @param fun function to process the time-series data. Default = apply.daily.
 #' @param ic Initial Condition.
@@ -67,7 +67,8 @@ ts2df <- function(x){
 #' @return A matrix, contains the colums of water balance factors
 #' @export
 wb.riv <-function(
-  xl=BasicPlot(varname=paste0('rivq', c('sub', 'surf', 'down') ), plot = FALSE, return = TRUE),
+  xl=BasicPlot(varname=paste0('rivq', c('sub', 'surf', 'down') ),
+               plot = FALSE, return = TRUE),
   fun = xts::apply.yearly, plot=TRUE
 ){
   fun.read <- function(xx, val){
@@ -109,11 +110,9 @@ wb.riv <-function(
   }
   x
 }
-# 
-# wbr=wb.riv(xl=xl, fun=apply.daily)
 
 #' Calculate the water balance
-#' \code{wb.riv}
+#' \code{wb.ele}
 #' @param xl List of data. Five variables are included: 
 #' @param fun function to process the time-series data. Default = apply.daily.
 #' @param period Period of the waterbalance

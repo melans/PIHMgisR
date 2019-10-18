@@ -52,7 +52,7 @@ map2d<-function(x=getElevation(),
 
 #' Plot hydrograph
 #' \code{hydrograph}
-#' @param x time-seres matrix. Column 1 is rainfall data.
+#' @param x time-seres matrix. The first column will be plot on top subfigure.
 #' @param legend.position Location to put the legend for discharge.
 #' @param unit Unit of the variables.
 #' @param col colors of each variable.
