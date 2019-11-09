@@ -16,9 +16,5 @@ PIHM <- function(prjname, inpath = file.path('input', prjname),
   dir.create(anapath, showWarnings = F, recursive = T)
   assign('anapath', anapath, envir = .pihm)
   assign('PIHM.MASK', NULL, envir=.pihm)
-  print(prjname)
-  print(inpath)
-  print(outpath)
-  print(anapath)
   return(list(prjname=prjname, inpath=inpath, outpath=outpath, anapath=anapath))
 }
