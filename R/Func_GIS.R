@@ -97,7 +97,7 @@ MeshData2Raster <- function(x=getElevation(),
     if (any(is.infinite(x))){
       x[is.infinite(x)] = 0
     }
-    xy=getCentroid(pm=pm)[,1:2]
+    xy=getCentroid(pm=pm)[,2:3]
     tps <- fields::Tps(xy, x)
 
     # use model to predict values at all locations
