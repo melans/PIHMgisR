@@ -28,14 +28,14 @@ wb.all <-function(
   IC = fun( func(xl$elevetic, w ), FUN=sum)
   ET = fun( func(xl$elevettr, w ), FUN=sum)
   EV = fun( func(xl$elevetev, w ), FUN=sum)
-  ETP = fun( func(xl$elevetp, w ), FUN=sum)
-  ETA=IC+EV+ET
+  PET = fun( func(xl$elevetp, w ), FUN=sum)
+  AET=IC+EV+ET
   ds = wb.DS(xl=xl, ic=ic)
   dh = P-Q-IC-EV-ET
-  x=cbind(dh, P, Q, ETA, ETP,IC, ET,EV)
-  # colnames(x)=c('P', 'ETP','Q','ET_IC', 'ET_TR','ET_EV')
+  x=cbind(dh, P, Q, AET, PET,IC, ET,EV)
+  # colnames(x)=c('P', 'PET','Q','ET_IC', 'ET_TR','ET_EV')
   # y = cbind(dh, x)
-  colnames(x)=c('DH', 'P', 'Q','ETA','ETP','ET_IC', 'ET_TR','ET_EV')
+  colnames(x)=c('DH', 'P', 'Q','AET','PET','ET_IC', 'ET_TR','ET_EV')
   if(plot){
       PIHMgisR::hydrograph(x)
   }
@@ -193,7 +193,7 @@ wb.DS<-function(xl=BasicPlot(varname = c(paste0('eley', c('surf', 'unsat', 'gw')
   rtype = pr@river$Type
   ra = pr@rivertype$Width[rtype] * pr@river$Length
   AA = sum(getArea())
-  por=g$ThetaS.m3_m3.[att$GEOL] * cfg.calib$GEOL_THETAS
+  por=g$ThAETS.m3_m3.[att$GEOL] * cfg.calib$GEOL_THAETS
   ds.sf=DeltaS(xl$eleysurf, x0=ic$minit$Surface)
   ds.us=DeltaS(xl$eleyunsat, x0=ic$minit$Unsat) * por
   ds.gw=DeltaS(xl$eleygw, x0=ic$minit$GW) * por
