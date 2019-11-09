@@ -60,7 +60,14 @@ readriv <-function(file = PIHM.filein()['md.riv'] ){
                     point = data.frame() #data.frame(d[[3]]) 
                     )
 }
-
+#' Read the river shapefile
+#' \code{readriv.sp} 
+#' @param file full path of spatialLines file
+#' @return spatialLines file
+#' @export
+readriv.sp <-function(file = file.path(PIHM.filein()['inpath'], 'gis', 'river.shp' ) ){
+  spr = rgdal::readOGR(file)  
+}
 #' Read the .rivchn file
 #' \code{readchannel} 
 #' @param file full path of .rivchn file
