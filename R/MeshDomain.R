@@ -79,7 +79,7 @@ Tri2Centroid <- function(tri){
 #' @return data.frame of PIHM .att
 #' @export
 pihmAtt <- function(tri, r.soil =NULL, r.geol=NULL, r.lc=NULL, r.forc=NULL,
-                    r.mf = NULL, r.BC = 0, r.SS =0){
+                    r.mf = NULL, r.BC = NULL, r.SS =NULL){
   pt = Tri2Centroid(tri)
   ncell = nrow(pt)
   atthead=c( "INDEX",  "SOIL", "GEOL", "LC", 
