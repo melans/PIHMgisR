@@ -5,8 +5,7 @@
 \title{Linefit the observation and simulation
 \code{LineFit}}
 \usage{
-LineFit(x, y = NULL, xlab = "Observation", ylab = "Simulation",
-  if.fitline = TRUE, lim, ...)
+LineFit(x, y = NULL, xlab = "Observation", ylab = "Simulation", ...)
 }
 \arguments{
 \item{x}{Observation data or matrix/data.frame consist of observation and simulation}
@@ -17,11 +16,7 @@ LineFit(x, y = NULL, xlab = "Observation", ylab = "Simulation",
 
 \item{ylab}{ylab, default is 'Simulation'}
 
-\item{if.fitline}{Whether plot the fiting line.}
-
-\item{lim}{limits of x and y axis.}
-
-\item{...}{more options for plot()}
+\item{...}{more options for stat_poly_eq()}
 }
 \value{
 Triangle mesh of model domain.
@@ -31,7 +26,14 @@ Linefit the observation and simulation
 \code{LineFit}
 }
 \examples{
-obs=rnorm(100)
-sim=obs+rnorm(100)/2
-LineFit(cbind(obs,sim))
+obs <- rnorm(100)
+sim <- obs+rnorm(100)/2
+p <- LineFit(cbind(obs,sim))
+p
+if(require(ggpmisc)){
+formula = y ~ x
+p+ ggpmisc::stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+label.x.npc = "right", label.y.npc = 0.15,
+formula = formula, parse = TRUE, size = 3)
+}
 }

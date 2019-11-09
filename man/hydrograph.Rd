@@ -6,7 +6,7 @@
 \code{hydrograph}}
 \usage{
 hydrograph(x, legend.position = "bottom", unit = rep("", ncol(x)),
-  col = c(3, 4), heights = c(3, 7), bg = TRUE)
+  col = c(3, 4), heights = c(3, 7), bg = TRUE, ylab = "Value")
 }
 \arguments{
 \item{x}{time-seres matrix. The first column will be plot on top subfigure.}

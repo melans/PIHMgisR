@@ -5,10 +5,13 @@
 \title{Summary of the basic information of PIHM input data.
 \code{ModelInfo}}
 \usage{
-ModelInfo(path = get("outpath", envir = .pihm))
+ModelInfo(path = PIHM.filein()["outpath"], spr = readriv.sp(),
+  crs.pcs = raster::crs(spr))
 }
 \arguments{
 \item{path}{Where to export the basic model infomation.}
+
+\item{crs.pcs}{The crs4string that defines the (x,y) in the model.}
 }
 \value{
 Basic model infomation, figures and tables

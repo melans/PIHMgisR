@@ -4,7 +4,7 @@
 \alias{readout}
 \title{Read output file from PIHM}
 \usage{
-readout(keyword, path = get("outpath", envir = .pihm),
+readout(keyword, path = get("outpath", envir = .pihm), ASCII = FALSE,
   file = file.path(path, paste0(get("PRJNAME", envir = .pihm), ".",
   keyword, ".dat")))
 }
@@ -12,6 +12,8 @@ readout(keyword, path = get("outpath", envir = .pihm),
 \item{keyword}{keyword of the output file. File name format is: projectname.keyword.dat}
 
 \item{path}{path of the outputfile}
+
+\item{ASCII}{If TRUE, convert the binary file to ASCII format (.csv)}
 
 \item{file}{Full path of output file.}
 }

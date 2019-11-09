@@ -6,12 +6,15 @@
 \code{PIHM.filein}}
 \usage{
 PIHM.filein(projname = get("PRJNAME", envir = .pihm),
-  indir = get("inpath", envir = .pihm))
+  inpath = get("inpath", envir = .pihm), outpath = get("outpath", envir
+  = .pihm))
 }
 \arguments{
 \item{projname}{Character, project name, default= PRJNAME which is a global variable.}
 
-\item{indir}{PIHM input directory, default = inpath which is global variable}
+\item{inpath}{PIHM input directory, default = inpath which is global variable}
+
+\item{outpath}{PIHM output directory, default = outpath which is global variable}
 }
 \value{
 Character of full path of input files for PIHM
