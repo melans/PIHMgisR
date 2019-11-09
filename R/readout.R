@@ -2,6 +2,7 @@
 #' @param keyword keyword of the output file. File name format is: projectname.keyword.dat
 #' @param file  Full path of output file. 
 #' @param path path of the outputfile
+#' @param ASCII If TRUE, convert the binary file to ASCII format (.csv)
 #' @keywords read output. Could be used for reading mesh and river format.
 #' @importFrom grDevices dev.off graphics.off png rgb topo.colors 
 #' @importFrom graphics grid hist lines par plot points 
@@ -11,7 +12,7 @@
 #' @return A TimeSeries data. This list require support of xts packages.
 #' @export  
 readout <- function(keyword,
-                    path=get('outpath', envir=.pihm) ,
+                    path=get('outpath', envir=.pihm) , ASCII=FALSE,
                     file = file.path(path, paste0(get('PRJNAME', envir=.pihm),'.', keyword,'.dat') ) 
 ){
   msg='readout::'
@@ -30,6 +31,15 @@ readout <- function(keyword,
     message(msg, 'File may not completed. ', nrr, "X", nc+1)
   }
   mat=t(matrix(dat[1:( nr*(nc+1) )], nrow=nc+1))
+  if(ASCII){
+    fn.asc=paste0(substr(file, 1, nchar(file)-3), 'csv')
+    write(paste(nc, st), file = fn.asc, append = FALSE)
+    tmp=mat
+    colnames(tmp)=c('T_MIN', paste0('X', 1:nc))
+    suppressWarnings(
+      write.table(tmp, file = fn.asc, append = TRUE, col.names = TRUE, row.names = FALSE)
+    )
+  }
   tmove = diff(mat[,1])
   tmove = c(tmove, tmove[length(tmove)])
   tsec =   ( mat[,1]) * 60 
@@ -77,6 +87,12 @@ BasicPlot <- function(
     }
   }
   
+  vtype = substr(varname,4,4)
+  att=cbind(varname, vtype, unit='')
+  att[vtype %in% 'y', 3] = 'm'
+  att[vtype %in% 'v', 3] = 'm/d'
+  att[vtype %in% 'q', 3] = 'm3/d'
+  
   ret=list()
   for(i in 1:nv){
     vn=varname[i]
@@ -93,7 +109,7 @@ BasicPlot <- function(
       t1=max(time)
       tr=paste( strftime(t0) ,'-', strftime(t1))
       png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
-      pp=xts::plot.xts(x, main=vn)
+      pp=xts::plot.xts(x, main=paste0(att[i, 1], ' (', att[i,3], ')') )
       pp = lines(xm, col=2, lwd=2, lty=2, type='b', pch=1)
       print(pp)
       dev.off()
