@@ -10,6 +10,20 @@ filebackup <- function(file, backup = TRUE){
   }
 }
 #' Write xts data out into file
+#' \code{write.xts}
+#' @param x xts data
+#' @param file file name
+#' @param append whether append
+#' @export
+write.xts <- function(x, file, append = F){
+    msg='write.ts::'
+    tt = stats::time(x)
+    md=data.frame('TIME'=tt, x) 
+    write.table(md, file = file, append = append,
+                sep = '\t', col.names = TRUE, row.names = FALSE) 
+    
+}
+#' Write xts data out into file
 #' \code{write.tsd}
 #' @param x xts data
 #' @param file file name
@@ -36,8 +50,10 @@ write.tsd <- function(x, file, append = F, quite=F, header = NULL, backup=TRUE){
   }
   dd = data.frame('Time_Day' = tday, mat)
   write(header,file = file, ncolumns = length(header), append = append, sep = '\t')
-  write(colnames(dd), file = file, ncolumns = nc+1, append = T, sep = '\t')
-  write(t(dd), file = file, ncolumns = nc + 1, append = T, sep = '\t')
+  write(colnames(dd), file = file, ncolumns = nc+1, append = TRUE, sep = '\t')
+  suppressWarnings(
+    write.table(dd, file = file, append = TRUE, sep = '\t', col.names = FALSE, row.names = FALSE) 
+    )
 }
 #' Write data.frame out into file
 #' \code{write.df}
