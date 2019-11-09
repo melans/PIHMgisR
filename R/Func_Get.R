@@ -60,6 +60,27 @@ getVertex <- function(pm = readmesh() ){
   return(ret)
 }
 
+#' Get the From/To nodes of the river.
+#' \code{getRiverNodes} 
+#' @param spr SpatialLine* of river streams.
+#' @return a list, c(points, FT_ID)
+#' @export
+getRiverNodes <- function(spr=readriv.sp() ){
+  crs.pcs = raster::crs(spr)
+  pts=extractCoords(spr)
+  ft0=FromToNode(spr, coord=pts)
+  ft.pts = pts[sort(unique(as.numeric(ft0))),]; 
+  colnames(ft.pts)=c('X', 'Y')
+  
+  ft=FromToNode(spr, coord = ft.pts)
+  
+  ll = ProjectCoordinate(ft.pts, proj4string = crs.pcs, P2G=TRUE)
+  ft.pts = cbind(ft.pts, ll)
+  riv.pts = data.frame('ID'=1:nrow(ft.pts), ft.pts)
+  riv.ft = data.frame('ID'=1:nrow(ft), ft)
+  return(list(points=riv.pts, 
+         FT_ID=riv.ft) )
+}
 #' Get the centroids of the cells
 #' \code{getCentroid} 
 #' @param pm \code{PIHM.mesh}
@@ -76,8 +97,8 @@ getCentroid <- function(pm = readmesh() ){
     aqd   =rowMeans(x[,,3]);
     zsurfc  =rowMeans(x[,,4]);
   }
-  ret = cbind(xc, yc, aqd, zsurfc)
-  colnames(ret) = c('X','Y', 'aqd', 'ZMAX')
+  ret = cbind(1:length(xc), xc, yc, aqd, zsurfc)
+  colnames(ret) = c('ID', 'X','Y', 'aqd', 'ZMAX')
   ret
   return(ret)
 }
