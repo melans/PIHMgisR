@@ -209,7 +209,7 @@ sp.DissolveLines <- function(sp){
     }
   }
   cdu = extractCoords(sp, unique = T)
-  ft=FromToNode(sp)
+  ft=FromToNode(sp, coord = cdu)
   ct= count(ft)
   pnode = as.numeric(names(ct))[which(ct != 2)]
 
