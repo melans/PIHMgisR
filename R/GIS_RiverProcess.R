@@ -17,18 +17,36 @@ sp.RiverDown <- function(sp, coord = extractCoords(sp)){
   }
   idown
 }
-#' determine River path
+#' determine River path, disolve the river network based on downstream-relationship.
 #' \code{sp.RiverPath}
 #' @param sp SpatialLines*
-#' @param idown coordinates of \code{sp}.
-#' @return List of River Path
+#' @param idown downstream index of \code{sp}.
+#' @param coord coordinates of \code{sp}.
+#' @return List of River Path(SegIDs, PointIDs, sp)
 #' @export
-sp.RiverPath <- function(sp, idown = sp.RiverDown(sp, coord = coord)){
-  coord = extractCoords(sp)
+#' @examples 
+# data(sh)
+# riv=sh$riv
+# x=sp.CutSptialLines(riv, tol=200)
+# px(x)
+# xx=sp.RiverPath(x)
+# px(xx$sp)
+sp.RiverPath <- function(sp, 
+                         coord = extractCoords(sp, unique = TRUE), 
+                         idown = sp.RiverDown(sp, coord = coord)){
+  pt.list <- unlist(coordinates(sp), recursive = FALSE)
+  id.list<-lapply(pt.list, function(x) { xy2ID(xy = x, coord = coord)})
+
   ft = FromToNode(sp, coord = coord)
   nsp = length(sp)
-  jid = which(table(as.matrix(ft)) > 2) #id of joint points
-  keys = c(which(idown<0), which(ft[,2] %in% jid) )
+  p.frq = data.frame(table(unlist(id.list)) )
+  p0 = ft[!(ft[, 1] %in% ft[,2]), 1]
+  tmp =  p.frq[p.frq[,2]>2, 1] # more than twice.
+  p1 = as.numeric(levels(tmp))[tmp]
+  p2 = ft[!(ft[, 2] %in% ft[,1]), 2] # TO that not in FROM
+  
+  # jid = which(table(as.matrix(ft)) > 2) #id of joint points
+  riv.keyid = c(which(idown<0), which(ft[,2] %in% p1) )
   updown = cbind(1:nsp, idown)
   goUp <- function(updown, id0){
     uid = which(idown == id0) # id of my upstream
@@ -39,20 +57,22 @@ sp.RiverPath <- function(sp, idown = sp.RiverDown(sp, coord = coord)){
     }
     ret
   }
-  StreamPath = lapply(keys, function(x) goUp(updown, x))
+  StreamPath = lapply(riv.keyid, function(x) goUp(updown, x))
   #========Point ID==========
   nstr = length(StreamPath)
   pl = list()
   for(i in 1:nstr){
     sid = StreamPath[[i]]
-    pid = c(ft[sid, 1], ft[sid[length(sid)], 2])
+    pid = unique(unlist(lapply(1:length(sid), function(x) id.list[[sid[x]]])))
+    # print(sid)
+    # print(pid)
     pl[[i]] = pid
   }
   #=========Spatial Lines===============
   ll = list()
   for(i in 1:nstr){
     sid = StreamPath[[i]]
-    pid = c(ft[sid, 1], ft[sid[length(sid)], 2])
+    pid = unique(unlist(lapply(1:length(sid), function(x) id.list[[sid[x]]])))
     ll[[i]] = sp::Lines( sp::Line(coord[pid, ] ), ID = i)
   }
   spx = sp::SpatialLines(ll, proj4string = raster::crs(sp))
@@ -124,22 +144,28 @@ sp.RiverOrder <- function(sp, coord = extractCoords(sp)){
   x.ord
 }
 
+#' return the Index of nodes in SpatialData
+#' \code{NodeIDList}
+#' @param sp SpatialLines*
+#' @param coord Coordinate of vertex in \code{sp}
+#' @return list of Index of each SpatialData, line or polygon
+#' @export
+NodeIDList <- function(sp, coord = extractCoords(sp, unique = TRUE) ){
+  pt.list <- unlist(coordinates(sp), recursive = FALSE)
+  id.list<-lapply(pt.list, function(x) { xy2ID(x, coord = coord)})
+}
 #' return the FROM and TO nodes index of the SpatialLines
 #' \code{FromToNode}
 #' @param sp SpatialLines*
 #' @param coord Coordinate of vertex in \code{sp}
 #' @return FROM and TO nodes index of the SpatialLines
 #' @export
-FromToNode <- function(sp, coord = extractCoords(sp) ){
-  nsp=length(sp)
-  frto = matrix(0,nrow=nsp, ncol=2)
-  # plot(sp, axes=T);
-  for(i in 1:nsp){
-    pg = extractCoords(sp[i,])
-    id = xy2ID(pg, coord)
-    frto[i,] = c(id[1], id[length(id)])
-    # points(coord[frto[i,], 1:2], col=i, pch=i)
-  }
+FromToNode <- function(sp, coord = extractCoords(sp, unique = TRUE) ){
+  id.list = NodeIDList(sp, coord=coord)
+  frto = cbind(
+    unlist(lapply(id.list, function(x) x[1])),
+    unlist(lapply(id.list, function(x) x[length(x)] ) )
+  )
   colnames(frto)=c('FrNode', 'ToNode')
   frto
 }
@@ -183,62 +209,66 @@ sp.RiverSeg <- function(sp.mesh, sp.riv){
   seg = raster::intersect(sr, sp)
   seg
 }
-
-#' Dissolve River segments
-#' \code{sp.RiverDissolve}
-#' @param sp SpatialLines
-#' @return SpatialLinesDataFrame
-#' @export
-sp.DissolveLines <- function(sp){
-  msg='sp.DissolveLines::'
-  id2Line <- function(id, key){
-    lp=key
-    ct = count(as.numeric(id))
-    cn = as.numeric( names(ct))
-    # ctf = count(id[,1]) #count of frNode
-    # ctt = count(id[,2])
-    lfr = which(id[,1] == key)
-    pto = which( cn == id[lfr,2] )
-    if( ct[pto] == 2 ) {
-      # 1 - header/outlet, >2 - joint point
-      # message(msg, key, '\t', pto)
-      ret = id2Line(id, key = pto)
-      return (c(lp, ret) )
-    }else{
-      return(c(key, cn[pto]) )
-    }
-  }
-  cdu = extractCoords(sp, unique = T)
-  ft=FromToNode(sp, coord = cdu)
-  ct= count(ft)
-  pnode = as.numeric(names(ct))[which(ct != 2)]
-
-  # plot(sp)
-  sl=list()
-  k=0
-  nnode = length(pnode)
-  for(i in 1:nnode ){
-    key = pnode[i]
-    points(cdu[key, 1], cdu[key, 2], pch=20)
-    if( length(which(ft[,1] == key)) > 0){
-      k = k +1
-      # message(msg, k, '\t', i, '/', nnode )
-      ids = id2Line(ft, key)
-      # cdf[ids] = k
-      points(cdu[ids, ], col=k, pch=k)
-      # text(cdu[ids[1], 1], cdu[ids[1], 2], paste(k), col=2 )
-      ln = sp::Line( cdu[ids,] )
-      sl[[k]] = sp::Lines(ln, ID=paste(k) )
-    }else{
-      # print(key)
-    }
-  }
-  sll = sp::SpatialLines(sl)
-  # ord= sp.RiverOrder(sll)
-  df = data.frame('INDEX'=1:length(sl))
-  sld = sp::SpatialLinesDataFrame(sll, data = df)
-  sld
-}
+#' 
+#' #' Dissolve River segments
+#' #' \code{sp.RiverDissolve}
+#' #' @param sp SpatialLines
+#' #' @return SpatialLinesDataFrame
+#' #' @export
+#' sp.DissolveLines <- function(sp){
+#'   msg='sp.DissolveLines::'
+#'   id2Line <- function(id, key){
+#'     lp=key
+#'     ct = count(as.numeric(id))
+#'     cn = as.numeric( names(ct))
+#'     # ctf = count(id[,1]) #count of frNode
+#'     # ctt = count(id[,2])
+#'     lfr = which(id[,1] == key)
+#'     pto = which( cn == id[lfr,2] )
+#'     if(length(pto)>0){
+#'       if( ct[pto] == 2 ) {
+#'         # 1 - header/outlet, >2 - joint point
+#'         # message(msg, key, '\t', pto)
+#'         ret = id2Line(id, key = pto)
+#'         return (c(lp, ret) )
+#'       }else{
+#'         return(c(key, cn[pto]) )
+#'       }
+#'     }else{
+#'       return(c(key, cn[pto]) )
+#'     }
+#'   }
+#'   cdu = extractCoords(sp, unique = T)
+#'   ft=FromToNode(sp, coord = cdu)
+#'   ct= count(ft)
+#'   pnode = as.numeric(names(ct))[which(ct != 2)]
+#' 
+#'   # plot(sp)
+#'   sl=list()
+#'   k=0
+#'   nnode = length(pnode)
+#'   for(i in 1:nnode ){
+#'     key = pnode[i]
+#'     # points(cdu[key, 1], cdu[key, 2], pch=20)
+#'     if( length(which(ft[,1] == key)) > 0){
+#'       k = k +1
+#'       # message(msg, k, '\t', i, '/', nnode )
+#'       ids = id2Line(ft, key)
+#'       # cdf[ids] = k
+#'       # points(cdu[ids, ], col=k, pch=k)
+#'       # text(cdu[ids[1], 1], cdu[ids[1], 2], paste(k), col=2 )
+#'       ln = sp::Line( cdu[ids,] )
+#'       sl[[k]] = sp::Lines(ln, ID=paste(k) )
+#'     }else{
+#'       # print(key)
+#'     }
+#'   }
+#'   sll = sp::SpatialLines(sl)
+#'   # ord= sp.RiverOrder(sll)
+#'   df = data.frame('INDEX'=1:length(sl))
+#'   sld = sp::SpatialLinesDataFrame(sll, data = df)
+#'   sld
+#' }
 
 #' Find Shared points in SpatialLine*
 #' \code{SharedPoints}

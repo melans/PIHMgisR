@@ -20,6 +20,8 @@ hydrograph(x, legend.position = "bottom", unit = rep("", ncol(x)),
 \item{heights}{Heights of top (rainfall) figure and bottom (discharge) figure}
 
 \item{bg}{Whether plot the background rectangles.}
+
+\item{ylab}{ylab}
 }
 \description{
 Plot hydrograph

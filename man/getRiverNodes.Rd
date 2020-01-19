@@ -2,18 +2,18 @@
 % Please edit documentation in R/Func_Get.R
 \name{getRiverNodes}
 \alias{getRiverNodes}
-\title{Get the centroids of the cells
-\code{getCentroid}}
+\title{Get the From/To nodes of the river.
+\code{getRiverNodes}}
 \usage{
 getRiverNodes(spr = readriv.sp())
 }
 \arguments{
-\item{pm}{\code{PIHM.mesh}}
+\item{spr}{SpatialLine* of river streams.}
 }
 \value{
-centroids of \code{PIHM.mesh}, ncell x 4 c('x','y','AqD', 'zmax')
+a list, c(points, FT_ID)
 }
 \description{
-Get the centroids of the cells
-\code{getCentroid}
+Get the From/To nodes of the river.
+\code{getRiverNodes}
 }

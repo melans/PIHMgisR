@@ -9,7 +9,8 @@ BasicPlot(varname = c(paste0("eley", c("surf", "unsat", "gw")),
   "etev", "ettr", "etic")), paste0("rivq", c("down", "sub", "surf")),
   paste0("rivy", "stage")), sp.riv = NULL,
   rdsfile = file.path(get("outpath", envir = .pihm), "BasicPlot.RDS"),
-  plot = TRUE, imap = FALSE, iRDS = TRUE, return = T)
+  plot = TRUE, imap = FALSE, iRDS = TRUE, return = T,
+  w.focal = matrix(1/9, 3, 3))
 }
 \arguments{
 \item{varname}{vector of output keywords}

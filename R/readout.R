@@ -73,7 +73,7 @@ BasicPlot <- function(
   sp.riv=NULL,
   rdsfile = file.path(get('outpath', envir = .pihm), 'BasicPlot.RDS'),
   plot=TRUE, imap=FALSE, iRDS = TRUE,
-  return=T){
+  return=T, w.focal=matrix(1/9, 3, 3)){
   msg='BasicPlot::'
   graphics.off()
   varname = tolower(varname)
@@ -120,10 +120,16 @@ BasicPlot <- function(
         fn= paste0('Map.', prjname,'_', vn, '.png')
         y = colMeans(x)
         png(file.path(path, fn), width=11, height=9, res=100, units = 'in')
-        map2d(y)
+        # map2d(y)
+        r = MeshData2Raster(y, stack=FALSE)
+        if(!is.null(w.focal)){
+          r = raster::focal(r, w=w.focal)
+        }
+        raster::plot(r)
         if(!is.null(sp.riv)){
           raster::plot(sp.riv, col=rgb(1,0,0,0.7), lwd=2, add=T)
         }
+        title(paste0(att[i, 1], ' (', att[i,3], ')'))
         dev.off()
       }
     }

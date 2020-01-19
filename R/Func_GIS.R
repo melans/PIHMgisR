@@ -8,7 +8,7 @@
 #' @return Raster map
 #' @export
 sp2raster <- function (sp, mask = get('PIHM.MASK', envir = .pihm),
-                       ngrids=200,
+                       ngrids=200, 
                        resolution=NULL, field=1) {
   if( is.null(mask) ){
     ext <-  raster::extent (sp)
@@ -31,37 +31,35 @@ sp2raster <- function (sp, mask = get('PIHM.MASK', envir = .pihm),
 #' Generate the raster mask of Mesh domain
 #' \code{PIHM.mask}
 #' @param pm \code{PIHM.mesh}
-#' @param ngrids Number of grid along x direction.
+#' @param n Number of grid
 #' @param rr Default mask in .pihm environment
-#' @param resolution Resolution, defaul = NULL, resolution = extent / ngrids
-#' @param proj Projection parameter
+#' @param cellsize Resolution, defaul = NULL, resolution = extent / ngrids
+#' @param crs Projection parameter
 #' @return Raster map
 #' @export
-PIHM.mask  <- function (pm = readmesh(), proj=NULL,
+PIHM.mask  <- function (pm = readmesh(), crs=NULL,
                         rr = get('PIHM.MASK', envir=.pihm),
-                        ngrids=200, resolution=NULL){
+                        n=40000, cellsize=NULL){
   # mesh=readmesh(shp=TRUE); ngrids=100; resolution=0
   if(is.null(rr)){
-    sp = sp.mesh2Shape(pm)
-
-    ext <-  raster::extent (sp)
-    xlim=ext[1:2]
-    ylim=ext[3:4]
-    if ( resolution<=0 || is.null(resolution)){
-      dx=diff(xlim) / ngrids;
+    spm =sp.mesh2Shape(pm)
+    sp0=rgeos::gUnaryUnion(spm)
+    if(is.null(cellsize)){
+      # grd <- as.data.frame(sp::spsample(spm, "regular", n=n))
+      # grd <- as.data.frame(sp::spsample(spm, "regular", nsig=2, n=n))
+      grd <- sp::makegrid(sp0, n = n)
     }else{
-      dx=resolution
+      # grd <- as.data.frame(sp::spsample(spm, "regular", cellsize = cellsize))
+      grd <- sp::makegrid(sp0, cellsize = cellsize)
     }
-    r <- raster::raster(ext, res=dx)
-    spd = rgeos::gUnionCascaded(sp)
-    rr <-raster::rasterize(spd, r)
-    # raster::plot(spd)
-    # raster::plot(rr, add=TRUE)
-    # saveRDS(file=RDSfile, r)
-    # }
-    # assign("PIHM.MASK",rr, envir = .pihm)
-    if(!is.null(proj)){
-      raster::crs(rr) = proj
+    names(grd)       <- c("X", "Y")
+    coordinates(grd) <- c("X", "Y")
+    gridded(grd)     <- TRUE  # Create SpatialPixel object
+    fullgrid(grd)    <- TRUE  # Create SpatialGrid object
+    rr=raster::raster(grd); rr[]=1
+    rr=raster::mask(rr, sp0)
+    if(!is.null(crs)){
+      raster::crs(rr) = crs
     }
     assign('PIHM.MASK', rr, envir=.pihm)
   }else{
@@ -75,18 +73,26 @@ PIHM.mask  <- function (pm = readmesh(), proj=NULL,
 #' @param x vector or matrix, length/nrow is number of cells.
 #' @param rmask mask of PIHM mesh
 #' @param stack Whether export the stack, only when the x is a matrix, i.e. (Ntime x Ncell).
-#' @param proj Projejction parameter
+#' @param crs Projejction parameter
 #' @param pm PIHM mesh
 #' @param plot Whether plot the result.
 #' @return Raster map
 #' @export
 MeshData2Raster <- function(x=getElevation(),
-                            rmask=PIHM.mask(proj=proj), pm=readmesh(), proj=NULL,
+                            rmask=PIHM.mask(crs=crs), 
+                            pm=readmesh(), crs=NULL,
                             stack=FALSE,
                             plot =FALSE){
-
+  msg = 'MeshData2Raster:'
   if(stack){
-    ret <- raster::stack(apply(x, 1, FUN = PIHMgisR::MeshData2Raster) )
+    sl = list()
+    nx = nrow(x)
+    for(i in 1:nx){
+      message(msg, 'RasterStack ', i, '/', nx)
+      sl[[i]] = PIHMgisR::MeshData2Raster(x[i, ], rmask=rmask, pm=pm,
+                                          crs=crs, stack=FALSE, plot=FALSE)
+    }
+    ret <- raster::stack(sl)
   }else{
     if( is.matrix(x) | is.data.frame(x)){
       x = as.numeric(x[nrow(x),])
@@ -98,19 +104,45 @@ MeshData2Raster <- function(x=getElevation(),
       x[is.infinite(x)] = 0
     }
     xy=getCentroid(pm=pm)[,2:3]
+    val= data.frame(xy, x)
+    colnames(val) = c('X', 'Y', 'Z')
+    sp::coordinates(val) = c('X', 'Y')
+    grd=methods::as(rmask, 'SpatialGrid')
+    
+    # if(grepl(method, 'idw')){
+      # Interpolate the grid cells using a power value of 2 (idp=2.0)
+      # dat <- gstat::idw(Z ~ 1, val, newdata=grd, idp=2.0)
+      # r = raster::raster(dat); plot(r)
+    # }else{
+    #   xlim=diff(range(xy[,1], na.rm = TRUE))
+    #   ylim=diff(range(xy[,2], na.rm = TRUE))
+    #   f.1 <- as.formula(Z ~ 1) 
+    #   # Compute the sample variogram; note that the f.1 trend model is one of the
+    #   # parameters passed to variogram(). This tells the function to create the 
+    #   # variogram on the de-trended data.
+    #   var.smpl <- gstat::variogram(f.1, val, cloud = FALSE,
+    #                                cutoff=xlim/1)
+    #   # Compute the variogram model by passing the nugget, sill and range values
+    #   # to fit.variogram() via the vgm() function.
+    #   dat.fit  <- gstat::fit.variogram(var.smpl, fit.ranges = FALSE, fit.sills = FALSE,
+    #                                    gstat::vgm( model="Gau", nugget=0))
+    #   plot(var.smpl, dat.fit)
+    #   dat <- gstat::krige( f.1, val, grd, dat.fit)
+    #   
+    #   r = raster::raster(dat);plot(r)
+    # }
     tps <- fields::Tps(xy, x)
-
     # use model to predict values at all locations
     r <- raster::interpolate(rmask, tps)
+    # r = raster::raster(dat)
     ret <- raster::mask(r,rmask)
   }
   if(plot){
     raster::plot(ret)
   }
+  if(!is.null(crs)){ raster::crs(ret) <- crs }
   return(ret)
 }
-
-
 #' Remove the holes in polygons
 #' \code{removeholes}
 #' @param sp SpatialPolygons or SpatialPolygonDataFrame

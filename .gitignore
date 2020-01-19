@@ -6,3 +6,11 @@ src/*.o
 src/*.so
 src/*.dll
 inst/doc
+input
+output
+.*
+Experiments
+function
+man/.*
+pushgithub.sh
+ET_PenmanMonteith.csv

@@ -6,7 +6,7 @@
 \code{PIHM.mask}}
 \usage{
 PIHM.mask(pm = readmesh(), proj = NULL, rr = get("PIHM.MASK", envir =
-  .pihm), ngrids = 200, resolution = NULL)
+  .pihm), n = 40000, cellsize = NULL)
 }
 \arguments{
 \item{pm}{\code{PIHM.mesh}}
@@ -15,9 +15,9 @@ PIHM.mask(pm = readmesh(), proj = NULL, rr = get("PIHM.MASK", envir =
 
 \item{rr}{Default mask in .pihm environment}
 
-\item{ngrids}{Number of grid along x direction.}
+\item{n}{Number of grid}
 
-\item{resolution}{Resolution, defaul = NULL, resolution = extent / ngrids}
+\item{cellsize}{Resolution, defaul = NULL, resolution = extent / ngrids}
 }
 \value{
 Raster map

@@ -134,7 +134,7 @@ hydrograph <- function(x, legend.position='bottom', unit = rep('', ncol(x)),
 #' x=as.xts(sin(1:1000 / 100), order.by=xd)
 #' plot_tsd(x)
 plot_tsd <- function(x, time.col='year'){
-  stats::time(x) = as.POSIXct(stats::time(x) )
+  zoo::index(x) = as.POSIXct(stats:::time(x) )
   tx = stats::time(x)
   if(grepl(time.col,'year')){
     ty = format(tx, '%Y')

@@ -2,20 +2,23 @@
 % Please edit documentation in R/GIS_RiverProcess.R
 \name{sp.RiverPath}
 \alias{sp.RiverPath}
-\title{determine River path
+\title{determine River path, disolve the river network based on downstream-relationship.
 \code{sp.RiverPath}}
 \usage{
-sp.RiverPath(sp, idown = sp.RiverDown(sp, coord = coord))
+sp.RiverPath(sp, coord = extractCoords(sp, unique = TRUE),
+  idown = sp.RiverDown(sp, coord = coord))
 }
 \arguments{
 \item{sp}{SpatialLines*}
 
-\item{idown}{coordinates of \code{sp}.}
+\item{coord}{coordinates of \code{sp}.}
+
+\item{idown}{downstream index of \code{sp}.}
 }
 \value{
-List of River Path
+List of River Path(SegIDs, PointIDs, sp)
 }
 \description{
-determine River path
+determine River path, disolve the river network based on downstream-relationship.
 \code{sp.RiverPath}
 }

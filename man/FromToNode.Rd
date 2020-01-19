@@ -5,7 +5,7 @@
 \title{return the FROM and TO nodes index of the SpatialLines
 \code{FromToNode}}
 \usage{
-FromToNode(sp, coord = extractCoords(sp))
+FromToNode(sp, coord = extractCoords(sp, unique = TRUE))
 }
 \arguments{
 \item{sp}{SpatialLines*}

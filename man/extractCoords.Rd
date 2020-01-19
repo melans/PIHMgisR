@@ -21,13 +21,3 @@ coordinates of points, m x 2.
 extract Coordinates of SpatialLines or  SpatialPolygons
 \code{extractCoords}
 }
-\examples{
-data('sh')
-wb=sh[['wbd']]
-p1=extractCoords(wb, aslist = TRUE)
-p2=extractCoords(wb, aslist = FALSE)
-plot(p2, asp=1)
-for(i in 1:length(p1)){
-  lines(p1[[i]], col=i+1)
-}
-}

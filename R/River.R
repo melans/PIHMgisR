@@ -240,3 +240,23 @@ getOutlets <- function(pr=readriv()){
   ids = which(idown < 0)
   ids
 }
+
+#' Get Index of critical river channels, that is defined as downstream of river convergence.
+#' \code{getCriticalRiver}
+#' @param pr PIHM river class
+#' @return Index of Critical River Channels, numeric
+#' @export
+getCriticalRiver<- function(pr=readriv()){
+  pr=readriv()
+  riv = pr@river
+  head(riv)
+  t1 = riv$Type
+  idown = pr@river[,'Down']
+  idown[idown < 0] = 1
+  t2 = riv$Type[idown]
+  id = which(t2 > t1)
+  oid=getOutlets(pr=pr)
+  rr = sort(unique(c(idown[id], oid)))
+  return(rr)
+}
+

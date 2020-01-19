@@ -20,9 +20,10 @@ LogicalVector rowMatch(NumericVector x, NumericMatrix m) {
   for(i = 0; i < nr; i++){
     // std::cout << m(i, 0) << "\t" << m(i,1) << std::endl;
     // std::cout << x(0) << "\t" << x(1) << std::endl;
-    if( m(i, 0) == x[1] && m(i, 1) == x(0) ){
-      out(i) = true;
-    }else if( m(i, 1) == x[1] && m(i, 0) == x(0)  ){
+//    if( m(i, 0) == x[1] && m(i, 1) == x[0] ){
+//      out(i) = true;
+//    }else
+    if( m(i, 1) == x[1] && m(i, 0) == x[0]  ){
       out(i) = true;
     }
   }

@@ -83,7 +83,7 @@ wb.riv <-function(
   # fun = xts::apply.daily
 
   func <-function(x, w){
-    aa= sum(ia)
+    # aa= sum(ia)
     y = sweep(x, 2, w, '*')
   }
   ia=getArea()
@@ -104,7 +104,7 @@ wb.riv <-function(
   # plot(dh)
 
   x=cbind(dh, q3)
-  colnames(x)=c('DH', 'Qout','Qin_sf','Qin_gw')
+  colnames(x)=c('DH_m/d', 'Qout_m/d','Qin_sf_m/d','Qin_gw_m/d')
   if(plot){
     hydrograph(x)
   }

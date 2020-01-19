@@ -38,15 +38,6 @@ Eudist <- function(p1,p2){
 #' @param aslist Whether return as list of coordinates
 #' @return coordinates of points, m x 2.
 #' @export
-#' @examples
-#' data('sh')
-#' wb=sh[['wbd']]
-#' p1=extractCoords(wb, aslist = TRUE)
-#' p2=extractCoords(wb, aslist = FALSE)
-#' plot(p2, asp=1)
-#' for(i in 1:length(p1)){
-#'   lines(p1[[i]], col=i+1)
-#' }
 extractCoords<-function(x, unique=TRUE, aslist = FALSE){
   spl <- methods::as(x, "SpatialLines")
   spp <- methods::as(spl, "SpatialPoints")
@@ -57,18 +48,6 @@ extractCoords<-function(x, unique=TRUE, aslist = FALSE){
     ret = pts
   }
   return(ret)
-  # pl = lapply(sp::coordinates(spl),
-  #             function(x) t(matrix(unlist(x), nrow =2, byrow = TRUE) ) )
-  # if(aslist){
-  #   ret = pl
-  # }else{
-  #   pts = do.call(rbind, pl)
-  #   if (unique){
-  #     ret = unique(pts)
-  #   }else{
-  #     ret = pts
-  #   }
-  # }
 }
 
 #' Convert the \code{xy} (X,Y) into Index in \code{coords}

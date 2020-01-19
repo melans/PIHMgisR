@@ -58,7 +58,7 @@ autoPIHMgis <- function(
 
   inapth = file.path(prjname)
 
-  fin <- PIHM.filein(prjname, indir = pihmout)
+  fin <- PIHM.filein(prjname, inpath = pihmout)
   x=list.files(pihmout, pattern = utils::glob2rx(paste0(prjname, '.*.*')), full.names = T)
 
   pngout = file.path(pihmout, 'fig')
