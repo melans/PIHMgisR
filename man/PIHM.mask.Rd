@@ -5,13 +5,13 @@
 \title{Generate the raster mask of Mesh domain
 \code{PIHM.mask}}
 \usage{
-PIHM.mask(pm = readmesh(), proj = NULL, rr = get("PIHM.MASK", envir =
+PIHM.mask(pm = readmesh(), crs = NULL, rr = get("PIHM.MASK", envir =
   .pihm), n = 40000, cellsize = NULL)
 }
 \arguments{
 \item{pm}{\code{PIHM.mesh}}
 
-\item{proj}{Projection parameter}
+\item{crs}{Projection parameter}
 
 \item{rr}{Default mask in .pihm environment}
 
