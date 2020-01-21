@@ -1,4 +1,7 @@
-# PIHMgisR --- PIHMgis tool in R
+# PIHMgisR --- PIHM GIS tool in R
+
+*Notice*: This version of PIHMgisR will not be updated anymore.  
+The newer version of the modeling system is transferred to [SHUD project](https://shud.xyz) via [www.shud.xyz](www.shud.xyz). 
 
 - Lele Shu (lele.shu@gmail.com)
 - www.pihm.psu.edu
