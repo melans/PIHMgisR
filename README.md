@@ -3,10 +3,10 @@
 *Notice*: This version of PIHMgisR will not be updated anymore.  
 The newer version of the modeling system is transferred to [SHUD project](https://shud.xyz) via [www.shud.xyz](www.shud.xyz). 
 
-- Lele Shu (lele.shu@gmail.com)
-- www.pihm.psu.edu
 
 ## PIHM
+- www.pihm.psu.edu
+
 The Penn State Integrated Hydrologic Model (PIHM) is a multiprocess, multi-scale hydrologic model where the major hydrological processes are fully coupled using the semi-discrete finite volume method. 
 
 This package can be used with the AutoPIHM project, that can build modeling domain automatically.
